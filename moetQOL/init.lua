@@ -3,44 +3,37 @@
 ---------------------------------------------------
 local _, ns			= ... -- namespace
 _G.moetQOLDB		= moetQOLDB or {} -- database
-local addonVersion	= "1.0"
+local addonVersion	= "1.2b"
+local shortcut		= "/mq"
 local color			= "00CC0F00" -- red
 local color2		= "FF00FF00" -- green
-local shortcut		= "/mq"
 local welcomeMSG	= string.format("|c%s%s|r to turn features on/off.", color, shortcut)
 
+
+-- TODO Add dymanic info to LuaErrors state, so it doesnt show off after reset/first install
 local default = {
 							-- value[1] = state, value[2] = description
 	["maxzoom"]				= {"Off", "sets camera distance to max"},
 	["hideportraitnumbers"]	= {"Off", "show/hide combat numbers on your portrait"},
 	["fastloot"]			= {"Off", "faster auto looting"},
 	["errormsg"]			= {"Off", "show/hide red error messages"},
-	["easydelete"]			= {"Off", "remove the need to type 'delete' on rare+ items"}
+	["easydelete"]			= {"Off", "remove the need to type 'delete' on rare+ items"},
+	["luaerrors"]			= {"Off", "turn LUA Errors on/off"},
 }
 
 ---------------------------------------------------
 -- CUSTOM SLASH COMMANDS
 ---------------------------------------------------
-local commands = {
+local mqCommands = {
 	["help"] = function()
-		print("List of commands:")
-		print("/mq |c" .. color2 .. "flags|r - to show your current settings.")
-		print("/mq |c" .. color2 .. "hardreset|r - to reset all saved settings to default (off).")
-		print(" ")
+		ns.Core.PrintHelp()
 		for key, value in pairs(default) do
 			print(string.format("/mq |c%s%s|r - %s.", color, key, value[2]))
 		end
 	end,
 
 	["flags"] = function()
-		print(" ")
-		for key, value in pairs(moetQOLDB) do
-			if (value[1] == "Off") then
-				print(string.format("|c%s%s|r: %s", color, key, value[1]))
-			else
-				print(string.format("|c%s%s|r: |c%s%s|r", color, key, color2, value[1]))
-			end
-		end
+		ns.Core.PrintFlags()
 	end,
 
 	["hardreset"] = function()
@@ -67,6 +60,16 @@ local commands = {
 		ChangeFlag(self)
 	end,
 
+	-- sell[arg] is not recognized as function in HandleSlashCommands (is nil)
+	-- unless wrapped in function; TODO FIX THAT ugly ass wrapping
+	["luaerrors"] = function()
+		ns.Core.FlipLuaErrorsFlag()
+	end,
+
+	-- not added to help automatically atm
+	["sell"] = function() 
+		ns.Core.SellGreyItems()
+	end,
 }
 
 ---------------------------------------------------
@@ -81,24 +84,26 @@ function ChangeFlag(str)
 	if (moetQOLDB[str][1] == "On") then
 		moetQOLDB[str][1] = "Off"
 		print("|c" .. color .. str .. "|r: Off")
-	else
+	elseif (moetQOLDB[str][1] == "Off") then
 		moetQOLDB[str][1] = "On"
 		print(string.format(
 			"|c%s%s|r: |c%sOn|r - Make sure you |c%s/reload|r for the change to take effect.", 
 			color, str, color2, color)
 		)
+	else
+		print("Requested ChangeFlag: " .. tostring(moetQOLDB[str][1]))
+		return
 	end
 end
 
 local function HandleSlashCommands(str)
 	if (#str == 0) then -- player entered /mq
-		commands.help()
+		mqCommands.help()
 	end
-
 	-- figure out what the player wrote
 	-- insert each word into a table and remove any spaces
 	local args = {}
-	local path = commands
+	local path = mqCommands
 
 	for _, arg in ipairs({ string.split(' ', str) }) do
 		if (#arg > 0) then
@@ -122,7 +127,7 @@ local function HandleSlashCommands(str)
 					path = path[arg] -- enter found subtable
 				end
 			else
-				commands.help()
+				mqCommands.help()
 				return
 			end
 		end
@@ -145,6 +150,7 @@ function ns:UpdateDataBaseDescriptions()
 	end
 end
 
+-- first function to run on ADDON_LOADED
 function ns:init(event, name)
 	if (name ~= "moetQOL") then return end -- checks if the correct addon loaded
 
@@ -153,7 +159,7 @@ function ns:init(event, name)
 
 	ns.CheckDataBaseForNil()
 	ns.UpdateDataBaseDescriptions()
-	ns.ActivateFunctions()
+	ns.Core.ActivateFunctions()
 
 	print("|c" .. color .. "moetQOL" .. "|r loaded: Version " .. addonVersion .. ".")
 	print(welcomeMSG)

@@ -2,9 +2,9 @@
 
 ## Title: moetQOL
 ## Author: moet
-## Version: 1.0
+## Version: 1.2b
 ## Notes: Lightweight quality of life improvements.
 ## SavedVariables: moetQOLDB
 
-init.lua
 core.lua
+init.lua
