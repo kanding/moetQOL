@@ -1,29 +1,36 @@
 ---------------------------------------------------
 -- SETUP
+-- TODO: FIX NAMING OF KEYS (if u change keyname it wont update DB)
 ---------------------------------------------------
 local _, ns			= ... -- namespace
 _G.moetQOLDB		= moetQOLDB or {} -- database
-local addonVersion	= "1.2b"
+local addonVersion	= GetAddOnMetadata("moetQOL", "Version")
 local shortcut		= "/mq"
 local color			= "00CC0F00" -- red
 local color2		= "FF00FF00" -- green
 local welcomeMSG	= string.format("|c%s%s|r to turn features on/off.", color, shortcut)
+local statesChanged = 0 -- avoid spamming with /reload requests
 
-
--- TODO Add dymanic info to LuaErrors state, so it doesnt show off after reset/first install
 local default = {
 							-- value[1] = state, value[2] = description
 	["maxzoom"]				= {"Off", "sets camera distance to max"},
-	["hideportraitnumbers"]	= {"Off", "show/hide combat numbers on your portrait"},
+	["portraitnumbers"]		= {"Off", "show/hide combat numbers on your portrait"},
 	["fastloot"]			= {"Off", "faster auto looting"},
 	["errormsg"]			= {"Off", "show/hide red error messages"},
 	["easydelete"]			= {"Off", "remove the need to type 'delete' on rare+ items"},
-	["luaerrors"]			= {"Off", "turn LUA Errors on/off"},
+	["voicebuttons"]		= {"Off", "show/hide Voice chat buttons"},
+	["skipmovies"]			= {"Off", "auto skip all cutscenes"},
+	["borders"]				= {"Off", "hides some Blizzard UI borders"},
+	["infostring"]			= {"Off", "shows MS and FPS beneath minimap"},
+	["sell"]				= {"Off", "adds a button on merchants to sell grey items"},
+	["scrap"]				= {"Off", "adds a button on the scrapping machine to insert scrap"}
 }
 
 ---------------------------------------------------
 -- CUSTOM SLASH COMMANDS
 ---------------------------------------------------
+-- sell[arg] is not recognized as function in HandleSlashCommands (is nil)
+-- unless wrapped in function
 local mqCommands = {
 	["help"] = function()
 		ns.Core.PrintHelp()
@@ -38,44 +45,60 @@ local mqCommands = {
 
 	["hardreset"] = function()
 		moetQOLDB = default
-	end,
-
-	["maxzoom"] = function(self)
-		ChangeFlag(self)
-	end,
-
-	["hideportraitnumbers"] = function(self)
-		ChangeFlag(self)
-	end,
-	
-	["fastloot"] = function(self)
-		ChangeFlag(self)
-	end,
-
-	["errormsg"] = function(self)
-		ChangeFlag(self)
-	end,
-
-	["easydelete"] = function(self)
-		ChangeFlag(self)
-	end,
-
-	-- sell[arg] is not recognized as function in HandleSlashCommands (is nil)
-	-- unless wrapped in function; TODO FIX THAT ugly ass wrapping
-	["luaerrors"] = function()
-		ns.Core.FlipLuaErrorsFlag()
+		print(string.format("|c%smq:|r Database set to default, values set to Off.", color))
 	end,
 
 	-- not added to help automatically atm
-	["sell"] = function() 
-		ns.Core.SellGreyItems()
+	["sell"] = function(self)
+		ChangeState(self)
 	end,
+
+	["maxzoom"] = function(self)
+		ChangeState(self)
+	end,
+
+	["portraitnumbers"] = function(self)
+		ChangeState(self)
+	end,
+	
+	["fastloot"] = function(self)
+		ChangeState(self)
+	end,
+
+	["errormsg"] = function(self)
+		ChangeState(self)
+	end,
+
+	["easydelete"] = function(self)
+		ChangeState(self)
+	end,
+
+	["voicebuttons"] = function(self)
+		ChangeState(self)
+	end,
+
+	["skipmovies"] = function(self)
+		ChangeState(self)
+	end,
+
+	["borders"] = function(self)
+		ChangeState(self)
+	end,
+
+	["infostring"] = function(self)
+		ChangeState(self)
+	end,
+
+	["scrap"] = function(self)
+		ChangeState(self)
+	end,
+	
 }
 
 ---------------------------------------------------
 -- FUNCTIONS
 ---------------------------------------------------
-function ChangeFlag(str)
+function ChangeState(str)
 	if (str == nil) then
 		print("string was nil in ChangeState.")
 		return
@@ -84,15 +107,21 @@ function ChangeFlag(str)
 	if (moetQOLDB[str][1] == "On") then
 		moetQOLDB[str][1] = "Off"
 		print("|c" .. color .. str .. "|r: Off")
+		statesChanged = statesChanged + 1
 	elseif (moetQOLDB[str][1] == "Off") then
 		moetQOLDB[str][1] = "On"
-		print(string.format(
-			"|c%s%s|r: |c%sOn|r - Make sure you |c%s/reload|r for the change to take effect.", 
-			color, str, color2, color)
-		)
+		print("|c" .. color .. str .. "|r: |c" .. color2 .. "On|r")
+		statesChanged = statesChanged + 1
 	else
-		print("Requested ChangeFlag: " .. tostring(moetQOLDB[str][1]))
+		print("Requested ChangeState: " .. tostring(moetQOLDB[str][1]))
 		return
+	end
+	-- only 1 reload needed per set of changes
+	if (statesChanged == 1) then
+		print(string.format(
+			"|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", 
+			color, color2)
+		)
 	end
 end
 
@@ -134,7 +163,7 @@ local function HandleSlashCommands(str)
 	end
 end
 
-function ns:CheckDataBaseForNil()
+local function CheckDataBaseForNil()
 	for key, value in pairs(default) do
 		if (moetQOLDB[key] == nil) then
 			moetQOLDB[key] = value
@@ -142,12 +171,20 @@ function ns:CheckDataBaseForNil()
 	end
 end
 
-function ns:UpdateDataBaseDescriptions()
+local function UpdateDataBaseDescriptions()
 	for key, value in pairs(default) do
 		if (moetQOLDB[key][2] ~= default[key][2]) then
 			moetQOLDB[key][2] = default[key][2]
 		end
 	end
+end
+
+function ns:GetDefaultTableCount() 
+	local count = 0
+	for _ in pairs(default) do
+		count = count + 1
+	end
+	return count
 end
 
 -- first function to run on ADDON_LOADED
@@ -157,8 +194,9 @@ function ns:init(event, name)
 	SLASH_moetQOL1 = shortcut
 	SlashCmdList.moetQOL = HandleSlashCommands
 
-	ns.CheckDataBaseForNil()
-	ns.UpdateDataBaseDescriptions()
+	CheckDataBaseForNil()
+	UpdateDataBaseDescriptions()
+	-- ns.CheckDataBaseKeyNames()
 	ns.Core.ActivateFunctions()
 
 	print("|c" .. color .. "moetQOL" .. "|r loaded: Version " .. addonVersion .. ".")

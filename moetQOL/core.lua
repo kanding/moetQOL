@@ -1,10 +1,7 @@
 ---------------------------------------------------
 -- TODO
 ---------------------------------------------------
--- remove class colouring in chat
--- only suggest /reload if actually needed (if user flip once without change)
--- add FPS / garbage collector / MS , rInfoStrings replacement
--- HIDE CHAT BUTTONS
+-- make infostrings dragable
 ---------------------------------------------------
 -- SETUP
 ---------------------------------------------------
@@ -15,46 +12,24 @@ local fColor		= "00CC0F00" -- red
 local fColor2		= "FF00FF00" -- green
 
 ---------------------------------------------------
--- FUNCTIONS (see helper functions below)
+-- HELPER FUNCTIONS (see main function below)
 ---------------------------------------------------
--- main function will fire on load and activate all features that are On
-function Core:ActivateFunctions()
-	if (moetQOLDB["maxzoom"][1] == "On") then
-		SetCVar("cameraDistanceMaxZoomFactor", 2.6)
-	end
-
-	if (moetQOLDB["hideportraitnumbers"][1] == "On") then
-		ns.Core.HidePortraitNumbers()
-	end
-
-	if (moetQOLDB["fastloot"][1] == "On") then
-		ns.Core.EnableFastLoot()
-	end
-
-	-- NOTE: This still shows UI_INFO_MESSAGES
-	if (moetQOLDB["errormsg"][1] == "On") then
-		UIErrorsFrame:UnregisterEvent("UI_ERROR_MESSAGE")
-	end
-
-	-- EASY DELETE CONFIRM modified by moet
-	-- written by Kesava-Auchindoun, all credits go to creator
-	if (moetQOLDB["easydelete"][1] == "On") then
-		ns.Core.EnableEasyDelete()
-	end
-end
-
----------------------------------------------------
--- HELPER FUNCTIONS
----------------------------------------------------
-
 function Core:PrintFlags()
 	print(" ")
+	local tablecount = 0
 	for key, value in pairs(moetQOLDB) do
+		tablecount = tablecount + 1
 		if (value[1] == "Off") then
 			print(string.format("|c%s%s|r: %s", fColor, key, value[1]))
 		else
 			print(string.format("|c%s%s|r: |c%s%s|r", fColor, key, fColor2, value[1]))
 		end
+	end
+
+	if (tablecount > ns.GetDefaultTableCount()) then
+		print(string.format(
+		"You may have outdated keys, consider using |c%s/mq|r |c%shardreset|r", 
+		fColor, fColor2))
 	end
 end
 
@@ -62,17 +37,16 @@ function Core:PrintHelp()
 	print("List of commands:")
 	print("/mq |c" .. fColor2 .. "flags|r - to show your current settings.")
 	print("/mq |c" .. fColor2 .. "hardreset|r - to reset all saved settings to default (off).")
-	print("/mq |c" .. fColor2 .. "sell|r - sell up to 12 |cff9d9d9dGrey|r items to vendor at a time.")
 	print(" ")
 end
 
-function Core:HidePortraitNumbers()
+local function HidePortraitNumbers()
 	PlayerHitIndicator.Show = function() end
 	PetHitIndicator.Show = function() end
 	CombatFeedback_OnCombatEvent = function() end
 end
 
-function Core:EnableFastLoot()
+local function EnableFastLoot()
 	SetCVar("autoLootDefault", "1") -- set auto loot to enabled
 
 	local tDelay = 0 -- Time delay
@@ -95,7 +69,7 @@ function Core:EnableFastLoot()
 end
 
 -- TODO: rework so its not a function within a function URGH (^_^)>/
-function Core:EnableEasyDelete()
+local function EnableEasyDelete()
 	local deleteFrame = CreateFrame('Frame','EasyDeleteConfirmFrame')
 
 	function deleteFrame:DELETE_ITEM_CONFIRM(...) -- cant be local, calls to global
@@ -126,28 +100,13 @@ function Core:EnableEasyDelete()
 	deleteFrame:RegisterEvent('DELETE_ITEM_CONFIRM')
 end
 
-function Core:FlipLuaErrorsFlag()
-	if (GetCVar("ScriptErrors")=="1") then
-		SetCVar("ScriptErrors", "0")
-		moetQOLDB["luaerrors"][1] = "Off"
-		print("|c" .. fColor .. "luaerrors" .. "|r: Off")
-	else
-		SetCVar("ScriptErrors", "1")
-		moetQOLDB["luaerrors"][1] = "On"
-		print(string.format(
-		"|c%sluaerrors|r: |c%sOn|r - Make sure you |c%s/reload|r for the change to take effect.", 
-		fColor, fColor2, fColor))
-	end	
-end
-
---NOTE: this only sells 12 items at a time, rest will say
---object is busy.
-function Core:SellGreyItems()
+--NOTE: this only sells 12 items at a time, rest will say object is busy.
+local function SellGreyItems()
 	if (MerchantFrame:IsVisible()) then
 		for bag = 0, 4 do
 			for slot = 1, GetContainerNumSlots(bag) do
 				local item = GetContainerItemLink(bag, slot)
-				if item then
+				if (item ~= nil) then
 					local grey = string.find(item, "|cff9d9d9d") -- grey
 					if (grey) then
 						currPrice = (select(11, GetItemInfo(item)) or 0) * select(2, GetContainerItemInfo(bag, slot))
@@ -159,8 +118,322 @@ function Core:SellGreyItems()
 				end
 			end
 		end
-	else
-		print("|c" .. fColor .. "mq|r: You need to open trade with a merchant to sell.")
-		return
 	end
+end
+
+local function CreateSellButton()
+	--"UIGoldBorderButtonTemplate"
+	local merchantButton = CreateFrame("Button", "moetQOL_SellButton", MerchantFrame, "LFGListMagicButtonTemplate") 
+	merchantButton:SetPoint("BOTTOMLEFT", 87, 4)
+	merchantButton:SetText("Sell Greys")
+	merchantButton:SetScript("OnClick", function() 
+		SellGreyItems() 
+	end)
+end
+
+local function HideVoiceButtons()
+	local hiddenFrame = CreateFrame("Frame")
+	hiddenFrame:Hide()
+
+	ChatFrameMenuButton:SetParent(hiddenFrame)
+	ChatFrameChannelButton:SetParent(hiddenFrame)
+	ChatFrameToggleVoiceDeafenButton:SetParent(hiddenFrame)
+	ChatFrameToggleVoiceMuteButton:SetParent(hiddenFrame)
+end
+
+local function AutoCancelCutscenes()
+	CancelCutsceneFrame = CreateFrame("Frame")
+	CancelCutsceneFrame:RegisterEvent("CINEMATIC_START")
+	-- CancelCutsceneFrame:RegisterEvent("PLAY_MOVIE")
+
+	CancelEventLoop = CancelCutsceneFrame:CreateAnimationGroup()
+	CancelEventLoop.anim = CancelEventLoop:CreateAnimation()
+	CancelEventLoop.anim:SetDuration(2)
+	CancelEventLoop:SetLooping("REPEAT")
+	CancelEventLoop:SetScript("OnLoop", function(self, event, ...)
+		CancelEventLoop:Stop()
+		CinematicFrame_CancelCinematic()
+	end)
+
+	CancelCutsceneFrame:SetScript("OnEvent", function(self, event, ...)
+		CinematicFrame_CancelCinematic()
+		CancelEventLoop:Play()
+	end)
+end
+
+local function HideBlizzardBorders()
+	local hiddenFrame = CreateFrame("Frame")
+	hiddenFrame:Hide()
+
+	CastingBarFrame.Border:SetParent(hiddenFrame)
+	TargetFrameSpellBar.Border:SetParent(hiddenFrame)
+	MirrorTimer1Border:SetParent(hiddenFrame)
+end
+
+local function InfoStringsGetFps() 
+	return floor(GetFramerate()) .. "fps"
+end
+
+local function InfoStringsGetMs() 
+	return select(3, GetNetStats()) .. "ms"
+end
+
+local function memoryformat(number)
+	if number > 1024 then
+		return string.format("%.2fmb", (number / 1024))
+	else
+		return string.format("%.1fkb", floor(number))
+	end
+end
+
+-- from rInfoStrings by zork
+local function CleanGarbage()
+	UpdateAddOnMemoryUsage()
+	local before = gcinfo()
+	collectgarbage()
+	UpdateAddOnMemoryUsage()
+	local after = gcinfo()
+	print("Cleaned: "..memoryformat(before-after))
+end
+
+local function addoncompare(a, b)
+	return a.memory > b.memory
+end
+
+--function to create tooltip from rInfoStrings by zork
+local function InfoStringTooltip(self)
+	local addonlist = 50
+	local color = { r=156/255, g=144/255, b=125/255 }
+	GameTooltip:SetOwner(self, "ANCHOR_NONE")
+	GameTooltip:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -90, 90)
+	local blizz = collectgarbage("count")
+	local addons = {}
+	local memory
+	local total = 0
+	local nr = 0
+	UpdateAddOnMemoryUsage()
+	GameTooltip:AddLine("Top "..addonlist.." AddOns", color.r, color.g, color.b)
+	GameTooltip:AddLine(" ")
+	for i=1, GetNumAddOns(), 1 do
+		if (GetAddOnMemoryUsage(i) > 0 ) then
+		memory = GetAddOnMemoryUsage(i)
+		entry = {name = GetAddOnInfo(i), memory = memory}
+		table.insert(addons, entry)
+		total = total + memory
+		end
+	end
+	table.sort(addons, addoncompare)
+	for _, entry in pairs(addons) do
+		if nr < addonlist then
+		GameTooltip:AddDoubleLine(entry.name, memoryformat(entry.memory), 1, 1, 1, 1, 1, 1)
+		nr = nr+1
+		end
+	end
+	GameTooltip:AddLine(" ")
+	GameTooltip:AddDoubleLine("Total", memoryformat(total), color.r, color.g, color.b, color.r, color.g, color.b)
+	GameTooltip:AddDoubleLine("Total incl. Blizzard", memoryformat(blizz), color.r, color.g, color.b, color.r, color.g, color.b)
+	GameTooltip:Show()
+end
+
+-- pretty dirty, refactor .. later :^)
+local function CreateInfoStrings()
+	-- create clickable frame
+	local posFrame = CreateFrame("FRAME", "moetQOL_Infostring")
+	posFrame:RegisterEvent("PET_BATTLE_OPENING_START")
+	posFrame:RegisterEvent("PET_BATTLE_CLOSE")
+	posFrame:RegisterEvent("CINEMATIC_START")
+	posFrame:RegisterEvent("CINEMATIC_STOP")
+	posFrame:SetPoint("TOP", Minimap, "BOTTOM", 0, -15)
+	posFrame:SetWidth(60)
+	posFrame:SetHeight(15)
+	posFrame:EnableMouse(true)
+
+	-- add mouse events
+	posFrame:SetScript("OnMouseDown", function() CleanGarbage() end)
+	posFrame:SetScript("OnEnter", function() InfoStringTooltip(posFrame) end)
+	posFrame:SetScript("OnLeave", function() GameTooltip:Hide() end)
+	posFrame:SetScript("OnEvent", function(self, event, ...)
+		if event == "PET_BATTLE_OPENING_START" then
+			self:Hide()
+		elseif event == "PET_BATTLE_CLOSE" then
+			self:Show()
+		elseif event == "CINEMATIC_START" then
+			self:Hide()
+		elseif event == "CINEMATIC_STOP" then
+			self:Show()
+		else
+			print("Unknown event in infostrings:")
+			print(event)
+		end
+	end)
+
+	-- create text in frame
+	local frameFontString = posFrame:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
+	frameFontString:SetFont(STANDARD_TEXT_FONT, 7, "THINOUTLINE")
+	frameFontString:SetText(InfoStringsGetFps() .. "  " .. InfoStringsGetMs())
+	frameFontString:SetPoint("CENTER", posFrame)
+	frameFontString:SetHeight(frameFontString:GetStringHeight())
+	frameFontString:SetWidth(frameFontString:GetStringWidth() + 5)
+
+	-- create animation loop group
+	local infoStringEvents = CreateFrame("FRAME")
+	local infoAnimation = infoStringEvents:CreateAnimationGroup()
+	infoAnimation.anim = infoAnimation:CreateAnimation()
+	infoAnimation.anim:SetDuration(1)
+	infoAnimation:SetLooping("REPEAT")
+	infoAnimation:SetScript("OnLoop", function()
+		frameFontString:SetText(InfoStringsGetFps() .. " " .. InfoStringsGetMs())
+	end)
+
+	-- update text in frame on loop
+	infoStringEvents:RegisterEvent("ADDON_LOADED")
+	infoStringEvents:SetScript("OnEvent", function(self, event, ...)
+		if event == "ADDON_LOADED" then
+			infoAnimation:Play()
+		end
+	end)
+end
+
+local function IsScrappable(itemString)
+	local tooltipReader = CreateFrame("GameTooltip", "moetQOL_TooltipReader", nil, "GameToolTipTemplate")
+	tooltipReader:SetOwner(WorldFrame, "ANCHOR_NONE")
+
+	-- add check here if you want to blacklist items
+
+	tooltipReader:ClearLines()
+	tooltipReader:AddFontStrings(
+		tooltipReader:CreateFontString("$parentTextLeft1", nil, "GameTooltipText"),
+		tooltipReader:CreateFontString("$parentTextRight1", nil, "GameTooltipText")
+	)
+
+	if (itemString ~= nil) then
+		tooltipReader:SetHyperlink(itemString)
+		if (tooltipReader:NumLines() < 9) then
+			for i = tooltipReader:NumLines(), 1, -1 do
+				local tooltipText = _G["moetQOL_TooltipReaderTextLeft" .. i]
+				local line = tooltipText:GetText()
+				if line == "Cannot be Scrapped" then
+					return false
+				elseif line == "Scrappable" then
+					return true
+				end
+			end
+		else
+			for i = select("#", tooltipReader:GetRegions()), 1, -1 do
+				local region = select(i, tooltipReader:GetRegions())
+				if region and region:GetObjectType() == "FontString" and region:GetText() then 
+					local line = region:GetText()
+					if line == "Cannot be Scrapped" then
+						return false
+					elseif line == "Scrappable" then
+						return true
+					end
+				end 
+			end
+		end
+	end
+end
+
+local function InsertScrapItems()
+	for bag = 0, 4 do
+		for slot = 1, GetContainerNumSlots(bag) do
+			local item = GetContainerItemLink(bag, slot)
+			if (item ~= nil) then -- quick check if empty slot
+				if (IsScrappable(item)) then
+					UseContainerItem(bag, slot)
+				end
+			end
+		end
+	end
+end
+
+local function CreateScrapButton()
+	LoadAddOn("Blizzard_ScrappingMachineUI")
+	local scrapButton = CreateFrame("Button", "moetQOL_ScrapButton", ScrappingMachineFrame, "OptionsButtonTemplate")
+	scrapButton:SetPoint("CENTER", ScrappingMachineFrame, "TOP", 0, -45)
+	scrapButton:SetText("Insert Scrap")
+
+	local scrapCooldown = CreateFrame("Cooldown", "scrapButtonAntiSpam", scrapButton, "CooldownFrameTemplate")
+	scrapCooldown:SetAllPoints() -- sized exactly same as scrapButton
+
+	scrapButton:SetScript("OnClick", function() 
+		local duration = scrapCooldown:GetCooldownDuration()
+
+		if (UnitCastingInfo("player") ~= nil) then
+			print(string.format("|c%smq:|r You cannot insert items while actively scrapping, cancel your cast to refill.", fColor))
+			return
+		end
+
+		if duration ~= 0 then
+			return
+		end
+
+		scrapCooldown:SetCooldown(GetTime(), 1)
+		if (C_ScrappingMachineUI.HasScrappableItems()) then
+			C_ScrappingMachineUI.RemoveAllScrapItems()
+			print(string.format("|c%smq:|r Refilling..", fColor))
+			InsertScrapItems()
+			PlaySound(73919) -- UI_PROFESSIONS_NEW_RECIPE_LEARNED_TOAST
+			return
+		end
+
+		PlaySound(73919) -- UI_PROFESSIONS_NEW_RECIPE_LEARNED_TOAST
+		InsertScrapItems()
+	end)
+end
+
+---------------------------------------------------
+-- MAIN FUNCTION
+---------------------------------------------------
+-- will fire on load and activate all features that are On
+function Core:ActivateFunctions()
+	if (moetQOLDB["maxzoom"][1] == "On") then
+		SetCVar("cameraDistanceMaxZoomFactor", 2.6)
+	end
+
+	if (moetQOLDB["portraitnumbers"][1] == "On") then
+		HidePortraitNumbers()
+	end
+
+	if (moetQOLDB["fastloot"][1] == "On") then
+		EnableFastLoot()
+	end
+
+	-- NOTE: This still shows UI_INFO_MESSAGES
+	if (moetQOLDB["errormsg"][1] == "On") then
+		UIErrorsFrame:UnregisterEvent("UI_ERROR_MESSAGE")
+	end
+
+	-- EASY DELETE CONFIRM
+	-- written by Kesava-Auchindoun, all credits go to creator
+	if (moetQOLDB["easydelete"][1] == "On") then
+		EnableEasyDelete()
+	end
+
+	if (moetQOLDB["voicebuttons"][1] == "On") then
+		HideVoiceButtons()
+	end
+
+	if (moetQOLDB["skipmovies"][1] == "On") then
+		AutoCancelCutscenes()
+	end
+
+	if (moetQOLDB["borders"][1] == "On") then
+		HideBlizzardBorders()
+	end
+
+	-- from rInfostrings by zork in 50400
+	-- fixed for 80000
+	if (moetQOLDB["infostring"][1] == "On") then
+		CreateInfoStrings()
+	end
+
+	if (moetQOLDB["sell"][1] == "On") then
+		CreateSellButton()
+	end
+
+	if (moetQOLDB["scrap"][1] == "On") then
+		CreateScrapButton()
+	end
+
 end
