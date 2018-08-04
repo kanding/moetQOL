@@ -1,6 +1,5 @@
 ---------------------------------------------------
 -- SETUP
--- TODO: FIX NAMING OF KEYS (if u change keyname it wont update DB)
 ---------------------------------------------------
 local _, ns			= ... -- namespace
 _G.moetQOLDB		= moetQOLDB or {} -- database
@@ -23,7 +22,6 @@ local default = {
 	["borders"]				= {"Off", "hides some Blizzard UI borders"},
 	["infostring"]			= {"Off", "shows MS and FPS beneath minimap"},
 	["sell"]				= {"Off", "adds a button on merchants to sell grey items"},
-	["scrap"]				= {"Off", "adds a button on the scrapping machine to insert scrap"}
 }
 
 ---------------------------------------------------
@@ -86,10 +84,6 @@ local mqCommands = {
 	end,
 
 	["infostring"] = function(self)
-		ChangeState(self)
-	end,
-
-	["scrap"] = function(self)
 		ChangeState(self)
 	end,
 	
