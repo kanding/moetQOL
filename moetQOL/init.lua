@@ -22,6 +22,7 @@ local default = {
 	["borders"]				= {"Off", "hides some Blizzard UI borders"},
 	["infostring"]			= {"Off", "shows MS and FPS beneath minimap"},
 	["sell"]				= {"Off", "adds a button on merchants to sell grey items"},
+	["communities"]			= {"Off", "Reverts to old guild frame if you're in a guild"},
 }
 
 ---------------------------------------------------
@@ -84,6 +85,10 @@ local mqCommands = {
 	end,
 
 	["infostring"] = function(self)
+		ChangeState(self)
+	end,
+
+	["communities"] = function(self)
 		ChangeState(self)
 	end,
 	

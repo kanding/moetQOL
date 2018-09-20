@@ -2,8 +2,7 @@
 -- TODO
 ---------------------------------------------------
 -- make infostrings dragable & lockable
--- add J to /guildroster macro
--- filter error messages (full bag/combat lockdown)
+-- fix hide ui and infostrings
 ---------------------------------------------------
 -- SETUP
 ---------------------------------------------------
@@ -125,12 +124,21 @@ local function SellGreyItems()
 end
 
 local function CreateSellButton()
-	--"UIGoldBorderButtonTemplate"
 	local merchantButton = CreateFrame("Button", "moetQOL_SellButton", MerchantFrame, "LFGListMagicButtonTemplate") 
 	merchantButton:SetPoint("BOTTOMLEFT", 87, 4)
 	merchantButton:SetText("Sell Greys")
 	merchantButton:SetScript("OnClick", function() 
 		SellGreyItems() 
+	end)
+
+	merchantButton:RegisterEvent("MERCHANT_SHOW")
+	merchantButton:SetScript("OnEvent", function()
+		if MerchantExtraCurrencyBg:IsVisible() then
+			MerchantMoneyFrame:Hide()
+			MerchantExtraCurrencyBg:Hide()
+		else
+			MerchantMoneyFrame:Show()
+		end
 	end)
 end
 
@@ -241,13 +249,13 @@ end
 -- pretty dirty, refactor .. later :^)
 local function CreateInfoStrings()
 	-- create clickable frame
-	local posFrame = CreateFrame("FRAME", "moetQOL_Infostring")
+	local posFrame = CreateFrame("FRAME", "moetQOL_Infostring", UIParent)
 	posFrame:RegisterEvent("PET_BATTLE_OPENING_START")
 	posFrame:RegisterEvent("PET_BATTLE_CLOSE")
 	posFrame:RegisterEvent("CINEMATIC_START")
 	posFrame:RegisterEvent("CINEMATIC_STOP")
-	posFrame:SetPoint("TOP", Minimap, "BOTTOM", 0, -15)
-	posFrame:SetWidth(60)
+	posFrame:SetPoint("TOP", Minimap, "BOTTOM", 0, -27)
+	posFrame:SetWidth(65)
 	posFrame:SetHeight(15)
 	posFrame:EnableMouse(true)
 
@@ -264,15 +272,12 @@ local function CreateInfoStrings()
 			self:Hide()
 		elseif event == "CINEMATIC_STOP" then
 			self:Show()
-		else
-			print("Unknown event in infostrings:")
-			print(event)
 		end
 	end)
 
 	-- create text in frame
 	local frameFontString = posFrame:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
-	frameFontString:SetFont(STANDARD_TEXT_FONT, 7, "THINOUTLINE")
+	frameFontString:SetFont(STANDARD_TEXT_FONT, 11, "THINOUTLINE")
 	frameFontString:SetText(InfoStringsGetFps() .. "  " .. InfoStringsGetMs())
 	frameFontString:SetPoint("CENTER", posFrame)
 	frameFontString:SetHeight(frameFontString:GetStringHeight())
@@ -295,6 +300,23 @@ local function CreateInfoStrings()
 			infoAnimation:Play()
 		end
 	end)
+end
+
+local function HideCommunities()
+	LoadAddOn("Blizzard_GuildUI") -- Load Guild UI
+	LoadAddOn("Blizzard_Communities") -- Load Communities
+	ToggleGuildFrame = function() 
+		if GuildFrame:IsVisible() or CommunitiesFrame:IsVisible() then
+			HideUIPanel(GuildFrame)
+			HideUIPanel(CommunitiesFrame)
+		else
+			if IsInGuild() then
+				ShowUIPanel(GuildFrame)
+			else 
+				ShowUIPanel(CommunitiesFrame)
+			end
+		end
+	end
 end
 
 ---------------------------------------------------
@@ -345,6 +367,10 @@ function Core:ActivateFunctions()
 
 	if (moetQOLDB["sell"][1] == "On") then
 		CreateSellButton()
+	end
+
+	if (moetQOLDB["communities"][1] == "On") then
+		HideCommunities()
 	end
 
 end
