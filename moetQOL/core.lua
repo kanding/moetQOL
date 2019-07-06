@@ -1,16 +1,14 @@
----------------------------------------------------
 -- TODO
----------------------------------------------------
 -- make infostrings dragable & lockable
--- fix hide ui and infostrings
+
 ---------------------------------------------------
 -- SETUP
 ---------------------------------------------------
-local _, ns			= ... -- namespace
-ns.Core				= {} -- add the core to the namespace
-local Core			= ns.Core
-local fColor		= "00CC0F00" -- red
-local fColor2		= "FF00FF00" -- green
+local _, ns	= ... -- namespace
+ns.Core	= {} -- add the core to the namespace
+local Core = ns.Core
+local fColor = "00CC0F00" -- red
+local fColor2 = "FF00FF00" -- green
 
 ---------------------------------------------------
 -- HELPER FUNCTIONS (see main function below)
@@ -110,7 +108,7 @@ local function SellGreyItems()
 				local item = GetContainerItemLink(bag, slot)
 				if (item ~= nil) then
 					local grey = string.find(item, "|cff9d9d9d") -- grey
-					if (grey) then
+					if grey then
 						currPrice = (select(11, GetItemInfo(item)) or 0) * select(2, GetContainerItemInfo(bag, slot))
 						if currPrice > 0 then
 							PickupContainerItem(bag, slot)
@@ -127,9 +125,7 @@ local function CreateSellButton()
 	local merchantButton = CreateFrame("Button", "moetQOL_SellButton", MerchantFrame, "LFGListMagicButtonTemplate") 
 	merchantButton:SetPoint("BOTTOMLEFT", 87, 4)
 	merchantButton:SetText("Sell Greys")
-	merchantButton:SetScript("OnClick", function() 
-		SellGreyItems() 
-	end)
+	merchantButton:SetScript("OnClick", SellGreyItems)
 
 	merchantButton:RegisterEvent("MERCHANT_SHOW")
 	merchantButton:SetScript("OnEvent", function()
@@ -246,7 +242,6 @@ local function InfoStringTooltip(self)
 	GameTooltip:Show()
 end
 
--- pretty dirty, refactor .. later :^)
 local function CreateInfoStrings()
 	-- create clickable frame
 	local posFrame = CreateFrame("FRAME", "moetQOL_Infostring", UIParent)
@@ -303,8 +298,8 @@ local function CreateInfoStrings()
 end
 
 local function HideCommunities()
-	LoadAddOn("Blizzard_GuildUI") -- Load Guild UI
-	LoadAddOn("Blizzard_Communities") -- Load Communities
+	GuildFrame_LoadUI()
+	Communities_LoadUI()
 	ToggleGuildFrame = function() 
 		if GuildFrame:IsVisible() or CommunitiesFrame:IsVisible() then
 			HideUIPanel(GuildFrame)
@@ -319,6 +314,22 @@ local function HideCommunities()
 	end
 end
 
+local function HideTalkingHead()
+	LoadAddOn("Blizzard_TalkingHeadUI")
+	hooksecurefunc("TalkingHeadFrame_PlayCurrent", function()
+		TalkingHeadFrame_CloseImmediately()
+	end)
+end
+
+local function InstantQueueMythicIsland()
+	local f = CreateFrame("FRAME")
+	f:RegisterEvent("ISLANDS_QUEUE_OPEN")
+	f:SetScript("OnEvent", function(self, event, ...)
+		if event == "ISLANDS_QUEUE_OPEN" then
+			C_IslandsQueue.QueueForIsland(1737)
+		end
+	end)
+end
 ---------------------------------------------------
 -- MAIN FUNCTION
 ---------------------------------------------------
@@ -373,4 +384,24 @@ function Core:ActivateFunctions()
 		HideCommunities()
 	end
 
+	if (moetQOLDB["talkinghead"][1] == "On") then
+		HideTalkingHead()
+	end
+
+	if (moetQOLDB["fastislands"][1] == "On") then
+		InstantQueueMythicIsland()
+	end
+
+	WorldMapFrame:SetFrameStrata("FULLSCREEN")
+
 end
+
+--[[
+function Core:ActivateFunctionsReal()
+	for k,v in pairs(moetQOLDB) do
+		if k[v][1] == "On" then
+			k[v][3]()
+		end
+	end
+end
+]]
