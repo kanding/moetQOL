@@ -1,13 +1,13 @@
 ---------------------------------------------------
 -- SETUP
 ---------------------------------------------------
-local _, ns	= ... -- namespace
+local _, ns = ... -- namespace
 _G.moetQOLDB = moetQOLDB or {} -- database
-local ADDON_VERSION = GetAddOnMetadata("moetQOL", "Version")
+ns.ADDON_VERSION = GetAddOnMetadata("moetQOL", "Version")
 local SHORTCUT = "/mq"
 local COLOR	= "00CC0F00" -- red
 local COLOR2 = "FF00FF00" -- green
-local WELCOME_MESSAGE = string.format("|c%smoetQOL|r loaded: V%s - |c%s%s|r to toggle features.", COLOR, ADDON_VERSION, COLOR, SHORTCUT)
+local WELCOME_MESSAGE = string.format("|c%smoetQOL|r loaded: V%s - |c%s%s|r to toggle features.", COLOR, ns.ADDON_VERSION, COLOR, SHORTCUT)
 local statesChanged = 0 -- avoid spamming with /reload requests
 local default = ns.Core.MQdefault
 --indices for state, description and associated function in default table
@@ -25,12 +25,14 @@ local mqCommands = {
 		moetQOLDB = default
 		print(string.format("|c%smq:|r Database set to default, values set to Off.", COLOR))
 	end,
+	["showbonus"] = function()
+		BonusRollFrame:Show()
+	end,
 }
 
 ---------------------------------------------------
 -- FUNCTIONS
 ---------------------------------------------------
--- Checks if valid string and if true changes On/Off.
 function ChangeState(str)
 	if (str == nil) then return end
 
@@ -92,7 +94,7 @@ local function HandleSlashCommands(str)
 	end
 end
 
-local function CheckDatabaseForErrors()
+local function CheckDatabaseErrors()
 	for k,v in pairs(default) do
 		if not moetQOLDB[k] then
 			moetQOLDB[k] = {v[STATE], v[DESC]}
@@ -113,7 +115,7 @@ function ns:init(event, name)
 	SlashCmdList.moetQOL = HandleSlashCommands
 	SlashCmdList.CLEAR = function() ChatFrame1:Clear() end
 
-	CheckDatabaseForErrors()
+	CheckDatabaseErrors()
 	ns.Core.ActivateFunctions()
 
 	print(WELCOME_MESSAGE)

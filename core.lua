@@ -28,7 +28,7 @@ function Core:PrintFlags()
 end
 
 function Core:PrintHelp()
-	print("List of commands:")
+	print("|c00CC0F00moetQOL|r V"..ns.ADDON_VERSION.." List of commands:")
 	print("/mq |c" .. F_COLOR2 .. "flags|r - to show your current settings.")
 	print("/mq |c" .. F_COLOR2 .. "hardreset|r - to reset all saved settings to default (off).")
 	for key, value in pairs(Core.MQdefault) do
@@ -303,7 +303,12 @@ end
 local function HideCommunities()
 	GuildFrame_LoadUI()
 	Communities_LoadUI()
-	ToggleGuildFrame = function() 
+
+	-- Allow close on Escape pressed.
+	tinsert(UISpecialFrames, "GuildFrame")
+	tinsert(UISpecialFrames, "CommunitiesFrame")
+	
+	ToggleGuildFrame = function()
 		if GuildFrame:IsVisible() or CommunitiesFrame:IsVisible() then
 			HideUIPanel(GuildFrame)
 			HideUIPanel(CommunitiesFrame)
@@ -315,6 +320,27 @@ local function HideCommunities()
 			end
 		end
 	end
+
+	-- All this to be able to open the guild frame in combat :-)
+	-- Above function will still cause 'taint'.
+	hooksecurefunc("ShowUIPanel",function(frame,force,duplicated)
+		if frame and not (frame:GetName() == "CommunitiesFrame" or frame:GetName() == "GuildFrame") then return end
+        
+        if frame and not frame:IsShown() and not duplicated and InCombatLockdown() and not WorldMapFrame:IsShown() then
+            local point,_,relativePoint,xOff,yOff = frame:GetPoint()
+            frame:ClearAllPoints()
+            frame:SetPoint(point or "TOPLEFT",UIParent,relativePoint or "TOPLEFT",xOff or 16,yOff or -116.00000762939)
+			frame:Show()
+        end
+	end)
+
+	hooksecurefunc("HideUIPanel",function(frame,force,duplicated)
+		if frame and not (frame:GetName() == "CommunitiesFrame" or frame:GetName() == "GuildFrame") then return end
+        
+        if frame and frame:IsShown() and not duplicated and InCombatLockdown() then
+			frame:Hide()
+        end
+	end)
 end
 
 local function HideTalkingHead()
@@ -346,13 +372,38 @@ local function MoetTweaks()
 	WorldMapFrame:SetFrameStrata("FULLSCREEN")
 end
 
+--[[
+	requires GroupLootContainer to actually function properly
+local function HideArenaBonusRolls()
+	BonusRollFrame:HookScript("OnShow", function(self, event, ...)
+		print(self)
+		print(event)
+		print(...)
+		local   _, instanceType, difficulty,_,_,_,_,mapID = GetInstanceInfo()
+		if instanceType == "arena" then
+			BonusRollFrame:Hide()
+			print("|c00CC0F00mq|r: Bonus Roll Frame has been hidden. Type /mq showbonus to show it.")
+		end
+	end)
+end
+
+local function HideMythicDungeonBonusRolls()
+	BonusRollFrame:HookScript("OnShow", function(self, event, ...)
+		local   _, _, difficulty,_,_,_,_,mapID = GetInstanceInfo()
+		if difficulty == 23 or difficulty == 8 then
+			BonusRollFrame:Hide()
+			print("|c00CC0F00mq|r: Bonus Roll Frame has been hidden. Type /mq showbonus to show it.")
+		end
+	end)
+end
+--]]
 ---------------------------------------------------
 -- MAIN FUNCTION
 ---------------------------------------------------
 Core.MQdefault = {
 	-- key = name, value[1] = state, value[2] = description, value[3] = function to execute if state is On
 	["maxzoom"]	= {"Off", "sets camera distance CVar to maximum available", SetMaxZoom},
-	["portraitnumbers"]	= {"Off", "show/hide combat numbers on your portrait", HidePortraitNumbers},
+	["portraitnumbers"] = {"Off", "show/hide combat numbers on your portrait", HidePortraitNumbers},
 	["fastloot"] = {"Off", "faster auto looting", EnableFastLoot},
 	["errormsg"] = {"Off", "hide red error messages", HideErrorMessages},
 	["easydelete"] = {"Off", "remove the need to type 'delete' on rare+ items", EnableEasyDelete},
@@ -365,9 +416,10 @@ Core.MQdefault = {
 	["talkinghead"] = {"Off", "hides talking head frames", HideTalkingHead},
 	["fastislands"] = {"Off", "instantly queues mythic islands upon opening the table", InstantQueueMythicIsland},
 	["tweaks"] = {"Off", "small random tweaks for myself", MoetTweaks},
+	--["bonusrollarena"] = {"Off", "hide bonus rolls while in arena", HideArenaBonusRolls},
+	--["bonusrolldungeons"] = {"Off", "hide bonus rolls while in M+ or Mythic dungeons", HideMythicDungeonBonusRolls},
 }
 
--- will fire on load and activate all features that are On
 function Core:ActivateFunctions()
 	for k,v in pairs(moetQOLDB) do
 		if v[STATE] == "On" and Core.MQdefault[k] then
