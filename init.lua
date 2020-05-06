@@ -25,9 +25,6 @@ local mqCommands = {
 		moetQOLDB = default
 		print(string.format("|c%smq:|r Database set to default, values set to Off.", COLOR))
 	end,
-	["showbonus"] = function()
-		BonusRollFrame:Show()
-	end,
 }
 
 ---------------------------------------------------

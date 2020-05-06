@@ -372,6 +372,62 @@ local function MoetTweaks()
 	WorldMapFrame:SetFrameStrata("FULLSCREEN")
 end
 
+local function AutoRepair()
+	local f = CreateFrame("FRAME")
+	f:RegisterEvent("MERCHANT_SHOW")
+	f:SetScript("OnEvent", function(self, event, ...)
+		if event == "MERCHANT_SHOW" and CanMerchantRepair() then
+			repairAllCost, canRepair = GetRepairAllCost()
+			if canRepair and repairAllCost <= GetMoney() then
+				RepairAllItems(false) -- use player funds
+				DEFAULT_CHAT_FRAME:AddMessage("Your items have been repaired for "..GetCoinText(repairAllCost,", ")..".",255,255,0)
+				--print(string.format("|c%smq|r Your items have been repaired: %s.", F_COLOR, GetCoinText(repairAllCost,", ")))
+			else
+				--DEFAULT_CHAT_FRAME:AddMessage("You don't have enough money for repair!",255,0,0);
+			end
+		end
+	end)
+end
+
+local function DynamicSpellQueue()
+	--[[local function AdjustSpellQueue()
+		local isRanged = {
+			["MAGE"] = {
+				["Frost"] = true,
+				["Fire"] = true,
+				["Arcane"] = true,
+			},
+			["HUNTER"] = {"Marksmanship","Beast Mastery"},
+			["WARLOCK"] = {"Affliction","Destruction","Demonology"},
+			["SHAMAN"] = {"Elemental"},
+			["DRUID"] = {"Balance"},
+			["PRIEST"] = {"Shadow", "Discipline"},
+		}
+
+		local currentSpec = GetSpecialization()
+		local _, CLASS = UnitClass("player")
+		local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or "None"
+		if isRanged[CLASS][currentSpecName] and GetCVar("SpellQueueWindow") <= 125 then
+			SetCVar("SpellQueueWindow", 400)
+		else
+			SetCVar("SpellQueueWindow", 125)
+		end
+	end
+
+	-- check if specialization changed
+	local f = CreateFrame("FRAME")
+	f:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	f:SetScript("OnEvent", function(self, event, ...)
+		if event == "PLAYER_SPECIALIZATION_CHANGED" and ... == "player" then
+			print("Adjusting spell queue.")
+			AdjustSpellQueue()
+		end
+	end)
+	SetCVar("SpellQueueWindow", 400)
+
+	AdjustSpellQueue()--]]
+end
+
 --[[
 	requires GroupLootContainer to actually function properly
 local function HideArenaBonusRolls()
@@ -416,6 +472,8 @@ Core.MQdefault = {
 	["talkinghead"] = {"Off", "hides talking head frames", HideTalkingHead},
 	["fastislands"] = {"Off", "instantly queues mythic islands upon opening the table", InstantQueueMythicIsland},
 	["tweaks"] = {"Off", "small random tweaks for myself", MoetTweaks},
+	["autorepair"] = {"Off", "automatically repair items when possible using player funds", AutoRepair},
+	["dynamicspellqueue"] = {"Off", "automatically changes SpellQueue/Input lag based on ranged or melee class", DynamicSpellQueue},
 	--["bonusrollarena"] = {"Off", "hide bonus rolls while in arena", HideArenaBonusRolls},
 	--["bonusrolldungeons"] = {"Off", "hide bonus rolls while in M+ or Mythic dungeons", HideMythicDungeonBonusRolls},
 }
