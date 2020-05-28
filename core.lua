@@ -381,9 +381,6 @@ local function AutoRepair()
 			if canRepair and repairAllCost <= GetMoney() then
 				RepairAllItems(false) -- use player funds
 				DEFAULT_CHAT_FRAME:AddMessage("Your items have been repaired for "..GetCoinText(repairAllCost,", ")..".",255,255,0)
-				--print(string.format("|c%smq|r Your items have been repaired: %s.", F_COLOR, GetCoinText(repairAllCost,", ")))
-			else
-				DEFAULT_CHAT_FRAME:AddMessage("You don't have enough money for repair!",255,0,0);
 			end
 		end
 	end)
