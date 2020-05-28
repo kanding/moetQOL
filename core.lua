@@ -383,76 +383,34 @@ local function AutoRepair()
 				DEFAULT_CHAT_FRAME:AddMessage("Your items have been repaired for "..GetCoinText(repairAllCost,", ")..".",255,255,0)
 				--print(string.format("|c%smq|r Your items have been repaired: %s.", F_COLOR, GetCoinText(repairAllCost,", ")))
 			else
-				--DEFAULT_CHAT_FRAME:AddMessage("You don't have enough money for repair!",255,0,0);
+				DEFAULT_CHAT_FRAME:AddMessage("You don't have enough money for repair!",255,0,0);
 			end
 		end
 	end)
 end
 
-local function DynamicSpellQueue()
-	--[[local function AdjustSpellQueue()
-		local isRanged = {
-			["MAGE"] = {
-				["Frost"] = true,
-				["Fire"] = true,
-				["Arcane"] = true,
-			},
-			["HUNTER"] = {"Marksmanship","Beast Mastery"},
-			["WARLOCK"] = {"Affliction","Destruction","Demonology"},
-			["SHAMAN"] = {"Elemental"},
-			["DRUID"] = {"Balance"},
-			["PRIEST"] = {"Shadow", "Discipline"},
-		}
+local function RealIDCounter()
+	local f = CreateFrame("FRAME", "moetQOL_RealIDCounter", FriendsTabHeaderTab3)
+	f:SetPoint("TOPLEFT", FriendsTabHeaderTab3, "TOPRIGHT", 7, -12)
+	f:SetWidth(50)
+	f:SetHeight(20)
 
-		local currentSpec = GetSpecialization()
-		local _, CLASS = UnitClass("player")
-		local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or "None"
-		if isRanged[CLASS][currentSpecName] and GetCVar("SpellQueueWindow") <= 125 then
-			SetCVar("SpellQueueWindow", 400)
-		else
-			SetCVar("SpellQueueWindow", 125)
-		end
-	end
-
-	-- check if specialization changed
-	local f = CreateFrame("FRAME")
-	f:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
-	f:SetScript("OnEvent", function(self, event, ...)
-		if event == "PLAYER_SPECIALIZATION_CHANGED" and ... == "player" then
-			print("Adjusting spell queue.")
-			AdjustSpellQueue()
-		end
-	end)
-	SetCVar("SpellQueueWindow", 400)
-
-	AdjustSpellQueue()--]]
-end
-
---[[
-	requires GroupLootContainer to actually function properly
-local function HideArenaBonusRolls()
-	BonusRollFrame:HookScript("OnShow", function(self, event, ...)
-		print(self)
-		print(event)
-		print(...)
-		local   _, instanceType, difficulty,_,_,_,_,mapID = GetInstanceInfo()
-		if instanceType == "arena" then
-			BonusRollFrame:Hide()
-			print("|c00CC0F00mq|r: Bonus Roll Frame has been hidden. Type /mq showbonus to show it.")
-		end
+	local fstring = f:CreateFontString("moetQOL_RealIDCounterString", "OVERLAY", "GameFontNormal")
+	fstring:SetFont(STANDARD_TEXT_FONT, 11, "NONE")
+	fstring:SetPoint("CENTER", f)
+	fstring:SetWidth(fstring:GetStringWidth())
+	fstring:SetHeight(fstring:GetStringHeight())
+	local k,_ = BNGetNumFriends()
+	fstring:SetText(k.."/200")
+	
+	f:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED")
+	f:SetScript("OnEvent", function()
+		print("event occured")
+		local k,_ = BNGetNumFriends()
+		fstring:SetText(k.."/200")
 	end)
 end
 
-local function HideMythicDungeonBonusRolls()
-	BonusRollFrame:HookScript("OnShow", function(self, event, ...)
-		local   _, _, difficulty,_,_,_,_,mapID = GetInstanceInfo()
-		if difficulty == 23 or difficulty == 8 then
-			BonusRollFrame:Hide()
-			print("|c00CC0F00mq|r: Bonus Roll Frame has been hidden. Type /mq showbonus to show it.")
-		end
-	end)
-end
---]]
 ---------------------------------------------------
 -- MAIN FUNCTION
 ---------------------------------------------------
@@ -473,9 +431,7 @@ Core.MQdefault = {
 	["fastislands"] = {"Off", "instantly queues mythic islands upon opening the table", InstantQueueMythicIsland},
 	["tweaks"] = {"Off", "small random tweaks for myself", MoetTweaks},
 	["autorepair"] = {"Off", "automatically repair items when possible using player funds", AutoRepair},
-	["dynamicspellqueue"] = {"Off", "automatically changes SpellQueue/Input lag based on ranged or melee class", DynamicSpellQueue},
-	--["bonusrollarena"] = {"Off", "hide bonus rolls while in arena", HideArenaBonusRolls},
-	--["bonusrolldungeons"] = {"Off", "hide bonus rolls while in M+ or Mythic dungeons", HideMythicDungeonBonusRolls},
+	["realidcounter"] = {"Off", "adds a counter that shows current out of total friends", RealIDCounter},
 }
 
 function Core:ActivateFunctions()
