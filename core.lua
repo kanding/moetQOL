@@ -488,16 +488,14 @@ local function RealIDCounter()
 end
 
 local function HideTooltipInCombat()
-	hooksecurefunc("GameTooltip_SetBasicTooltip", function(t, parent)
+	GameTooltip:SetScript("OnShow", function()
 		if InCombatLockdown() then
-			t:Hide()
+			local point, t = GameTooltip:GetPoint()
+			if t and t.firstTimeLoaded then
+				GameTooltip:Hide()
+			end
 		end
 	end)
-	--[[GameTooltip:SetScript("OnShow", function()
-		if InCombatLockdown() then
-			GameTooltip:Hide()
-		end
-	end)--]]
 end
 
 ---------------------------------------------------
