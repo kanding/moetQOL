@@ -1,3 +1,7 @@
+-- moet, 2020
+-- Some functionality is inspired or moved
+-- here for future maintenance
+-- Credit is always given above the function.
 ---------------------------------------------------
 -- SETUP
 ---------------------------------------------------
@@ -45,7 +49,7 @@ end
 local function EnableFastLoot()
 	SetCVar("autoLootDefault", "1") -- set auto loot to enabled
 
-	local tDelay = 0 -- Time delay
+	local tDelay = 0
 
 	local function FastLoot()
 		if GetTime() - tDelay >= 0.3 then
@@ -64,6 +68,9 @@ local function EnableFastLoot()
 	lootEventFrame:SetScript("OnEvent", FastLoot)
 end
 
+-- EasyDelete by Kesava
+-- Moved here to maintain
+-- https://github.com/kesava-wow/easydeleteconfirm
 local function EnableEasyDelete()
 	local deleteFrame = CreateFrame('Frame','EasyDeleteConfirmFrame')
 
@@ -172,6 +179,9 @@ local function HideBlizzardBorders()
 	MirrorTimer1Border:SetParent(hiddenFrame)
 end
 
+-- Inspired by rInfostring by zork
+-- Moved here to rework and maintain.
+-- https://github.com/zorker/rothui
 local function InfoStringsGetFps() 
 	return floor(GetFramerate()) .. "fps"
 end
@@ -188,7 +198,6 @@ local function memoryformat(number)
 	end
 end
 
--- from rInfoStrings by zork
 local function CleanGarbage()
 	UpdateAddOnMemoryUsage()
 	local before = gcinfo()
@@ -301,30 +310,30 @@ local function CreateInfoStrings()
 end
 
 local function HideCommunities()
-	GuildFrame_LoadUI()
-	Communities_LoadUI()
+	local f = CreateFrame("FRAME")
+	f:RegisterEvent("PLAYER_LOGIN")
+	f:SetScript("OnEvent", function()
+		if IsInGuild() then
+			GuildFrame_LoadUI()
+			tinsert(UISpecialFrames, "GuildFrame")
 
-	-- Allow close on Escape pressed.
-	tinsert(UISpecialFrames, "GuildFrame")
-	tinsert(UISpecialFrames, "CommunitiesFrame")
-	
-	ToggleGuildFrame = function()
-		if GuildFrame:IsVisible() or CommunitiesFrame:IsVisible() then
-			HideUIPanel(GuildFrame)
-			HideUIPanel(CommunitiesFrame)
-		else
-			if IsInGuild() then
-				ShowUIPanel(GuildFrame)
-			else 
-				ShowUIPanel(CommunitiesFrame)
+			ToggleGuildFrame = function()
+				if GuildFrame:IsVisible() then
+					HideUIPanel(GuildFrame)
+				else
+					ShowUIPanel(GuildFrame)
+				end
 			end
 		end
-	end
+
+		f:UnregisterEvent("PLAYER_LOGIN")
+		f = nil
+	end)
 
 	-- All this to be able to open the guild frame in combat :-)
 	-- Above function will still cause 'taint'.
 	hooksecurefunc("ShowUIPanel",function(frame,force,duplicated)
-		if frame and not (frame:GetName() == "CommunitiesFrame" or frame:GetName() == "GuildFrame") then return end
+		if frame and not frame:GetName() == "GuildFrame" then return end
         
         if frame and not frame:IsShown() and not duplicated and InCombatLockdown() and not WorldMapFrame:IsShown() then
             local point,_,relativePoint,xOff,yOff = frame:GetPoint()
@@ -335,7 +344,7 @@ local function HideCommunities()
 	end)
 
 	hooksecurefunc("HideUIPanel",function(frame,force,duplicated)
-		if frame and not (frame:GetName() == "CommunitiesFrame" or frame:GetName() == "GuildFrame") then return end
+		if frame and not frame:GetName() == "GuildFrame" then return end
         
         if frame and frame:IsShown() and not duplicated and InCombatLockdown() then
 			frame:Hide()
@@ -364,14 +373,59 @@ local function SetMaxZoom()
 	SetCVar("cameraDistanceMaxZoomFactor", 2.6)
 end
 
+-- Hide Error Messages inspired by zork rError (here for continued maintenance)
+-- https://github.com/zorker/rothui
 local function HideErrorMessages()
+	local blacklist = {
+		["ERR_ABILITY_COOLDOWN"] = true,           -- Ability is not ready yet. (Ability)
+		["ERR_ITEM_COOLDOWN"] = true,
+		["ERR_SPELL_OUT_OF_RANGE"] = true,
+		["ERR_BADATTACKPOS"] = true,
+		["ERR_OUT_OF_ENERGY"] = true,              -- Not enough energy. (Err)
+		["ERR_OUT_OF_RANGE"] = true,
+		["ERR_OUT_OF_RAGE"] = true,                -- Not enough rage.
+		["ERR_OUT_OF_FOCUS"] = true,                -- Not enough focus
+		["ERR_ATTACK_MOUNTED"] = true,
+		["ERR_NO_ATTACK_TARGET"] = true,           -- There is nothing to attack.
+		["SPELL_FAILED_MOVING"] = true,
+		["SPELL_FAILED_AFFECTING_COMBAT"] = true,
+		["ERR_NOT_IN_COMBAT"] = true,
+		["SPELL_FAILED_UNIT_NOT_INFRONT"] = true,
+		["ERR_BADATTACKFACING"] = true,
+		["SPELL_FAILED_TOO_CLOSE"] = true,
+		["ERR_INVALID_ATTACK_TARGET"] = true,      -- You cannot attack that target.
+		["ERR_SPELL_COOLDOWN"] = true,             -- Spell is not ready yet. (Spell)
+		["SPELL_FAILED_NO_COMBO_POINTS"] = true,   -- That ability requires combo points.
+		["SPELL_FAILED_TARGETS_DEAD"] = true,      -- Your target is dead.
+		["SPELL_FAILED_SPELL_IN_PROGRESS"] = true, -- Another action is in progress. (Spell)
+		["SPELL_FAILED_TARGET_AURASTATE"] = true,  -- You can't do that yet. (TargetAura)
+		["SPELL_FAILED_CASTER_AURASTATE"] = true,  -- You can't do that yet. (CasterAura)
+		["SPELL_FAILED_NO_ENDURANCE"] = true,      -- Not enough endurance
+		["SPELL_FAILED_BAD_TARGETS"] = true,       -- Invalid target
+		["SPELL_FAILED_NOT_MOUNTED"] = true,       -- You are mounted
+		["SPELL_FAILED_NOT_ON_TAXI"] = true,       -- You are in flight
+	}
+
 	UIErrorsFrame:UnregisterEvent("UI_ERROR_MESSAGE")
+
+	local function OnUIErrorMessage(self, event, messageType, message)
+		local errorName, soundKitID, voiceID = GetGameMessageInfo(messageType)
+	
+		if blacklist[errorName] then return end
+		UIErrorsFrame:AddMessage(message, 1, .1, .1)
+	end
+
+	local eventHandler = CreateFrame("Frame")
+	eventHandler:SetScript("OnEvent", OnUIErrorMessage)
+	eventHandler:RegisterEvent("UI_ERROR_MESSAGE")
 end
 
 local function MoetTweaks()
 	WorldMapFrame:SetFrameStrata("FULLSCREEN")
 end
 
+-- Inspired by AutoRepair
+-- Credit: https://www.curseforge.com/wow/addons/autorepair
 local function AutoRepair()
 	local f = CreateFrame("FRAME")
 	f:RegisterEvent("MERCHANT_SHOW")
@@ -386,6 +440,32 @@ local function AutoRepair()
 	end)
 end
 
+-- Inspired by ExaltedPlus
+-- massively reworked :>
+-- original: https://www.curseforge.com/wow/addons/exaltedplus
+local function ParagonTooltip()
+	local line = "" --safety
+
+	hooksecurefunc("ReputationParagonFrame_SetupParagonTooltip", function(frame)
+		id = frame.factionID
+
+		curValue, threshold, _, rewardpending = C_Reputation.GetFactionParagonInfo(id)
+		if curValue then
+			turnins = (rewardpending and math.modf(curValue/threshold)-1) or (math.modf(curValue/threshold))
+		end
+
+		line = format(ARCHAEOLOGY_COMPLETION, turnins)
+	end)
+
+	hooksecurefunc("EmbeddedItemTooltip_SetItemByQuestReward",function(tt,t)
+		tt.Tooltip:AddLine(line)
+		tt.Tooltip:Show()
+	end)
+end
+
+-- Inspired by RealIDCounter
+-- reworked
+-- original: https://www.curseforge.com/wow/addons/ridc
 local function RealIDCounter()
 	local f = CreateFrame("FRAME", "moetQOL_RealIDCounter", FriendsTabHeaderTab3)
 	f:SetPoint("TOPLEFT", FriendsTabHeaderTab3, "TOPRIGHT", 7, -12)
@@ -402,9 +482,16 @@ local function RealIDCounter()
 	
 	f:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED")
 	f:SetScript("OnEvent", function()
-		print("event occured")
 		local k,_ = BNGetNumFriends()
 		fstring:SetText(k.."/200")
+	end)
+end
+
+local function HideTooltipInCombat()
+	GameTooltip:SetScript("OnShow", function()
+		if InCombatLockdown() then
+			GameTooltip:Hide()
+		end
 	end)
 end
 
@@ -416,19 +503,21 @@ Core.MQdefault = {
 	["maxzoom"]	= {"Off", "sets camera distance CVar to maximum available", SetMaxZoom},
 	["portraitnumbers"] = {"Off", "show/hide combat numbers on your portrait", HidePortraitNumbers},
 	["fastloot"] = {"Off", "faster auto looting", EnableFastLoot},
-	["errormsg"] = {"Off", "hide red error messages", HideErrorMessages},
+	["errormsg"] = {"Off", "hide generic red error messages", HideErrorMessages},
 	["easydelete"] = {"Off", "remove the need to type 'delete' on rare+ items", EnableEasyDelete},
 	["voicebuttons"] = {"Off", "show/hide Voice chat buttons", HideVoiceButtons},
 	["skipmovies"] = {"Off", "auto skip all cutscenes", AutoCancelCutscenes},
 	["borders"] = {"Off", "hides some Blizzard UI borders", HideBlizzardBorders},
 	["infostring"] = {"Off", "shows MS and FPS beneath minimap (moveable with ALT+LClick)", CreateInfoStrings},
 	["sell"] = {"Off", "adds a button on merchants to sell grey items", CreateSellButton},
-	["communities"]	= {"Off", "Reverts to old guild frame if you're in a guild", HideCommunities},
+	["oldguild"] = {"Off", "Reverts to old guild frame if you're in a guild", HideCommunities},
 	["talkinghead"] = {"Off", "hides talking head frames", HideTalkingHead},
 	["fastislands"] = {"Off", "instantly queues mythic islands upon opening the table", InstantQueueMythicIsland},
 	["tweaks"] = {"Off", "small random tweaks for myself", MoetTweaks},
 	["autorepair"] = {"Off", "automatically repair items when possible using player funds", AutoRepair},
+	["paragontooltip"] = {"Off", "adds total completions to paragon tooltip", ParagonTooltip},
 	["realidcounter"] = {"Off", "adds a counter that shows current out of total friends", RealIDCounter},
+	["combattooltip"] = {"Off", "hides tooltip if in combat", HideTooltipInCombat},
 }
 
 function Core:ActivateFunctions()
