@@ -1,3 +1,1 @@
-Added the ability to hide tooltip in combat
-Added a counter current Real ID friends out of cap
-Added a counter to paragon rep tooltip that shows total completetions
+CombatTooltip now only hides Unit mouseovers.

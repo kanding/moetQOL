@@ -493,10 +493,29 @@ local function RealIDCounter()
 end
 
 local function HideTooltipInCombat()
-	GameTooltip:SetScript("OnShow", function()
-		if InCombatLockdown() then
+	--hide if player enters combat with unit as mouseover
+	local f = CreateFrame("FRAME")
+	f:RegisterEvent("PLAYER_REGEN_DISABLED")
+	f:SetScript("OnEvent", function()
+		if GameTooltip:IsShown() then
 			local point, t = GameTooltip:GetPoint()
-			if t and t.firstTimeLoaded then
+			local unit = UnitExists("mouseover")
+			local player = UnitIsPlayer("mouseover")
+			if t and t.firstTimeLoaded and (unit or player) then
+				GameTooltip:Hide()
+			end
+		end
+	end)
+	f:Hide()
+
+	GameTooltip:SetScript("OnShow", function()
+		-- Doesn't work if you mouseover portrait.
+		-- unit/player both nil "OnShow".
+		if InCombatLockdown() then
+			local _, t = GameTooltip:GetPoint()
+			local unit = UnitExists("mouseover")
+			local player = UnitIsPlayer("mouseover")
+			if t and t.firstTimeLoaded and (unit or player) then
 				GameTooltip:Hide()
 			end
 		end
