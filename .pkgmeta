@@ -1,0 +1,8 @@
+package-as: moetQOL
+
+ignore:
+    - README.md
+
+manual-changelog: CHANGELOG.txt
+
+license-output: LICENSE
