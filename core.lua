@@ -455,11 +455,16 @@ local function ParagonTooltip()
 		end
 
 		line = format(ARCHAEOLOGY_COMPLETION, turnins)
+
+		EmbeddedItemTooltip:AddLine(line)
+		EmbeddedItemTooltip:Show()
+
 	end)
 
-	hooksecurefunc("EmbeddedItemTooltip_SetItemByQuestReward",function(tt,t)
-		tt.Tooltip:AddLine(line)
-		tt.Tooltip:Show()
+	hooksecurefunc("ReputationParagonFrame_OnLeave", function(self)
+		if line then
+			line = ""
+		end
 	end)
 end
 
