@@ -1,8 +1,8 @@
 ---------------------------------------------------
 -- SETUP
 ---------------------------------------------------
-local _, ns = ... -- namespace
-_G.moetQOLDB = moetQOLDB or {} -- database
+local _, ns = ...
+_G.moetQOLDB = moetQOLDB or {}
 ns.ADDON_VERSION = GetAddOnMetadata("moetQOL", "Version")
 local SHORTCUT = "/mq"
 local COLOR	= "00CC0F00" -- red

@@ -5,7 +5,7 @@
 ---------------------------------------------------
 -- SETUP
 ---------------------------------------------------
-local _, ns	= ... -- namespace
+local _, ns	= ...
 ns.Core	= {} -- add the core to the namespace
 local Core = ns.Core
 local F_COLOR = "00CC0F00" -- red

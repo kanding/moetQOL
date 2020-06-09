@@ -1,8 +1,8 @@
 package-as: moetQOL
 
 ignore:
-    - README.md
+    - /README.md
 
-manual-changelog: CHANGELOG.txt
-
-license-output: LICENSE
+manual-changelog:
+    filename: CHANGELOG.txt
+    markup-type: markdown
