@@ -1,9 +1,10 @@
 package-as: moetQOL
 
+manual-changelog: CHANGELOG.txt
+
 ignore:
     - README.md
-
-manual-changelog: CHANGELOG.txt
+    - CHANGELOG.txt
 
 move-folders:
   moetQOL/moetQOL: moetQOL
