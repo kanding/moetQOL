@@ -3,6 +3,7 @@ package-as: moetQOL
 ignore:
     - README.md
 
-manual-changelog:
-    filename: CHANGELOG.txt
-    markup-type: markdown
+manual-changelog: CHANGELOG.txt
+
+move-folders:
+  moetQOL/moetQOL: moetQOL
