@@ -3,9 +3,10 @@
 ## Title: moetQOL
 ## Author: moet
 
-## Version: 2.5.3
+## Version: 2.6.0
 ## Notes: Lightweight quality of life improvements.
 ## SavedVariables: moetQOLDB
 
+func.lua
 core.lua
 init.lua

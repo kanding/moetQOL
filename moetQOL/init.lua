@@ -9,7 +9,7 @@ ns.ADDON_VERSION = GetAddOnMetadata("moetQOL", "Version")
 local SHORTCUT = "/mq"
 local COLOR	= "00CC0F00" -- red
 local COLOR2 = "FF00FF00" -- green
-local WELCOME_MESSAGE = string.format("|c%smoetQOL|r loaded: V%s - |c%s%s|r to toggle features.", COLOR, ns.ADDON_VERSION, COLOR, SHORTCUT)
+local WELCOME_MESSAGE = string.format("|c%smoetQOL|r loaded: v%s - |c%s%s|r to toggle features.", COLOR, ns.ADDON_VERSION, COLOR, SHORTCUT)
 local statesChanged = 0 -- avoid spamming with /reload requests
 local default = ns.Core.MQdefault
 --indices for state, description and associated function in default table
@@ -32,16 +32,16 @@ local mqCommands = {
 ---------------------------------------------------
 -- FUNCTIONS
 ---------------------------------------------------
-function ChangeState(str)
-	if (str == nil) then return end
+local function ChangeState(str)
+	if str == nil then return end
 
 	if moetQOLDB[str] then
-		if (moetQOLDB[str][STATE] == "On") then
+		if moetQOLDB[str][STATE] == "On" then
 			moetQOLDB[str][STATE] = "Off"
-			print("|c" .. COLOR .. str .. "|r: Off")
-		elseif (moetQOLDB[str][STATE] == "Off") then
+			print(string.format("|c%s%s|r: Off", COLOR, str))
+		elseif moetQOLDB[str][STATE] == "Off" then
 			moetQOLDB[str][STATE] = "On"
-			print("|c" .. COLOR .. str .. "|r: |c" .. COLOR2 .. "On|r")
+			print(string.format("|c%s%s|r: |c%sOn|r", COLOR, str, COLOR2))
 		end
 		statesChanged = statesChanged + 1
 	else
@@ -50,7 +50,7 @@ function ChangeState(str)
 	end
 
 	-- only 1 reload needed per set of changes
-	if (statesChanged == 1) then
+	if statesChanged == 1 then
 		print(string.format(
 			"|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", 
 			COLOR, COLOR2))
@@ -58,7 +58,7 @@ function ChangeState(str)
 end
 
 local function HandleSlashCommands(str)
-	if (#str == 0) then -- player entered /mq
+	if #str == 0 then -- player entered /mq
 		mqCommands.help()
 	end
 
@@ -95,24 +95,28 @@ end
 
 local function CheckDatabaseErrors()
 	for k,v in pairs(default) do
+		--create if not exist
 		if not moetQOLDB[k] then
 			moetQOLDB[k] = {v[STATE], v[DESC]}
 		end
 		
+		--update if outdated
 		if moetQOLDB[k][DESC] and moetQOLDB[k][DESC] ~= default[k][DESC] then
 			moetQOLDB[k][DESC] = default[k][DESC]
 		end
 	end
 end
 
-function ns:init(event, name)
+local function Init(self, event, name)
 	if (name ~= "moetQOL") then return end
 
 	-- custom slash commands
 	SLASH_moetQOL1 = SHORTCUT
 	SLASH_CLEAR1 = "/clear"
+	SLASH_RL1 = "/rl"
 	SlashCmdList.moetQOL = HandleSlashCommands
 	SlashCmdList.CLEAR = function() ChatFrame1:Clear() end
+	SlashCmdList.RL = function() ReloadUI() end
 
 	CheckDatabaseErrors()
 	ns.Core.ActivateFunctions()
@@ -123,6 +127,7 @@ end
 ---------------------------------------------------
 -- INIT
 ---------------------------------------------------
-local addonLoadedEvents = CreateFrame("frame")
+local addonLoadedEvents = CreateFrame("FRAME")
 addonLoadedEvents:RegisterEvent("ADDON_LOADED")
-addonLoadedEvents:SetScript("OnEvent", ns.init)
+addonLoadedEvents:SetScript("OnEvent", Init)
+addonLoadedEvents:Hide()

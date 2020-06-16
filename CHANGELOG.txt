@@ -1,1 +1,3 @@
-CombatTooltip now only hides Unit mouseovers.
+Fixed camera distance set cvar on player login.
+Added slash command /rl to Reload UI.
+Moved functions to own lua file.
