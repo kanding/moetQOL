@@ -141,9 +141,8 @@ local function SetupGuildFrame()
 end
 
 ---------------------------------------------------
--- MAIN FUNCTIONS, entry points
+-- MAIN FUNCTIONS
 ---------------------------------------------------
-
 function Func:HidePortraitNumbers()
 	PlayerHitIndicator.Show = function() end
 	PetHitIndicator.Show = function() end
@@ -156,10 +155,10 @@ function Func:EnableFastLoot()
 	local function FastLoot()
 		if GetTime() - tDelay >= 0.3 then
 			tDelay = GetTime()
-				if GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE") then
-					for i = GetNumLootItems(), 1, -1 do
-						LootSlot(i)
-					end
+			if GetCVarBool("autoLootDefault") ~= IsModifiedClick("AUTOLOOTTOGGLE") then
+				for i = GetNumLootItems(), 1, -1 do
+					LootSlot(i)
+				end
 				tDelay = GetTime()
 			end
 		end
@@ -475,6 +474,15 @@ function Func:RealIDCounter()
 end
 
 function Func:HideTooltipInCombat()
+	local option = moetQOLDB["combattooltip"][ns.Core.OPTION]
+	local normal = option == "normal"
+	local strict = option == "strict"
+	local moderate = option == "moderate"
+	if not moderate and not strict and not normal then
+		print(string.format("|c%scombattooltip:|r ineligible custom option: %s", F_COLOR, option))
+		print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
+	end
+
 	--hide if player enters combat with unit as mouseover
 	local f = CreateFrame("FRAME")
 	f:RegisterEvent("PLAYER_REGEN_DISABLED")
@@ -493,6 +501,12 @@ function Func:HideTooltipInCombat()
 	-- Doesn't work if you mouseover portrait.
 	-- unit/player both nil "OnShow".
 	GameTooltip:SetScript("OnShow", function()
+		-- TODO: fix not updating this so frequently..
+		local name, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize, LfgDungeonID = GetInstanceInfo()
+
+		if moderate and instanceType == "none" then return end
+		if strict and instanceType == "none" and not UnitInRaid("player") then return end
+
 		if InCombatLockdown() then
 			local _, t = GameTooltip:GetPoint()
 			local unit = UnitExists("mouseover")

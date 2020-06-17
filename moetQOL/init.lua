@@ -13,7 +13,7 @@ local WELCOME_MESSAGE = string.format("|c%smoetQOL|r loaded: v%s - |c%s%s|r to t
 local statesChanged = 0 -- avoid spamming with /reload requests
 local default = ns.Core.MQdefault
 --indices for state, description and associated function in default table
-local STATE, DESC, FUNC = ns.Core.STATE, ns.Core.DESC, ns.Core.FUNC
+local STATE, DESC, FUNC, OPTION = ns.Core.STATE, ns.Core.DESC, ns.Core.FUNC, ns.Core.OPTION
 
 ---------------------------------------------------
 -- CUSTOM SLASH COMMANDS
@@ -57,17 +57,39 @@ local function ChangeState(str)
 	end
 end
 
-local function HandleSlashCommands(str)
-	if #str == 0 then -- player entered /mq
-		mqCommands.help()
+local function ChangeOptions(str, option)
+	if str == nil or option == nil then return end
+
+	if moetQOLDB[str][OPTION] then
+		if type(option) == type(moetQOLDB[str][OPTION]) then
+			moetQOLDB[str][OPTION] = option
+			print(string.format("|c%s%s|r: |c%s%s|r", COLOR, str, COLOR2, moetQOLDB[str][OPTION]))
+			statesChanged = statesChanged + 1
+		else
+			print(string.format("|c%smq:|r %s custom option must be of type: %s", COLOR, str, type(moetQOLDB[str][OPTION])))
+			print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", COLOR))
+		end
+	else
+		print(string.format("|c%smq:|r %s does not have custom options.", COLOR, str))
+		print(string.format("|c%smq:|r See https://github.com/kanding/moetQOL/releases for details.", COLOR))
 	end
+
+	if statesChanged == 1 then
+		print(string.format(
+			"|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", 
+			COLOR, COLOR2))
+	end
+end
+
+local function HandleSlashCommands(str)
+	if #str == 0 then mqCommands.help() return end
 
 	local args = {}
 	local path = mqCommands
 
 	for _, arg in ipairs({ string.split(' ', str) }) do
 		if (#arg > 0) then
-			table.insert(args, arg) -- args is now a table with each word
+			table.insert(args, arg)
 		end
 	end
 
@@ -77,16 +99,17 @@ local function HandleSlashCommands(str)
 			arg = arg:lower()
 			if (path[arg]) then
 				if (type(path[arg]) == "function") then
-					path[arg](arg)
-					--[[ save this if we want any extra arguments to be passed,
-						 example: /mq fastloot on (will pass "fastloot" + "on")
-						 path[arg](select(id + 1, unpack(args))) --]]
+					path[arg](select(id, unpack(args)))
 					return
 				elseif (type(path[arg]) == "table") then
 					path = path[arg] -- enter found subtable
 				end
 			else
-				ChangeState(arg)
+				if #args > 1 then
+					ChangeOptions(select(id, unpack(args)))
+				else
+					ChangeState(arg)
+				end
 				return
 			end
 		end
@@ -97,12 +120,24 @@ local function CheckDatabaseErrors()
 	for k,v in pairs(default) do
 		--create if not exist
 		if not moetQOLDB[k] then
-			moetQOLDB[k] = {v[STATE], v[DESC]}
+			if v[OPTION] then
+				moetQOLDB[k] = {v[STATE], v[DESC], v[OPTION]}
+			else
+				moetQOLDB[k] = {v[STATE], v[DESC]}
+			end
 		end
 		
 		--update if outdated
 		if moetQOLDB[k][DESC] and moetQOLDB[k][DESC] ~= default[k][DESC] then
 			moetQOLDB[k][DESC] = default[k][DESC]
+		end
+
+		if default[k][OPTION] and (not moetQOLDB[k][OPTION] or 
+		(moetQOLDB[k][OPTION] and type(moetQOLDB[k][OPTION]) ~= type(default[k][OPTION])))
+		then
+			moetQOLDB[k][OPTION] = default[k][OPTION]
+		elseif moetQOLDB[k][OPTION] and not default[k][OPTION] then
+			moetQOLDB[k][OPTION] = nil
 		end
 	end
 end

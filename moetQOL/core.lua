@@ -13,14 +13,21 @@ local F_COLOR2 = "FF00FF00" -- green
 Core.STATE = 1
 Core.DESC = 2
 Core.FUNC = 3
-local STATE, DESC, FUNC = Core.STATE, Core.DESC, Core.FUNC
+Core.OPTION = 4
+local STATE, DESC, FUNC, OPTION = Core.STATE, Core.DESC, Core.FUNC, Core.OPTION
 
+---------------------------------------------------
+-- INVOKE ON LOGIN
+---------------------------------------------------
 local function InvokeLoginFunctions()
 	for i=1, #Func.onLogin do
 		if type(Func.onLogin[i]) == "function" then
 			Func.onLogin[i]()
 		end
 	end
+
+	Func.onLogin = nil
+	eventFrame = nil
 end
 
 local eventFrame = CreateFrame("FRAME")
@@ -30,14 +37,35 @@ eventFrame:Hide()
 ---------------------------------------------------
 -- CORE FUNCTIONS
 ---------------------------------------------------
-function Core:PrintFlags()
+function Core:PrintFlags(state)
 	for key, value in pairs(moetQOLDB) do
 		if Core.MQdefault[key] then
-			if (value[STATE] == "Off") then
-				print(string.format("|c%s%s|r: %s", F_COLOR, key, value[STATE]))
+			if state then
+				state = state:lower()
+				if value[STATE]:lower() == state then
+					if state == "off" then
+						print(string.format("|c%s%s|r: %s", F_COLOR, key, value[STATE]))
+					else
+						if value[OPTION] then
+							print(string.format("|c%s%s|r: |c%s%s|r, %s", F_COLOR, key, F_COLOR2, value[STATE], value[OPTION]))
+						else
+							print(string.format("|c%s%s|r: |c%s%s|r", F_COLOR, key, F_COLOR2, value[STATE]))
+						end
+					end
+				end
 			else
-				print(string.format("|c%s%s|r: |c%s%s|r", F_COLOR, key, F_COLOR2, value[STATE]))
+				if value[STATE] == "Off" then
+					print(string.format("|c%s%s|r: %s", F_COLOR, key, value[STATE]))
+				else
+					if value[OPTION] then
+						print(string.format("|c%s%s|r: |c%s%s|r, %s", F_COLOR, key, F_COLOR2, value[STATE], value[OPTION]))
+					else
+						print(string.format("|c%s%s|r: |c%s%s|r", F_COLOR, key, F_COLOR2, value[STATE]))
+					end
+				end
 			end
+		else
+			moetQOLDB[key] = nil -- remove unsupported key
 		end
 	end
 end
@@ -74,7 +102,7 @@ Core.MQdefault = {
 	["autorepair"] = {"Off", "automatically repair items when possible using player funds", Func.AutoRepair},
 	["paragontooltip"] = {"Off", "adds total completions to paragon tooltip", Func.ParagonTooltip},
 	["realidcounter"] = {"Off", "adds a counter that shows current out of total friends", Func.RealIDCounter},
-	["combattooltip"] = {"Off", "hides tooltip if in combat", Func.HideTooltipInCombat, 1},
+	["combattooltip"] = {"Off", "hides tooltip if in combat", Func.HideTooltipInCombat, "normal"},
 }
 
 function Core:ActivateFunctions()

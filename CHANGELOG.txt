@@ -1,3 +1,12 @@
 Fixed camera distance set cvar on player login.
 Added slash command /rl to Reload UI.
 Moved functions to own lua file.
+Now cleans up unsupported keys in DB when running /mq flags
+Added functionality for printing flags of certain state:
+- '/mq flags on' prints all functions that are on
+- '/mq flags off' prints all functions that are off
+Added functionality to add custom options to functions.
+Added CombatTooltip custom options:
+- normal, always hide unit tooltips in combat
+- moderate, hide unit tooltips in combat if in an instance
+- strict, hide unit tooltips in combat only if in instance and raid
