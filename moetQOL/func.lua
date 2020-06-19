@@ -102,6 +102,7 @@ local function InfoStringTooltip(self)
 	GameTooltip:AddDoubleLine("Total", memoryformat(total), color.r, color.g, color.b, color.r, color.g, color.b)
 	GameTooltip:AddDoubleLine("Total incl. Blizzard", memoryformat(blizz), color.r, color.g, color.b, color.r, color.g, color.b)
 	GameTooltip:Show()
+	wipe(addons)
 end
 
 local function SetupGuildFrame()
@@ -138,6 +139,29 @@ local function SetupGuildFrame()
 			end
 		end)
 	end
+end
+
+local function IsPlayerRanged()
+	local ranged = {
+		["MAGE"] = true,
+		["HUNTER"] = {["Marksmanship"]=true, ["Beast Mastery"]=true},
+		["WARLOCK"] = true,
+		["SHAMAN"] = {["Elemental"]=true,["Restoration"]=true},
+		["DRUID"] = {["Balance"]=true, ["Restoration"]=true},
+		["PRIEST"] = true,
+	}
+
+	local currentSpec = GetSpecialization()
+	local _, CLASS = UnitClass("player")
+	local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or "None"
+
+	if not ranged[CLASS] then return false end
+
+	if (ranged[CLASS] and ranged[CLASS] == true) or ranged[CLASS][currentSpecName] then
+		return true
+	end
+
+	return false
 end
 
 ---------------------------------------------------
@@ -487,11 +511,12 @@ function Func:HideTooltipInCombat()
 	local f = CreateFrame("FRAME")
 	f:RegisterEvent("PLAYER_REGEN_DISABLED")
 	f:SetScript("OnEvent", function()
+		if moderate and select(2, GetInstanceInfo()) == "none" then return end
+		if strict and select(2, GetInstanceInfo()) == "none" and not UnitInRaid("player") then return end
+
 		if GameTooltip:IsShown() then
 			local point, t = GameTooltip:GetPoint()
-			local unit = UnitExists("mouseover")
-			local player = UnitIsPlayer("mouseover")
-			if t and t.firstTimeLoaded and (unit or player) then
+			if t and t.firstTimeLoaded and (UnitExists("mouseover") or UnitIsPlayer("mouseover")) then
 				GameTooltip:Hide()
 			end
 		end
@@ -501,19 +526,39 @@ function Func:HideTooltipInCombat()
 	-- Doesn't work if you mouseover portrait.
 	-- unit/player both nil "OnShow".
 	GameTooltip:SetScript("OnShow", function()
-		-- TODO: fix not updating this so frequently..
-		local name, instanceType, difficultyID, difficultyName, maxPlayers, dynamicDifficulty, isDynamic, instanceID, instanceGroupSize, LfgDungeonID = GetInstanceInfo()
-
-		if moderate and instanceType == "none" then return end
-		if strict and instanceType == "none" and not UnitInRaid("player") then return end
+		if moderate and select(2, GetInstanceInfo()) == "none" then return end
+		if strict and select(2, GetInstanceInfo()) == "none" and not UnitInRaid("player") then return end
 
 		if InCombatLockdown() then
 			local _, t = GameTooltip:GetPoint()
-			local unit = UnitExists("mouseover")
-			local player = UnitIsPlayer("mouseover")
-			if t and t.firstTimeLoaded and (unit or player) then
+			if t and t.firstTimeLoaded and (UnitExists("mouseover") or UnitIsPlayer("mouseover")) then
 				GameTooltip:Hide()
 			end
 		end
 	end)
+end
+
+function Func:DynamicSpellQueue()
+	local function AdjustSpellQueue()
+		local ranged = IsPlayerRanged()
+		local rangedValue = moetQOLDB["dynamicspellqueue"][ns.Core.OPTION] or 280
+
+		if ranged then
+			SetCVar("SpellQueueWindow", rangedValue)
+		else
+			SetCVar("SpellQueueWindow", 125)
+		end
+	end
+	
+	RunOnLogin(AdjustSpellQueue)
+
+	-- check if specialization changed
+	local f = CreateFrame("FRAME")
+	f:RegisterEvent("PLAYER_SPECIALIZATION_CHANGED")
+	f:SetScript("OnEvent", function(self, event, ...)
+		if event == "PLAYER_SPECIALIZATION_CHANGED" and ... == "player" then
+			AdjustSpellQueue()
+		end
+	end)
+	f:Hide()
 end

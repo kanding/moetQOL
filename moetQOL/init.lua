@@ -18,7 +18,7 @@ local STATE, DESC, FUNC, OPTION = ns.Core.STATE, ns.Core.DESC, ns.Core.FUNC, ns.
 ---------------------------------------------------
 -- CUSTOM SLASH COMMANDS
 -- For special commands. If no equal key in mqCommands then
--- argument is passed to ChangeState() and executed if valid.
+-- argument is passed to ChangeState() or ChangeOptions().
 ---------------------------------------------------
 local mqCommands = {
 	["help"] = ns.Core.PrintHelp,
@@ -61,6 +61,9 @@ local function ChangeOptions(str, option)
 	if str == nil or option == nil then return end
 
 	if moetQOLDB[str][OPTION] then
+		local isNumber = tonumber(option)
+		if isNumber then option = isNumber end
+
 		if type(option) == type(moetQOLDB[str][OPTION]) then
 			moetQOLDB[str][OPTION] = option
 			print(string.format("|c%s%s|r: |c%s%s|r", COLOR, str, COLOR2, moetQOLDB[str][OPTION]))
@@ -143,7 +146,7 @@ local function CheckDatabaseErrors()
 end
 
 local function Init(self, event, name)
-	if (name ~= "moetQOL") then return end
+	if name ~= "moetQOL" then return end
 
 	-- custom slash commands
 	SLASH_moetQOL1 = SHORTCUT

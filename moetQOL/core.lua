@@ -84,7 +84,8 @@ end
 ---------------------------------------------------
 Core.MQdefault = {
 	-- key = name, value[1] = state, value[2] = description, value[3] = function to execute if state is On
-	-- values beyond that are custom options 
+	-- values beyond that are custom options
+	-- TODO: consider using dictionary, state = "off", desc = .. etc
 	["maxzoom"]	= {"Off", "sets camera distance to maximum available", Func.SetMaxZoom},
 	["portraitnumbers"] = {"Off", "hide combat numbers on your portrait", Func.HidePortraitNumbers},
 	["fastloot"] = {"Off", "faster auto looting", Func.EnableFastLoot},
@@ -103,6 +104,7 @@ Core.MQdefault = {
 	["paragontooltip"] = {"Off", "adds total completions to paragon tooltip", Func.ParagonTooltip},
 	["realidcounter"] = {"Off", "adds a counter that shows current out of total friends", Func.RealIDCounter},
 	["combattooltip"] = {"Off", "hides tooltip if in combat", Func.HideTooltipInCombat, "normal"},
+	["dynamicspellqueue"] = {"Off", "automatically adjust spellqueue based on ranged or melee", Func.DynamicSpellQueue, 280}
 }
 
 function Core:ActivateFunctions()
