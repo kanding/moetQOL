@@ -18,3 +18,5 @@ Added CombatTooltip custom options:
 
 Added DynamicSpellqueue which automatically changes the SpellQueueWindow
 baesd on ranged or melee. Melee is set to 125, ranged value can be supplied.
+
+Added Manual/Auto custom options to Sell Greys

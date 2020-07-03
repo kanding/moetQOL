@@ -71,38 +71,37 @@ end
 
 --function to create tooltip from rInfoStrings by zork
 local function InfoStringTooltip(self)
-	local addonlist = 50
 	local color = { r=156/255, g=144/255, b=125/255 }
+	GameTooltip:ClearLines()
 	GameTooltip:SetOwner(self, "ANCHOR_NONE")
 	GameTooltip:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", -90, 90)
 	local blizz = collectgarbage("count")
 	local addons = {}
-	local memory
 	local total = 0
 	local nr = 0
 	UpdateAddOnMemoryUsage()
-	GameTooltip:AddLine("Top "..addonlist.." AddOns", color.r, color.g, color.b)
+	GameTooltip:AddLine("Top 50 AddOns", color.r, color.g, color.b)
 	GameTooltip:AddLine(" ")
 	for i=1, GetNumAddOns(), 1 do
-		if (GetAddOnMemoryUsage(i) > 0 ) then
-		memory = GetAddOnMemoryUsage(i)
-		entry = {name = GetAddOnInfo(i), memory = memory}
-		table.insert(addons, entry)
-		total = total + memory
+		if GetAddOnMemoryUsage(i) > 0  then
+			local memory = GetAddOnMemoryUsage(i)
+			entry = {name = GetAddOnInfo(i), memory = memory}
+			table.insert(addons, entry)
+			total = total + memory
 		end
 	end
 	table.sort(addons, addoncompare)
 	for _, entry in pairs(addons) do
-		if nr < addonlist then
-		GameTooltip:AddDoubleLine(entry.name, memoryformat(entry.memory), 1, 1, 1, 1, 1, 1)
-		nr = nr+1
+		if nr < 50 then
+			GameTooltip:AddDoubleLine(entry.name, memoryformat(entry.memory), 1, 1, 1, 1, 1, 1)
+			nr = nr+1
 		end
 	end
 	GameTooltip:AddLine(" ")
 	GameTooltip:AddDoubleLine("Total", memoryformat(total), color.r, color.g, color.b, color.r, color.g, color.b)
 	GameTooltip:AddDoubleLine("Total incl. Blizzard", memoryformat(blizz), color.r, color.g, color.b, color.r, color.g, color.b)
 	GameTooltip:Show()
-	wipe(addons)
+	addons = nil
 end
 
 local function SetupGuildFrame()
@@ -229,6 +228,14 @@ function Func:EnableEasyDelete()
 end
 
 function Func:CreateSellButton()
+	local option = moetQOLDB["sell"][ns.Core.OPTION]
+	local auto = option == "auto"
+	local manual = option == "manual"
+	if not manual and not auto then
+		print(string.format("|c%ssell:|r ineligible custom option: %s", F_COLOR, option))
+		print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
+	end
+
 	local merchantButton = CreateFrame("Button", "moetQOL_SellButton", MerchantFrame, "LFGListMagicButtonTemplate") 
 	merchantButton:SetPoint("BOTTOMLEFT", 87, 4)
 	merchantButton:SetText("Sell Greys")
@@ -236,6 +243,10 @@ function Func:CreateSellButton()
 
 	merchantButton:RegisterEvent("MERCHANT_SHOW")
 	merchantButton:SetScript("OnEvent", function()
+		if auto then
+			SellGreyItems()
+		end
+		
 		if MerchantExtraCurrencyBg:IsVisible() then
 			MerchantMoneyFrame:Hide()
 			MerchantExtraCurrencyBg:Hide()
