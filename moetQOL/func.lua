@@ -436,8 +436,12 @@ function Func:HideErrorMessages()
 	eventHandler:Hide()
 end
 
-function Func:MoetTweaks()
-	WorldMapFrame:SetFrameStrata("FULLSCREEN")
+function Func:MoetUI()
+	RunOnLogin(function()
+		WorldMapFrame:SetFrameStrata("FULLSCREEN")
+		PlayerFrame:SetPoint("CENTER", nil, "CENTER", -370, -238)
+		TargetFrame:SetPoint("CENTER", nil, "CENTER", 370, -238)
+	end)
 end
 
 -- Inspired by AutoRepair

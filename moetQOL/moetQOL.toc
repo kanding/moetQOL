@@ -3,7 +3,7 @@
 ## Title: moetQOL
 ## Author: moet
 
-## Version: 2.6.0
+## Version: 2.6.1
 ## Notes: Lightweight quality of life improvements.
 ## SavedVariables: moetQOLDB
 
