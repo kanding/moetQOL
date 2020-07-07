@@ -439,8 +439,12 @@ end
 function Func:MoetUI()
 	RunOnLogin(function()
 		WorldMapFrame:SetFrameStrata("FULLSCREEN")
+		PlayerFrame:ClearAllPoints()
 		PlayerFrame:SetPoint("CENTER", nil, "CENTER", -370, -238)
+		PlayerFrame:SetUserPlaced(true);
+		TargetFrame:ClearAllPoints()
 		TargetFrame:SetPoint("CENTER", nil, "CENTER", 370, -238)
+		TargetFrame:SetUserPlaced(true);
 	end)
 end
 
