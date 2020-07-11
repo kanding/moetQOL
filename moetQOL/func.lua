@@ -269,7 +269,8 @@ end
 function Func:AutoCancelCutscenes()
 	CancelCutsceneFrame = CreateFrame("Frame")
 	CancelCutsceneFrame:RegisterEvent("CINEMATIC_START")
-	-- CancelCutsceneFrame:RegisterEvent("PLAY_MOVIE")
+	CancelCutsceneFrame:RegisterEvent("PLAY_MOVIE")
+	CancelCutsceneFrame:Hide()
 
 	CancelEventLoop = CancelCutsceneFrame:CreateAnimationGroup()
 	CancelEventLoop.anim = CancelEventLoop:CreateAnimation()
@@ -281,8 +282,12 @@ function Func:AutoCancelCutscenes()
 	end)
 
 	CancelCutsceneFrame:SetScript("OnEvent", function(self, event, ...)
-		CinematicFrame_CancelCinematic()
-		CancelEventLoop:Play()
+		if event == "CINEMATIC_START" then
+			CinematicFrame_CancelCinematic()
+			CancelEventLoop:Play()
+		else
+			MovieFrame:Hide()
+		end
 	end)
 end
 
