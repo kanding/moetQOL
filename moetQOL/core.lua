@@ -93,7 +93,6 @@ Core.MQdefault = {
 	["easydelete"] = {"Off", "remove the need to type 'delete' on rare+ items", Func.EnableEasyDelete},
 	["voicebuttons"] = {"Off", "hide Voice chat buttons", Func.HideVoiceButtons},
 	["skipmovies"] = {"Off", "auto skip all cutscenes", Func.AutoCancelCutscenes},
-	["borders"] = {"Off", "hides some Blizzard UI borders", Func.HideBlizzardBorders},
 	["infostring"] = {"Off", "show addon usage, MS and FPS beneath minimap, click to collect garbage (moveable with ALT+LClick)", Func.CreateInfoStrings},
 	["sell"] = {"Off", "adds a button on merchants to sell grey items", Func.CreateSellButton, "manual"},
 	["oldguild"] = {"Off", "Reverts to old guild frame if you're in a guild", Func.HideCommunities},

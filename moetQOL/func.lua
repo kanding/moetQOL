@@ -291,15 +291,6 @@ function Func:AutoCancelCutscenes()
 	end)
 end
 
-function Func:HideBlizzardBorders()
-	local hiddenFrame = CreateFrame("Frame")
-	hiddenFrame:Hide()
-
-	CastingBarFrame.Border:SetParent(hiddenFrame)
-	TargetFrameSpellBar.Border:SetParent(hiddenFrame)
-	MirrorTimer1Border:SetParent(hiddenFrame)
-end
-
 -- Inspired by rInfostring by zork
 -- Moved here to rework and maintain.
 -- https://github.com/zorker/rothui
@@ -442,14 +433,35 @@ function Func:HideErrorMessages()
 end
 
 function Func:MoetUI()
+	local hiddenFrame = CreateFrame("Frame")
+	hiddenFrame:Hide()
+
+	local pFrame = {anchor = "CENTER", relative = "CENTER", x = -370, y = -238}
+	local tFrame = {anchor = "CENTER", relative = "CENTER", x = 370, y = -238}
+
 	RunOnLogin(function()
+		CastingBarFrame.Border:SetParent(hiddenFrame)
+		TargetFrameSpellBar.Border:SetParent(hiddenFrame)
+		MirrorTimer1Border:SetParent(hiddenFrame)
 		WorldMapFrame:SetFrameStrata("FULLSCREEN")
-		PlayerFrame:ClearAllPoints()
-		PlayerFrame:SetPoint("CENTER", nil, "CENTER", -370, -238)
-		PlayerFrame:SetUserPlaced(true);
-		TargetFrame:ClearAllPoints()
-		TargetFrame:SetPoint("CENTER", nil, "CENTER", 370, -238)
-		TargetFrame:SetUserPlaced(true);
+
+		local anchor, _, relative, x, y = PlayerFrame:GetPoint()
+
+		if anchor ~= pFrame.anchor or relative ~= pFrame.relative
+		or x ~= pFrame.x or y ~= pFrame.y then
+			PlayerFrame:ClearAllPoints()
+			PlayerFrame:SetPoint("CENTER", UIParent, "CENTER", -370, -238)
+			PlayerFrame:SetUserPlaced(true);
+		end
+
+		anchor, _, relative, x, y = TargetFrame:GetPoint()
+
+		if anchor ~= tFrame.anchor or relative ~= tFrame.relative
+		or x ~= tFrame.x or y ~= tFrame.y then
+			TargetFrame:ClearAllPoints()
+			TargetFrame:SetPoint("CENTER", UIParent, "CENTER", 370, -238)
+			TargetFrame:SetUserPlaced(true);
+		end
 	end)
 end
 
