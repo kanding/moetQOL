@@ -267,27 +267,12 @@ function Func:HideVoiceButtons()
 end
 
 function Func:AutoCancelCutscenes()
-	CancelCutsceneFrame = CreateFrame("Frame")
-	CancelCutsceneFrame:RegisterEvent("CINEMATIC_START")
-	CancelCutsceneFrame:RegisterEvent("PLAY_MOVIE")
-	CancelCutsceneFrame:Hide()
-
-	CancelEventLoop = CancelCutsceneFrame:CreateAnimationGroup()
-	CancelEventLoop.anim = CancelEventLoop:CreateAnimation()
-	CancelEventLoop.anim:SetDuration(2)
-	CancelEventLoop:SetLooping("REPEAT")
-	CancelEventLoop:SetScript("OnLoop", function(self, event, ...)
-		CancelEventLoop:Stop()
-		CinematicFrame_CancelCinematic()
+	hooksecurefunc("MovieFrame_PlayMovie", function()
+		MovieFrame:Hide()
 	end)
 
-	CancelCutsceneFrame:SetScript("OnEvent", function(self, event, ...)
-		if event == "CINEMATIC_START" then
-			CinematicFrame_CancelCinematic()
-			CancelEventLoop:Play()
-		else
-			MovieFrame:Hide()
-		end
+	CinematicFrame:HookScript("OnShow", function(self, ...)
+		CinematicFrame_CancelCinematic()
 	end)
 end
 
@@ -441,10 +426,12 @@ function Func:MoetUI()
 
 	RunOnLogin(function()
 		CastingBarFrame.Border:SetParent(hiddenFrame)
+		CastingBarFrame.Flash:SetParent(hiddenFrame)
 		TargetFrameSpellBar.Border:SetParent(hiddenFrame)
+		TargetFrameSpellBar.Flash:SetParent(hiddenFrame)
 		MirrorTimer1Border:SetParent(hiddenFrame)
 		WorldMapFrame:SetFrameStrata("FULLSCREEN")
-
+		
 		local anchor, _, relative, x, y = PlayerFrame:GetPoint()
 
 		if anchor ~= pFrame.anchor or relative ~= pFrame.relative
