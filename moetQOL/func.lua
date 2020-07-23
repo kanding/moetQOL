@@ -40,11 +40,11 @@ local function SellGreyItems()
 	end
 end
 
-local function InfoStringsGetFps() 
+local function InfoStringsGetFps()
 	return floor(GetFramerate()) .. "fps"
 end
 
-local function InfoStringsGetMs() 
+local function InfoStringsGetMs()
 	return select(3, GetNetStats()) .. "ms"
 end
 
@@ -121,7 +121,7 @@ local function SetupGuildFrame()
 		-- Above function will still cause 'taint'.
 		hooksecurefunc("ShowUIPanel",function(frame,force,duplicated)
 			if frame and not frame:GetName() == "GuildFrame" then return end
-			
+
 			if frame and not frame:IsShown() and not duplicated and InCombatLockdown() and not WorldMapFrame:IsShown() then
 				local point,_,relativePoint,xOff,yOff = frame:GetPoint()
 				frame:ClearAllPoints()
@@ -132,7 +132,7 @@ local function SetupGuildFrame()
 
 		hooksecurefunc("HideUIPanel",function(frame,force,duplicated)
 			if frame and not frame:GetName() == "GuildFrame" then return end
-			
+
 			if frame and frame:IsShown() and not duplicated and InCombatLockdown() then
 				frame:Hide()
 			end
@@ -163,6 +163,66 @@ local function IsPlayerRanged()
 	return false
 end
 
+local function UpdatePlayerFramePosition(pFrame, tFrame)
+	local anchor, _, _, x, y = PlayerFrame:GetPoint()
+
+	if anchor ~= pFrame.anchor or x ~= pFrame.x or y ~= pFrame.y then
+		PlayerFrame:ClearAllPoints()
+		PlayerFrame:SetPoint("CENTER", -370, -238)
+		PlayerFrame:SetUserPlaced(true);
+	end
+
+	anchor, _, relative, x, y = TargetFrame:GetPoint()
+
+	if anchor ~= tFrame.anchor or x ~= tFrame.x or y ~= tFrame.y then
+		TargetFrame:ClearAllPoints()
+		TargetFrame:SetPoint("CENTER", 370, -238)
+		TargetFrame:SetUserPlaced(true);
+	end
+end
+
+local function HideBlizzardFrames()
+	local ALPHA = 0.2
+	local hiddenFrame = CreateFrame("FRAME")
+	hiddenFrame:Hide()
+
+	--[[local toggleFrame = CreateFrame("FRAME")
+	toggleFrame:SetAllPoints("MultiBarLeft")
+	toggleFrame:SetFrameStrata("HIGH")
+	toggleFrame:HookScript("OnEnter", function() MultiBarLeft:SetAlpha(1.0) end)
+	toggleFrame:HookScript("OnLeave", function() MultiBarLeft:SetAlpha(ALPHA) end)
+	toggleFrame:Show()--]]
+
+	local MICRO_BUTTONS = {
+		"CharacterMicroButton",
+		"SpellbookMicroButton",
+		"TalentMicroButton",
+		"AchievementMicroButton",
+		"QuestLogMicroButton",
+		"GuildMicroButton",
+		"LFDMicroButton",
+		"CollectionsMicroButton",
+		"EJMicroButton",
+		"StoreMicroButton",
+		"MainMenuMicroButton"
+	}
+
+	for _,v in pairs(MICRO_BUTTONS) do
+		_G[v]:SetAlpha(ALPHA)
+	end
+
+	CastingBarFrame.Border:SetParent(hiddenFrame)
+	CastingBarFrame.Flash:SetParent(hiddenFrame)
+	TargetFrameSpellBar.Border:SetParent(hiddenFrame)
+	TargetFrameSpellBar.Flash:SetParent(hiddenFrame)
+	MirrorTimer1Border:SetParent(hiddenFrame)
+	MicroButtonAndBagsBar:Hide()
+
+	WorldMapFrame:SetFrameStrata("FULLSCREEN")
+	MultiBarLeft:SetAlpha(ALPHA)
+	MultiBarRight:SetAlpha(ALPHA)
+end
+
 ---------------------------------------------------
 -- MAIN FUNCTIONS
 ---------------------------------------------------
@@ -174,7 +234,7 @@ end
 
 function Func:EnableFastLoot()
 	local tDelay = 0
-	
+
 	local function FastLoot()
 		if GetTime() - tDelay >= 0.3 then
 			tDelay = GetTime()
@@ -236,7 +296,7 @@ function Func:CreateSellButton()
 		print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
 	end
 
-	local merchantButton = CreateFrame("Button", "moetQOL_SellButton", MerchantFrame, "LFGListMagicButtonTemplate") 
+	local merchantButton = CreateFrame("Button", "moetQOL_SellButton", MerchantFrame, "LFGListMagicButtonTemplate")
 	merchantButton:SetPoint("BOTTOMLEFT", 87, 4)
 	merchantButton:SetText("Sell Greys")
 	merchantButton:SetScript("OnClick", SellGreyItems)
@@ -246,7 +306,7 @@ function Func:CreateSellButton()
 		if auto then
 			SellGreyItems()
 		end
-		
+
 		if MerchantExtraCurrencyBg:IsVisible() then
 			MerchantMoneyFrame:Hide()
 			MerchantExtraCurrencyBg:Hide()
@@ -292,8 +352,8 @@ function Func:CreateInfoStrings()
 	posFrame:EnableMouse(true)
 	posFrame:SetMovable(true)
 	posFrame:RegisterForDrag("LeftButton")
-	posFrame:SetScript("OnDragStart", function() 
-		if IsAltKeyDown() then 
+	posFrame:SetScript("OnDragStart", function()
+		if IsAltKeyDown() then
 			posFrame:StartMoving()
 		end
 	end)
@@ -406,7 +466,7 @@ function Func:HideErrorMessages()
 
 	local function OnUIErrorMessage(self, event, messageType, message)
 		local errorName, soundKitID, voiceID = GetGameMessageInfo(messageType)
-	
+
 		if blacklist[errorName] then return end
 		UIErrorsFrame:AddMessage(message, 1, .1, .1)
 	end
@@ -418,37 +478,12 @@ function Func:HideErrorMessages()
 end
 
 function Func:MoetUI()
-	local hiddenFrame = CreateFrame("Frame")
-	hiddenFrame:Hide()
-
-	local pFrame = {anchor = "CENTER", relative = "CENTER", x = -370, y = -238}
-	local tFrame = {anchor = "CENTER", relative = "CENTER", x = 370, y = -238}
+	local pFrame = {anchor = "CENTER", x = -370, y = -238}
+	local tFrame = {anchor = "CENTER", x = 370, y = -238}
 
 	RunOnLogin(function()
-		CastingBarFrame.Border:SetParent(hiddenFrame)
-		CastingBarFrame.Flash:SetParent(hiddenFrame)
-		TargetFrameSpellBar.Border:SetParent(hiddenFrame)
-		TargetFrameSpellBar.Flash:SetParent(hiddenFrame)
-		MirrorTimer1Border:SetParent(hiddenFrame)
-		WorldMapFrame:SetFrameStrata("FULLSCREEN")
-		
-		local anchor, _, relative, x, y = PlayerFrame:GetPoint()
-
-		if anchor ~= pFrame.anchor or relative ~= pFrame.relative
-		or x ~= pFrame.x or y ~= pFrame.y then
-			PlayerFrame:ClearAllPoints()
-			PlayerFrame:SetPoint("CENTER", UIParent, "CENTER", -370, -238)
-			PlayerFrame:SetUserPlaced(true);
-		end
-
-		anchor, _, relative, x, y = TargetFrame:GetPoint()
-
-		if anchor ~= tFrame.anchor or relative ~= tFrame.relative
-		or x ~= tFrame.x or y ~= tFrame.y then
-			TargetFrame:ClearAllPoints()
-			TargetFrame:SetPoint("CENTER", UIParent, "CENTER", 370, -238)
-			TargetFrame:SetUserPlaced(true);
-		end
+		HideBlizzardFrames()
+		UpdatePlayerFramePosition(pFrame, tFrame)
 	end)
 end
 
@@ -512,7 +547,7 @@ function Func:RealIDCounter()
 	fstring:SetHeight(fstring:GetStringHeight())
 	local k,_ = BNGetNumFriends()
 	fstring:SetText(k.."/200")
-	
+
 	f:RegisterEvent("BN_FRIEND_LIST_SIZE_CHANGED")
 	f:SetScript("OnEvent", function()
 		local k,_ = BNGetNumFriends()
@@ -572,7 +607,7 @@ function Func:DynamicSpellQueue()
 			SetCVar("SpellQueueWindow", 125)
 		end
 	end
-	
+
 	RunOnLogin(AdjustSpellQueue)
 
 	-- check if specialization changed
