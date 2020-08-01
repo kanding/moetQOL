@@ -98,7 +98,6 @@ Core.MQdefault = {
 	["oldguild"] = {"Off", "Reverts to old guild frame if you're in a guild", Func.HideCommunities},
 	["talkinghead"] = {"Off", "hides talking head frames", Func.HideTalkingHead},
 	["fastislands"] = {"Off", "instantly queues mythic islands upon opening the table", Func.InstantQueueMythicIsland},
-	["moetui"] = {"Off", "UI setup for myself", Func.MoetUI},
 	["autorepair"] = {"Off", "automatically repair items when possible using player funds", Func.AutoRepair},
 	["paragontooltip"] = {"Off", "adds total completions to paragon tooltip", Func.ParagonTooltip},
 	["realidcounter"] = {"Off", "adds a counter that shows current out of total friends", Func.RealIDCounter},

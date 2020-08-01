@@ -5,6 +5,7 @@ manual-changelog: CHANGELOG.txt
 ignore:
     - README.md
     - CHANGELOG.txt
+    - moetUI/
 
 move-folders:
   moetQOL/moetQOL: moetQOL
