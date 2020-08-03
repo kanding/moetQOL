@@ -8,6 +8,7 @@
 local _, ns	= ...
 ns.Func	= {} -- add the core to the namespace
 local Func = ns.Func
+local DATA = ns.Data
 local F_COLOR = "00CC0F00" -- red
 local F_COLOR2 = "FF00FF00" -- green
 
@@ -161,6 +162,104 @@ local function IsPlayerRanged()
 	end
 
 	return false
+end
+
+local function AutoShareQuest(questID)
+	if C_QuestLog.IsPushableQuest(questID) then
+		local title = C_QuestLog.GetTitleForQuestID(questID)
+		C_QuestLog.SetSelectedQuest(questID)
+		QuestLogPushQuest();
+		DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq|r: Attempting to share %s with your group...", F_COLOR, title));
+	end
+end
+
+local function HandleQuests(self, e, ...)
+	if e == "QUEST_ACCEPTED" then
+		if IsInGroup() then
+			AutoShareQuest(...)
+		end
+	end
+
+	if IsShiftKeyDown() then return end
+
+	if e == "QUEST_DETAIL" then
+		if not QuestGetAutoAccept() then
+			AcceptQuest()
+		end
+
+		CloseQuest()
+	elseif e == "QUEST_PROGRESS" then
+		if IsQuestCompletable() then
+			CompleteQuest()
+		end
+	elseif e == "QUEST_COMPLETE" then
+		if GetNumQuestChoices() == 0 then
+			GetQuestReward(nil);
+		elseif GetNumQuestChoices() == 1 then
+			GetQuestReward(1);
+		end
+		-- possibly add option to brute force item value etc
+		-- GetQuestReward(QuestFrameRewardPanel.itemChoice);
+	end
+end
+
+local function HandleGossip(self, e, ...)
+	if IsShiftKeyDown() then return end
+
+	local numAvailableQuests = 0
+	local numActiveQuests = 0
+	local gossipOptions = C_GossipInfo.GetNumOptions()
+	local gossip = true --don't gossip if handing-in/picking up
+
+	if e == "QUEST_GREETING" then
+		-- fired if NPC only has quests
+		numAvailableQuests = GetNumAvailableQuests()
+		numActiveQuests = GetNumActiveQuests()
+	elseif e == "GOSSIP_SHOW" then
+		-- fired if NPC has gossip as well as quests.
+		numAvailableQuests = C_GossipInfo.GetNumAvailableQuests()
+		numActiveQuests = C_GossipInfo.GetNumActiveQuests()
+	end
+
+	if numAvailableQuests > 0 then
+		gossip = false
+		for i = 1, numAvailableQuests do
+			if e == "QUEST_GREETING" then
+				SelectAvailableQuest(i);
+			elseif e == "GOSSIP_SHOW" then
+				C_GossipInfo.SelectAvailableQuest(i);
+			end
+		end
+	end
+
+	if numActiveQuests > 0 then
+		local quests = C_GossipInfo.GetActiveQuests()
+		for idx, quest in pairs(quests) do
+			if quest.isComplete then
+				gossip = false
+				if e == "QUEST_GREETING" then
+					SelectActiveQuest(idx);
+				elseif e == "GOSSIP_SHOW" then
+					C_GossipInfo.SelectActiveQuest(idx);
+				end
+			end
+		end
+	end
+
+	if gossip and gossipOptions > 0 then
+		local target = UnitName("target")
+		if not DATA.SHADOWLANDS_GOSSIP[target] then return end
+		local option = DATA.SHADOWLANDS_GOSSIP[target]
+
+		-- doesnt cover extreme obscure cases but most
+		if type(option) == "table" then
+			local max = math.max(unpack(DATA.SHADOWLANDS_GOSSIP[target]))
+			option = max
+			if max >= gossipOptions then option = gossipOptions end
+		end
+
+		C_GossipInfo.SelectOption(option)
+	end
 end
 
 ---------------------------------------------------
@@ -451,7 +550,6 @@ function Func:ParagonTooltip()
 
 		EmbeddedItemTooltip:AddLine(line)
 		EmbeddedItemTooltip:Show()
-
 	end)
 
 	hooksecurefunc("ReputationParagonFrame_OnLeave", function(self)
@@ -549,4 +647,18 @@ function Func:DynamicSpellQueue()
 		end
 	end)
 	f:Hide()
+end
+
+function Func:AutoQuest()
+	local questFrame = CreateFrame("FRAME", "moetQOL_QuestFrame")
+	questFrame:RegisterEvent("QUEST_DETAIL")
+	questFrame:RegisterEvent("QUEST_PROGRESS")
+	questFrame:RegisterEvent("QUEST_ACCEPTED")
+	questFrame:RegisterEvent("QUEST_COMPLETE")
+	questFrame:SetScript("OnEvent", HandleQuests)
+
+	local gossipFrame = CreateFrame("FRAME", "moetQOL_GossipFrame")
+	gossipFrame:RegisterEvent("GOSSIP_SHOW")
+	gossipFrame:RegisterEvent("QUEST_GREETING")
+	gossipFrame:SetScript("OnEvent", HandleGossip)
 end

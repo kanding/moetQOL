@@ -1,11 +1,13 @@
-## Interface: 80300
+## Interface: 90001
 
 ## Title: moetQOL
 ## Author: moet
 
-## Version: 2.6.1
+## Version: 2.6.1b
 ## Notes: Lightweight quality of life improvements.
 ## SavedVariables: moetQOLDB
+
+data/SHADOWLANDS_GOSSIP.lua
 
 func.lua
 core.lua

@@ -102,7 +102,8 @@ Core.MQdefault = {
 	["paragontooltip"] = {"Off", "adds total completions to paragon tooltip", Func.ParagonTooltip},
 	["realidcounter"] = {"Off", "adds a counter that shows current out of total friends", Func.RealIDCounter},
 	["combattooltip"] = {"Off", "hides tooltip if in combat", Func.HideTooltipInCombat, "normal"},
-	["dynamicspellqueue"] = {"Off", "automatically adjust spellqueue based on ranged or melee", Func.DynamicSpellQueue, 280}
+	["dynamicspellqueue"] = {"Off", "automatically adjust spellqueue based on ranged or melee", Func.DynamicSpellQueue, 280},
+	["autoquest"] = {"Off", "auto accept/deliver/share quests (hold SHIFT to disable)", Func.AutoQuest},
 }
 
 function Core:ActivateFunctions()
