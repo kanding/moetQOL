@@ -174,6 +174,7 @@ local function AutoShareQuest(questID)
 end
 
 local function HandleQuests(self, e, ...)
+	print(e)
 	if e == "QUEST_ACCEPTED" then
 		if IsInGroup() then
 			AutoShareQuest(...)
@@ -204,6 +205,7 @@ local function HandleQuests(self, e, ...)
 end
 
 local function HandleGossip(self, e, ...)
+	print(e)
 	if IsShiftKeyDown() then return end
 
 	local numAvailableQuests = 0
@@ -221,6 +223,10 @@ local function HandleGossip(self, e, ...)
 		numActiveQuests = C_GossipInfo.GetNumActiveQuests()
 	end
 
+	print("GOSSIP OPTIONS: "..gossipOptions)
+	print("AVAIL QUESTS: "..numAvailableQuests)
+	print("ACTIVE QUESTS: "..numActiveQuests)
+
 	if numAvailableQuests > 0 then
 		gossip = false
 		for i = 1, numAvailableQuests do
@@ -234,13 +240,26 @@ local function HandleGossip(self, e, ...)
 
 	if numActiveQuests > 0 then
 		local quests = C_GossipInfo.GetActiveQuests()
-		for idx, quest in pairs(quests) do
-			if quest.isComplete then
-				gossip = false
+		--quests can be empty on quest greeting event.
+		--getactivequests/getavailablequests returns empty table
+		if #quests ~= 0 then
+			for i, quest in pairs(quests) do
+				if quest.isComplete then
+					gossip = false
+					if e == "QUEST_GREETING" then
+						SelectActiveQuest(i);
+					elseif e == "GOSSIP_SHOW" then
+						C_GossipInfo.SelectActiveQuest(i);
+					end
+				end
+			end
+		else
+			--fallback just select quests, cant check if complete?
+			for i = 1, numActiveQuests do
 				if e == "QUEST_GREETING" then
-					SelectActiveQuest(idx);
+					SelectActiveQuest(i);
 				elseif e == "GOSSIP_SHOW" then
-					C_GossipInfo.SelectActiveQuest(idx);
+					C_GossipInfo.SelectActiveQuest(i);
 				end
 			end
 		end
@@ -248,17 +267,20 @@ local function HandleGossip(self, e, ...)
 
 	if gossip and gossipOptions > 0 then
 		local target = UnitName("target")
-		if not DATA.SHADOWLANDS_GOSSIP[target] then return end
-		local option = DATA.SHADOWLANDS_GOSSIP[target]
+		if not DATA.SHADOWLANDS_GOSSIP[target] then
+			print(string.format("GOSSIP: %s NOT IN TABLE.", target))
+			return
+		end
+		local choice = DATA.SHADOWLANDS_GOSSIP[target]
 
 		-- doesnt cover extreme obscure cases but most
-		if type(option) == "table" then
+		if type(choice) == "table" then
 			local max = math.max(unpack(DATA.SHADOWLANDS_GOSSIP[target]))
-			option = max
-			if max >= gossipOptions then option = gossipOptions end
+			choice = max
+			if max >= gossipOptions then choice = gossipOptions end
 		end
-
-		C_GossipInfo.SelectOption(option)
+		print("GOSSIP: PICKING CHOICE "..tostring(choice))
+		C_GossipInfo.SelectOption(choice)
 	end
 end
 
@@ -342,9 +364,7 @@ function Func:CreateSellButton()
 
 	merchantButton:RegisterEvent("MERCHANT_SHOW")
 	merchantButton:SetScript("OnEvent", function()
-		if auto then
-			SellGreyItems()
-		end
+		if auto then SellGreyItems() end
 
 		if MerchantExtraCurrencyBg:IsVisible() then
 			MerchantMoneyFrame:Hide()
@@ -355,10 +375,18 @@ function Func:CreateSellButton()
 	end)
 end
 
-function Func:HideVoiceButtons()
+function Func:HideChatButtons()
 	local hiddenFrame = CreateFrame("Frame")
 	hiddenFrame:Hide()
 
+	for i=1,NUM_CHAT_WINDOWS do
+		local f = _G["ChatFrame"..i.."ButtonFrame"]
+		if f:IsShown() then
+			f:SetParent(hiddenFrame)
+		end
+	end
+
+	QuickJoinToastButton:SetParent(hiddenFrame)
 	ChatFrameMenuButton:SetParent(hiddenFrame)
 	ChatFrameChannelButton:SetParent(hiddenFrame)
 	ChatFrameToggleVoiceDeafenButton:SetParent(hiddenFrame)
@@ -661,4 +689,8 @@ function Func:AutoQuest()
 	gossipFrame:RegisterEvent("GOSSIP_SHOW")
 	gossipFrame:RegisterEvent("QUEST_GREETING")
 	gossipFrame:SetScript("OnEvent", HandleGossip)
+end
+
+function Func:HideChatInCombat()
+
 end

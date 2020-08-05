@@ -1,3 +1,11 @@
+--moetQOL v2.6.2beta
+
+Added AutoQuest option for automatically handing in/picking up/sharing quests
+as well as gossip for certain NPCs specified in data/ file. For Shadowlands
+levelling.
+
+Renamed voicebuttons to chatbuttons and hit QuickJoinToast button as well.
+
 --moetQOL v2.6.1
 
 Moved HideBlizzardBorders and UI specific stuff into new moetUI addon.

@@ -91,7 +91,7 @@ Core.MQdefault = {
 	["fastloot"] = {"Off", "faster auto looting", Func.EnableFastLoot},
 	["errormsg"] = {"Off", "hide generic red error messages", Func.HideErrorMessages},
 	["easydelete"] = {"Off", "remove the need to type 'delete' on rare+ items", Func.EnableEasyDelete},
-	["voicebuttons"] = {"Off", "hide Voice chat buttons", Func.HideVoiceButtons},
+	["chatbuttons"] = {"Off", "hide chat buttons", Func.HideChatButtons},
 	["skipmovies"] = {"Off", "auto skip all cutscenes", Func.AutoCancelCutscenes},
 	["infostring"] = {"Off", "show addon usage, MS and FPS beneath minimap, click to collect garbage (moveable with ALT+LClick)", Func.CreateInfoStrings},
 	["sell"] = {"Off", "adds a button on merchants to sell grey items", Func.CreateSellButton, "manual"},
@@ -104,6 +104,7 @@ Core.MQdefault = {
 	["combattooltip"] = {"Off", "hides tooltip if in combat", Func.HideTooltipInCombat, "normal"},
 	["dynamicspellqueue"] = {"Off", "automatically adjust spellqueue based on ranged or melee", Func.DynamicSpellQueue, 280},
 	["autoquest"] = {"Off", "auto accept/deliver/share quests (hold SHIFT to disable)", Func.AutoQuest},
+	["combatchat"] = {"Off", "NYI: fades chat when in Boss/Encounter combat", Func.HideChatInCombat},
 }
 
 function Core:ActivateFunctions()
