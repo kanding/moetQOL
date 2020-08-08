@@ -22,11 +22,11 @@ end
 
 local function IsInArray(array, s)
     for _, v in pairs(array) do
-		if v == s then
-			return true
-		end
-	end
-	return false
+        if v == s then
+            return true
+        end
+    end
+    return false
 end
 
 --NOTE: this only sells 12 items at a time, rest will say object is busy.
@@ -299,24 +299,24 @@ local function ChatFrame_OnLeave(self)
     local f = GetMouseFocus()
     if f then
         -- Ensure frame is not just higher strata than mouseover frame
-		if f.messageInfo then return end
+        if f.messageInfo then return end
         if IsInArray(self.Frames, f) then return end
 
         if not f:GetName() then
             --most likely scrollbar
         elseif f:GetParent() then
             f = f:GetParent()
-			if IsInArray(self.Frames, f) then
-				return
-			end
-			if f:GetParent() then
-				f = f:GetParent()
-				if IsInArray(self.Frames, f) then
-					return
-				end
-			end
-		end
-	end
+            if IsInArray(self.Frames, f) then
+                return
+            end
+            if f:GetParent() then
+                f = f:GetParent()
+                if IsInArray(self.Frames, f) then
+                    return
+                end
+            end
+        end
+    end
 
     for _, frame in pairs(self.Frames) do
         local alpha = frame:GetAlpha()
@@ -354,25 +354,25 @@ local function SetupMouseoverFrames()
             }
             chatMouseover:SetFrameStrata("BACKGROUND")
             chatMouseover.FadeOut = function(self) ChatFrame_OnLeave(self) end
-			chatMouseover.FadeIn = function(self) ChatFrame_OnEnter(self) end
+            chatMouseover.FadeIn = function(self) ChatFrame_OnEnter(self) end
             chatMouseover:SetScript("OnEnter", function(self) self:FadeIn(self) end)
             chatMouseover:SetScript("OnLeave", function(self) self:FadeOut(self) end)
 
             --add tabs and buttons to chatframe1 to be hidden
-			if i == 1 then
-				table.insert(chatMouseover.Frames, GeneralDockManager)
-				table.insert(chatMouseover.Frames, GeneralDockManagerScrollFrame)
-				if ChatFrameMenuButton:IsShown() then
-					table.insert(chatMouseover.Frames, ChatFrameMenuButton)
+            if i == 1 then
+                table.insert(chatMouseover.Frames, GeneralDockManager)
+                table.insert(chatMouseover.Frames, GeneralDockManagerScrollFrame)
+                if ChatFrameMenuButton:IsShown() then
+                    table.insert(chatMouseover.Frames, ChatFrameMenuButton)
                 end
                 if ChatFrameChannelButton:IsShown() then
                     table.insert(chatMouseover.Frames, ChatFrameChannelButton)
                 end
-				table.insert(chatMouseover.Frames, QuickJoinToastButton)
-			end
+                table.insert(chatMouseover.Frames, QuickJoinToastButton)
+            end
 
-			table.insert(frames, chatMouseover)
-		end
+            table.insert(frames, chatMouseover)
+        end
     end
 
     return frames

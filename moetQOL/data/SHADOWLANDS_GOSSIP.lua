@@ -1,12 +1,9 @@
 local _, ns	= ...
-ns.Data	= {} -- add the core to the namespace
 
 --[[
     ["NPC NAME"] = GOSSIP_OPTION
 
-    Gossip option number is seperate from quests.
-    So one talk/speech bubble option = 1, regardless
-    of whether or not there are quests to pickup/hand-in
+    Count ONLY speech bubble options.
 
     Run:
     /run print(C_GossipInfo.GetNumOptions())

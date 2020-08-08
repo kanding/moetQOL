@@ -7,6 +7,7 @@
 ## Notes: Lightweight quality of life improvements.
 ## SavedVariables: moetQOLDB
 
+data/data.lua
 data/SHADOWLANDS_GOSSIP.lua
 
 func.lua
