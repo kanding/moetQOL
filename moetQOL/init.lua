@@ -21,145 +21,143 @@ local STATE, DESC, FUNC, OPTION = ns.Core.STATE, ns.Core.DESC, ns.Core.FUNC, ns.
 -- argument is passed to ChangeState() or ChangeOptions().
 ---------------------------------------------------
 local mqCommands = {
-	["help"] = ns.Core.PrintHelp,
-	["flags"] = ns.Core.PrintFlags,
-	["hardreset"] = function()
-		moetQOLDB = default
-		print(string.format("|c%smq:|r Database set to default, values set to Off.", COLOR))
-	end,
+    ["help"] = ns.Core.PrintHelp,
+    ["flags"] = ns.Core.PrintFlags,
+    ["hardreset"] = function()
+        moetQOLDB = default
+        print(string.format("|c%smq:|r Database set to default, values set to Off.", COLOR))
+    end,
 }
 
 ---------------------------------------------------
 -- FUNCTIONS
 ---------------------------------------------------
 local function ChangeState(str)
-	if str == nil then return end
+    if str == nil then return end
 
-	if moetQOLDB[str] then
-		if moetQOLDB[str][STATE] == "On" then
-			moetQOLDB[str][STATE] = "Off"
-			print(string.format("|c%s%s|r: Off", COLOR, str))
-		elseif moetQOLDB[str][STATE] == "Off" then
-			moetQOLDB[str][STATE] = "On"
-			print(string.format("|c%s%s|r: |c%sOn|r", COLOR, str, COLOR2))
-		end
-		statesChanged = statesChanged + 1
-	else
-		print(string.format("|c%smq:|r %s is not a valid command.", COLOR, str))
-		return
-	end
+    if moetQOLDB[str] then
+        if moetQOLDB[str][STATE] == "On" then
+            moetQOLDB[str][STATE] = "Off"
+            print(string.format("|c%s%s|r: Off", COLOR, str))
+        elseif moetQOLDB[str][STATE] == "Off" then
+            moetQOLDB[str][STATE] = "On"
+            print(string.format("|c%s%s|r: |c%sOn|r", COLOR, str, COLOR2))
+        end
+        statesChanged = statesChanged + 1
+    else
+        print(string.format("|c%smq:|r %s is not a valid command.", COLOR, str))
+        return
+    end
 
-	-- only 1 reload needed per set of changes
-	if statesChanged == 1 then
-		print(string.format(
-			"|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", 
-			COLOR, COLOR2))
-	end
+    -- only 1 reload needed per set of changes
+    if statesChanged == 1 then
+        print(string.format(
+            "|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.",
+            COLOR, COLOR2))
+    end
 end
 
 local function ChangeOptions(str, option)
-	if str == nil or option == nil then return end
+    if str == nil or option == nil then return end
 
-	if moetQOLDB[str][OPTION] then
-		local isNumber = tonumber(option)
-		if isNumber then option = isNumber end
+    if moetQOLDB[str][OPTION] then
+        local isNumber = tonumber(option)
+        if isNumber then option = isNumber end
 
-		if type(option) == type(moetQOLDB[str][OPTION]) then
-			moetQOLDB[str][OPTION] = option
-			print(string.format("|c%s%s|r: |c%s%s|r", COLOR, str, COLOR2, moetQOLDB[str][OPTION]))
-			statesChanged = statesChanged + 1
-		else
-			print(string.format("|c%smq:|r %s custom option must be of type: %s", COLOR, str, type(moetQOLDB[str][OPTION])))
-			print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", COLOR))
-		end
-	else
-		print(string.format("|c%smq:|r %s does not have custom options.", COLOR, str))
-		print(string.format("|c%smq:|r See https://github.com/kanding/moetQOL/releases for details.", COLOR))
-	end
+        if type(option) == type(moetQOLDB[str][OPTION]) then
+            moetQOLDB[str][OPTION] = option
+            print(string.format("|c%s%s|r: |c%s%s|r", COLOR, str, COLOR2, moetQOLDB[str][OPTION]))
+            statesChanged = statesChanged + 1
+        else
+            print(string.format("|c%smq:|r %s custom option must be of type: %s", COLOR, str, type(moetQOLDB[str][OPTION])))
+            print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", COLOR))
+        end
+    else
+        print(string.format("|c%smq:|r %s does not have custom options.", COLOR, str))
+        print(string.format("|c%smq:|r See https://github.com/kanding/moetQOL/releases for details.", COLOR))
+    end
 
-	if statesChanged == 1 then
-		print(string.format(
-			"|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", 
-			COLOR, COLOR2))
-	end
+    if statesChanged == 1 then
+        print(string.format("|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", COLOR, COLOR2))
+    end
 end
 
 local function HandleSlashCommands(str)
-	if #str == 0 then mqCommands.help() return end
+    if #str == 0 then mqCommands.help() return end
 
-	local args = {}
-	local path = mqCommands
+    local args = {}
+    local path = mqCommands
 
-	for _, arg in ipairs({ string.split(' ', str) }) do
-		if (#arg > 0) then
-			table.insert(args, arg)
-		end
-	end
+    for _, arg in ipairs({ string.split(' ', str) }) do
+        if (#arg > 0) then
+            table.insert(args, arg)
+        end
+    end
 
-	-- iterate through commands until we find the correct one
-	for id, arg in ipairs(args) do
-		if (#arg > 0) then
-			arg = arg:lower()
-			if (path[arg]) then
-				if (type(path[arg]) == "function") then
-					path[arg](select(id, unpack(args)))
-					return
-				elseif (type(path[arg]) == "table") then
-					path = path[arg] -- enter found subtable
-				end
-			else
-				if #args > 1 then
-					ChangeOptions(select(id, unpack(args)))
-				else
-					ChangeState(arg)
-				end
-				return
-			end
-		end
-	end
+    -- iterate through commands until we find the correct one
+    for id, arg in ipairs(args) do
+        if (#arg > 0) then
+            arg = arg:lower()
+            if (path[arg]) then
+                if (type(path[arg]) == "function") then
+                    path[arg](select(id, unpack(args)))
+                    return
+                elseif (type(path[arg]) == "table") then
+                    path = path[arg] -- enter found subtable
+                end
+            else
+                if #args > 1 then
+                    ChangeOptions(select(id, unpack(args)))
+                else
+                    ChangeState(arg)
+                end
+                return
+            end
+        end
+    end
 end
 
 local function CheckDatabaseErrors()
-	for k,v in pairs(default) do
-		--create if not exist
-		if not moetQOLDB[k] then
-			if v[OPTION] then
-				moetQOLDB[k] = {v[STATE], v[DESC], v[OPTION]}
-			else
-				moetQOLDB[k] = {v[STATE], v[DESC]}
-			end
-		end
-		
-		--update if outdated
-		if moetQOLDB[k][DESC] and moetQOLDB[k][DESC] ~= default[k][DESC] then
-			moetQOLDB[k][DESC] = default[k][DESC]
-		end
+    for k,v in pairs(default) do
+        --create if not exist
+        if not moetQOLDB[k] then
+            if v[OPTION] then
+                moetQOLDB[k] = {v[STATE], v[DESC], v[OPTION]}
+            else
+                moetQOLDB[k] = {v[STATE], v[DESC]}
+            end
+        end
 
-		if default[k][OPTION] and (not moetQOLDB[k][OPTION] or 
-		(moetQOLDB[k][OPTION] and type(moetQOLDB[k][OPTION]) ~= type(default[k][OPTION])))
-		then
-			moetQOLDB[k][OPTION] = default[k][OPTION]
-		elseif moetQOLDB[k][OPTION] and not default[k][OPTION] then
-			moetQOLDB[k][OPTION] = nil
-		end
-	end
+        --update if outdated
+        if moetQOLDB[k][DESC] and moetQOLDB[k][DESC] ~= default[k][DESC] then
+            moetQOLDB[k][DESC] = default[k][DESC]
+        end
+
+        if default[k][OPTION] and (not moetQOLDB[k][OPTION] or
+        (moetQOLDB[k][OPTION] and type(moetQOLDB[k][OPTION]) ~= type(default[k][OPTION])))
+        then
+            moetQOLDB[k][OPTION] = default[k][OPTION]
+        elseif moetQOLDB[k][OPTION] and not default[k][OPTION] then
+            moetQOLDB[k][OPTION] = nil
+        end
+    end
 end
 
 local function Init(self, event, name)
-	if name ~= "moetQOL" then return end
+    if name ~= "moetQOL" then return end
 
-	-- custom slash commands
-	SLASH_moetQOL1 = SHORTCUT
-	SLASH_CLEAR1 = "/clear"
-	SLASH_RL1 = "/rl"
-	SlashCmdList.moetQOL = HandleSlashCommands
-	SlashCmdList.CLEAR = function() ChatFrame1:Clear() end
-	SlashCmdList.RL = function() ReloadUI() end
+    -- custom slash commands
+    SLASH_moetQOL1 = SHORTCUT
+    SLASH_CLEAR1 = "/clear"
+    SLASH_RL1 = "/rl"
+    SlashCmdList.moetQOL = HandleSlashCommands
+    SlashCmdList.CLEAR = function() ChatFrame1:Clear() end
+    SlashCmdList.RL = function() ReloadUI() end
 
-	CheckDatabaseErrors()
-	ns.Core.ActivateFunctions()
+    CheckDatabaseErrors()
+    ns.Core.ActivateFunctions()
 
-	print(WELCOME_MESSAGE)
+    print(WELCOME_MESSAGE)
 end
 
 ---------------------------------------------------

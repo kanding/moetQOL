@@ -6,6 +6,13 @@ levelling.
 
 Renamed voicebuttons to chatbuttons and hit QuickJoinToast button as well.
 
+Added CombatChat option for hiding chat in combat. Can be revealed in combat
+by mousing over the chatframe.
+
+Renamed tooltip options to always, instance, raid
+
+
+
 --moetQOL v2.6.1
 
 Moved HideBlizzardBorders and UI specific stuff into new moetUI addon.
