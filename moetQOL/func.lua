@@ -129,7 +129,7 @@ local function SetupGuildFrame()
 
         -- All this to be able to open the guild frame in combat :-)
         -- Above function will still cause 'taint'.
-        hooksecurefunc("ShowUIPanel",function(frame,force,duplicated)
+        hooksecurefunc("ShowUIPanel", function(frame,force,duplicated)
             if frame and not frame:GetName() == "GuildFrame" then return end
 
             if frame and not frame:IsShown() and not duplicated and InCombatLockdown() and not WorldMapFrame:IsShown() then
@@ -140,7 +140,7 @@ local function SetupGuildFrame()
             end
         end)
 
-        hooksecurefunc("HideUIPanel",function(frame,force,duplicated)
+        hooksecurefunc("HideUIPanel", function(frame,force,duplicated)
             if frame and not frame:GetName() == "GuildFrame" then return end
 
             if frame and frame:IsShown() and not duplicated and InCombatLockdown() then
@@ -183,7 +183,6 @@ local function AutoShareQuest(questID)
 end
 
 local function HandleQuests(self, e, ...)
-    print(e)
     if e == "QUEST_ACCEPTED" then
         if IsInGroup() then
             AutoShareQuest(...)
@@ -214,7 +213,6 @@ local function HandleQuests(self, e, ...)
 end
 
 local function HandleGossip(self, e, ...)
-    print(e)
     if IsShiftKeyDown() then return end
 
     local numAvailableQuests = 0
@@ -321,9 +319,10 @@ local function ChatFrame_OnLeave(self)
     for _, frame in pairs(self.Frames) do
         local alpha = frame:GetAlpha()
         UIFrameFadeOut(frame, 0.5*alpha, alpha, 0)
-        frame.Show = function() end --fixes boss spell icons etcc
-        --frame.fadeInfo.finishedArg1 = frame
-        --frame.fadeInfo.finishedFunc = frame.Hide
+        --fixes boss spell icons etc
+        frame.Show = function() end
+        frame.fadeInfo.finishedArg1 = frame
+        frame.fadeInfo.finishedFunc = frame.Hide
     end
 end
 
@@ -378,6 +377,17 @@ local function SetupMouseoverFrames()
     return frames
 end
 
+local function AdjustSpellQueue()
+    local ranged = IsPlayerRanged()
+    local rangedValue = moetQOLDB["dynamicspellqueue"][ns.Core.OPTION] or 280
+
+    if ranged then
+        SetCVar("SpellQueueWindow", rangedValue)
+    else
+        SetCVar("SpellQueueWindow", 125)
+    end
+end
+
 ---------------------------------------------------
 -- MAIN FUNCTIONS
 ---------------------------------------------------
@@ -419,7 +429,7 @@ function Func:EnableEasyDelete()
             StaticPopup1EditBox:Hide()
             StaticPopup1Button1:Enable()
 
-            local link = select(3,GetCursorInfo())
+            local link = select(3, GetCursorInfo())
 
             deleteFrame.link:SetText(link)
             deleteFrame.link:Show()
@@ -592,47 +602,16 @@ end
 -- Hide Error Messages inspired by zork rError (here for continued maintenance)
 -- https://github.com/zorker/rothui
 function Func:HideErrorMessages()
-    local blacklist = {
-        ["ERR_ABILITY_COOLDOWN"] = true,           -- Ability is not ready yet. (Ability)
-        ["ERR_ITEM_COOLDOWN"] = true,
-        ["ERR_SPELL_OUT_OF_RANGE"] = true,
-        ["ERR_BADATTACKPOS"] = true,
-        ["ERR_OUT_OF_ENERGY"] = true,              -- Not enough energy. (Err)
-        ["ERR_OUT_OF_RANGE"] = true,
-        ["ERR_OUT_OF_FURY"] = true,
-        ["ERR_OUT_OF_RAGE"] = true,                -- Not enough rage.
-        ["ERR_OUT_OF_FOCUS"] = true,               -- Not enough focus
-        ["ERR_ATTACK_MOUNTED"] = true,
-        ["ERR_NO_ATTACK_TARGET"] = true,           -- There is nothing to attack.
-        ["SPELL_FAILED_MOVING"] = true,
-        ["SPELL_FAILED_AFFECTING_COMBAT"] = true,
-        ["ERR_NOT_IN_COMBAT"] = true,
-        ["SPELL_FAILED_UNIT_NOT_INFRONT"] = true,
-        ["ERR_BADATTACKFACING"] = true,
-        ["SPELL_FAILED_TOO_CLOSE"] = true,
-        ["ERR_INVALID_ATTACK_TARGET"] = true,      -- You cannot attack that target.
-        ["ERR_SPELL_COOLDOWN"] = true,             -- Spell is not ready yet. (Spell)
-        ["SPELL_FAILED_NO_COMBO_POINTS"] = true,   -- That ability requires combo points.
-        ["SPELL_FAILED_TARGETS_DEAD"] = true,      -- Your target is dead.
-        ["SPELL_FAILED_SPELL_IN_PROGRESS"] = true, -- Another action is in progress. (Spell)
-        ["SPELL_FAILED_TARGET_AURASTATE"] = true,  -- You can't do that yet. (TargetAura)
-        ["SPELL_FAILED_CASTER_AURASTATE"] = true,  -- You can't do that yet. (CasterAura)
-        ["SPELL_FAILED_NO_ENDURANCE"] = true,      -- Not enough endurance
-        ["SPELL_FAILED_BAD_TARGETS"] = true,       -- Invalid target
-        ["SPELL_FAILED_NOT_MOUNTED"] = true,       -- You are mounted
-        ["SPELL_FAILED_NOT_ON_TAXI"] = true,       -- You are in flight
-    }
-
     UIErrorsFrame:UnregisterEvent("UI_ERROR_MESSAGE")
 
     local function OnUIErrorMessage(self, event, messageType, message)
         local errorName, soundKitID, voiceID = GetGameMessageInfo(messageType)
 
-        if blacklist[errorName] then return end
+        if DATA.ERROR_BLACKLIST[errorName] then return end
         UIErrorsFrame:AddMessage(message, 1, .1, .1)
     end
 
-    local eventHandler = CreateFrame("Frame")
+    local eventHandler = CreateFrame("FRAME")
     eventHandler:SetScript("OnEvent", OnUIErrorMessage)
     eventHandler:RegisterEvent("UI_ERROR_MESSAGE")
     eventHandler:Hide()
@@ -648,7 +627,9 @@ function Func:AutoRepair()
             repairAllCost, canRepair = GetRepairAllCost()
             if canRepair and repairAllCost <= GetMoney() then
                 RepairAllItems(false) -- use player funds
-                DEFAULT_CHAT_FRAME:AddMessage("Your items have been repaired for "..GetCoinText(repairAllCost,", ")..".",255,255,0)
+                DEFAULT_CHAT_FRAME:AddMessage(
+                    "Your items have been repaired for "..GetCoinText(repairAllCost,", ")..".", 255, 255, 0
+                )
             end
         end
     end)
@@ -747,17 +728,6 @@ function Func:HideTooltipInCombat()
 end
 
 function Func:DynamicSpellQueue()
-    local function AdjustSpellQueue()
-        local ranged = IsPlayerRanged()
-        local rangedValue = moetQOLDB["dynamicspellqueue"][ns.Core.OPTION] or 280
-
-        if ranged then
-            SetCVar("SpellQueueWindow", rangedValue)
-        else
-            SetCVar("SpellQueueWindow", 125)
-        end
-    end
-
     RunOnLogin(AdjustSpellQueue)
 
     -- check if specialization changed
@@ -818,6 +788,7 @@ function Func:HideChatInCombat()
     f:RegisterEvent("PLAYER_REGEN_DISABLED")
     f:SetScript("OnEvent", function(self, e, ...)
         if instance and select(2, GetInstanceInfo()) == "none" then return end
+        if boss and not UnitInRaid("player") then return end
 
         if boss then
             if e == "ENCOUNTER_START" then
