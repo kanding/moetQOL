@@ -788,7 +788,7 @@ function Func:HideChatInCombat()
     f:RegisterEvent("PLAYER_REGEN_DISABLED")
     f:SetScript("OnEvent", function(self, e, ...)
         if instance and select(2, GetInstanceInfo()) == "none" then return end
-        if boss and not UnitInRaid("player") then return end
+        --if boss and not UnitInRaid("player") then return end
 
         if boss then
             if e == "ENCOUNTER_START" then
