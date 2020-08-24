@@ -26,9 +26,28 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Disciple Fotima"] = 1,
     ["Disciple Lykaste"] = 1,
     ["Disciple Helene"] = 1,
+    ["Vulnerable Aspirant"] = 1,
+    ["Eridia"] = 1,
+    ["Fallen Disciple Nikolon"] = 1,
+    ["Disciple Kosmas"] = 1,
+    ["Vesiphone"] = 1,
+    ["Mikanikos"] = 1,
+    ["Polemarch Adrestes"] = 1,
+    ["Thanikos"] = 1,
 
     --Maldraxxus
     ["Arena Spectator"] = 1,
+    ["Baroness Draka"] = 1,
+    ["Baron Vyraz"] = 1,
+    ["Chosen Protector"] = 1,
+    ["Head Summoner Perex"] = 1,
+    ["Drill Sergeant Telice"] = 1,
+    ["Secutor Mevix"] = 1,
+    ["Bonesmith Heirmir"] = 1,
+    ["Vial Master Lurgy"] = 1,
+    ["Foul-Tongue Cyrlix"] = 1,
+    ["Boil Master Yetch"] = 1,
+    ["Baroness Vashj"] = {1,2},
 
     --Ardenweald
     ["Hunt-Captain Korayn"] = 1,
@@ -51,5 +70,15 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Projection of Prince Renathal"] = 1,
 
     --Oribos
+    ["Protector Captain"] = 1,
+    ["Overseer Kah-Delen"] = 1,
+    ["Tal-Inara"] = 1,
+    ["Ebon Blade Acolyte"] = 1,
+    ["Foreman Au'brak"] = 1,
+    ["Caretaker Kah-Rahm"] = 1,
+    ["Host Ta'rela"] = 1,
+    ["Fatescribe Roh-Tahl"] = 1,
+    ["Overseer Ta'readon"] = 1,
+    ["Overseer Kah-Sher"] = 1,
 
 }

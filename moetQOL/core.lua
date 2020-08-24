@@ -103,9 +103,9 @@ Core.MQdefault = {
     ["realidcounter"] = {"Off", "adds a counter that shows current out of total friends", Func.RealIDCounter},
     ["combattooltip"] = {"Off", "hides tooltip if in combat", Func.HideTooltipInCombat, "always"},
     ["dynamicspellqueue"] = {"Off", "automatically adjust spellqueue based on ranged or melee", Func.DynamicSpellQueue, 280},
-    ["autoquest"] = {"Off", "auto accept/deliver/share quests (hold SHIFT to disable)", Func.AutoQuest},
+    ["autoquest"] = {"Off", "auto accept/deliver/share quests (hold SHIFT to disable)", Func.AutoQuest, "noforce"},
     ["combatchat"] = {"Off", "fades chat when in combat", Func.HideChatInCombat, "always"},
-    ["questitembutton"] = {"Off", "adds a keybind (set in Key Bindings/AddOns) to use most recent quest item", Func.QuestItemButton},
+    ["questitembind"] = {"Off", "adds a keybind (set in Key Bindings/AddOns) to use the closest watched quest item", Func.QuestItemButton},
 }
 
 function Core:ActivateFunctions()

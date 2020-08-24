@@ -148,7 +148,7 @@ local function Init(self, event, name)
 
     -- specify keybinds header
     BINDING_HEADER_MOETQOL = "moetQOL"
-    BINDING_NAME_USEMOSTRECENTQUESTITEM = "Use most recent quest item (requires feature enabled)"
+    BINDING_NAME_USEMOSTRECENTQUESTITEM = "Use the closest watched quest item (requires feature enabled)"
 
     -- custom slash commands
     SLASH_moetQOL1 = SHORTCUT

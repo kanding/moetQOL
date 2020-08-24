@@ -206,9 +206,26 @@ local function HandleQuests(self, e, ...)
             GetQuestReward(nil);
         elseif GetNumQuestChoices() == 1 then
             GetQuestReward(1);
+        elseif GetNumQuestChoices() > 1 then
+            local force = moetQOLDB["autoquest"][ns.Core.OPTION] == "force"
+            if not force then return end
+
+            local index = 1
+            local money = 0
+
+            for i=1, GetNumQuestChoices() do
+                local link = GetQuestItemLink("choice", i)
+                if link then
+                    local m = select(11, GetItemInfo(link))
+                    if m > money then
+                        money = m
+                        index = i
+                    end
+                end
+            end
+
+            GetQuestReward(index)
         end
-        -- possibly add option to brute force item value etc
-        -- GetQuestReward(QuestFrameRewardPanel.itemChoice);
     end
 end
 
@@ -282,8 +299,11 @@ local function HandleGossip(self, e, ...)
             choice = max
             if max >= gossipOptions then choice = gossipOptions end
         end
-        print("GOSSIP: PICKING CHOICE "..tostring(choice))
-        C_GossipInfo.SelectOption(choice)
+
+        if choice <= gossipOptions then
+            print("GOSSIP: PICKING CHOICE "..tostring(choice))
+            C_GossipInfo.SelectOption(choice)
+        end
     end
 end
 
@@ -738,6 +758,14 @@ function Func:DynamicSpellQueue()
 end
 
 function Func:AutoQuest()
+    local option = moetQOLDB["autoquest"][ns.Core.OPTION]
+    local noforce = option == "noforce"
+    local force = option == "force"
+    if not noforce and not force then
+        print(string.format("|c%sautoquest:|r ineligible custom option: %s", F_COLOR, option))
+        print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
+    end
+
     local questFrame = CreateFrame("FRAME", "moetQOL_QuestFrame")
     questFrame:RegisterEvent("QUEST_DETAIL")
     questFrame:RegisterEvent("QUEST_PROGRESS")
@@ -818,18 +846,31 @@ end
 
 function Func:QuestItemButton()
     local buttonFrame = CreateFrame("FRAME", "moetQOL_QuestItemButton")
-    local lastItem = nil
+    local lastItem, lastQuest, lastDist
 
     hooksecurefunc("QuestObjectiveItem_Initialize", function(itemButton, questLogIndex)
         -- GET NEW ITEM TO USE
         local link, item, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex)
         local itemName = GetItemInfo(link)
+        local questID = C_QuestLog.GetQuestIDForLogIndex(questLogIndex)
+        local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(questID)
 
-        -- CREATE A TEMPORARY KEYBIND
+        if itemName and itemName ~= lastItem then
+            if lastQuest then
+                -- Check validity of last quest.
+                if C_QuestLog.IsOnQuest(lastQuest) and not C_QuestLog.ReadyForTurnIn(lastQuest) then
+                    -- Check that new quest is not closer than last quest.
+                    if lastDist and lastDist < distanceSq then return end
+                    if not onContinent then return end
+                end
+            end
 
-        if lastItem ~= itemName then
+            -- UPDATE QUEST TO KEYBIND
             lastItem = itemName
+            lastQuest = questID
+            lastDist = distanceSq
 
+            -- CREATE A TEMPORARY KEYBIND
             if not GetBindingKey("USEMOSTRECENTQUESTITEM") then
                 print(string.format("|c%smq:|r Attempted to create Keybind to use %s, but none is set! Set bind to use in Key Bindings/AddOns!", F_COLOR, link))
                 return
