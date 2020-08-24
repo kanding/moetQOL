@@ -826,13 +826,15 @@ function Func:QuestItemButton()
         local itemName = GetItemInfo(link)
 
         -- CREATE A TEMPORARY KEYBIND
-        if not GetBindingKey("USEMOSTRECENTQUESTITEM") then
-            print(string.format("|c%smq:|r Attempted to create Keybind to use %s, but none is set! Set bind to use in Key Bindings/AddOns!", F_COLOR, link))
-            return
-        end
 
         if lastItem ~= itemName then
             lastItem = itemName
+
+            if not GetBindingKey("USEMOSTRECENTQUESTITEM") then
+                print(string.format("|c%smq:|r Attempted to create Keybind to use %s, but none is set! Set bind to use in Key Bindings/AddOns!", F_COLOR, link))
+                return
+            end
+
             ClearOverrideBindings(buttonFrame)
             SetOverrideBindingItem(buttonFrame, false, GetBindingKey("USEMOSTRECENTQUESTITEM"), itemName)
             print(string.format("|c%smq:|r Created temporary keybind %s to use %s", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link))
