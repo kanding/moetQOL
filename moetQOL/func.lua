@@ -818,6 +818,7 @@ end
 
 function Func:QuestItemButton()
     local buttonFrame = CreateFrame("FRAME", "moetQOL_QuestItemButton")
+    local lastItem = nil
 
     hooksecurefunc("QuestObjectiveItem_Initialize", function(itemButton, questLogIndex)
         -- GET NEW ITEM TO USE
@@ -825,8 +826,11 @@ function Func:QuestItemButton()
         local itemName = GetItemInfo(link)
 
         -- CREATE A TEMPORARY KEYBIND
-        ClearOverrideBindings(buttonFrame)
-        SetOverrideBindingItem(buttonFrame, false, GetBindingKey("USEMOSTRECENTQUESTITEM"), itemName)
-        print(string.format("|c%smq:|r Created temporary keybind %s to use %s", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link))
+        if lastItem ~= itemName then
+            lastItem = itemName
+            ClearOverrideBindings(buttonFrame)
+            SetOverrideBindingItem(buttonFrame, false, GetBindingKey("USEMOSTRECENTQUESTITEM"), itemName)
+            print(string.format("|c%smq:|r Created temporary keybind %s to use %s", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link))
+        end
     end)
 end
