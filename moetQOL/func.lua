@@ -50,11 +50,11 @@ local function SellGreyItems()
     end
 end
 
-local function InfoStringsGetFps()
+local function GetFps()
     return floor(GetFramerate()) .. "fps"
 end
 
-local function InfoStringsGetMs()
+local function GetMs()
     return select(3, GetNetStats()) .. "ms"
 end
 
@@ -229,10 +229,6 @@ local function HandleGossip(self, e, ...)
         numAvailableQuests = C_GossipInfo.GetNumAvailableQuests()
         numActiveQuests = C_GossipInfo.GetNumActiveQuests()
     end
-
-    print("GOSSIP OPTIONS: "..gossipOptions)
-    print("AVAIL QUESTS: "..numAvailableQuests)
-    print("ACTIVE QUESTS: "..numActiveQuests)
 
     if numAvailableQuests > 0 then
         gossip = false
@@ -549,7 +545,7 @@ function Func:CreateInfoStrings()
     -- create text in frame
     local frameFontString = posFrame:CreateFontString(nil, "BACKGROUND", "GameFontNormal")
     frameFontString:SetFont(STANDARD_TEXT_FONT, 11, "THINOUTLINE")
-    frameFontString:SetText(InfoStringsGetFps() .. "  " .. InfoStringsGetMs())
+    frameFontString:SetText(GetFps() .. "  " .. GetMs())
     frameFontString:SetPoint("CENTER", posFrame)
     frameFontString:SetHeight(frameFontString:GetStringHeight())
     frameFontString:SetWidth(frameFontString:GetStringWidth() + 5)
@@ -561,7 +557,7 @@ function Func:CreateInfoStrings()
     infoAnimation.anim:SetDuration(1)
     infoAnimation:SetLooping("REPEAT")
     infoAnimation:SetScript("OnLoop", function()
-        frameFontString:SetText(InfoStringsGetFps() .. " " .. InfoStringsGetMs())
+        frameFontString:SetText(GetFps() .. " " .. GetMs())
     end)
 
     -- update text in frame on loop
@@ -817,5 +813,20 @@ function Func:HideChatInCombat()
                 end
             end
         end
+    end)
+end
+
+function Func:QuestItemButton()
+    local buttonFrame = CreateFrame("FRAME", "moetQOL_QuestItemButton")
+
+    hooksecurefunc("QuestObjectiveItem_Initialize", function(itemButton, questLogIndex)
+        -- GET NEW ITEM TO USE
+        local link, item, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex)
+        local itemName = GetItemInfo(link)
+
+        -- CREATE A TEMPORARY KEYBIND
+        ClearOverrideBindings(buttonFrame)
+        SetOverrideBindingItem(buttonFrame, false, GetBindingKey("USEMOSTRECENTQUESTITEM"), itemName)
+        print(string.format("|c%smq:|r Created temporary keybind %s to use %s", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link))
     end)
 end

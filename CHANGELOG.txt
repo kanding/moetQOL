@@ -1,15 +1,9 @@
---moetQOL v2.6.2beta
+--moetQOL v2.6.3beta
 
-Added AutoQuest option for automatically handing in/picking up/sharing quests
-as well as gossip for certain NPCs specified in data/ file. For Shadowlands
-levelling.
+Added more specific options for combatchat and combattooltip.
 
-Renamed voicebuttons to chatbuttons and hit QuickJoinToast button as well.
-
-Added CombatChat option for hiding chat in combat. Can be revealed in combat
-by mousing over the chatframe.
-
-Renamed tooltip options to always, instance, raid
+Added questitembutton which creates a keybind that uses the
+most recent quest item.
 
 
 
