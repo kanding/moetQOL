@@ -846,20 +846,21 @@ end
 
 function Func:QuestItemButton()
     local buttonFrame = CreateFrame("FRAME", "moetQOL_QuestItemButton")
+    buttonFrame:Hide()
     local lastItem, lastQuest, lastDist
 
     hooksecurefunc("QuestObjectiveItem_Initialize", function(itemButton, questLogIndex)
         -- GET NEW ITEM TO USE
         local link, item, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex)
         local itemName = GetItemInfo(link)
-        local questID = C_QuestLog.GetQuestIDForLogIndex(questLogIndex)
-        local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(questID)
 
         if itemName and itemName ~= lastItem then
+            local questID = C_QuestLog.GetQuestIDForLogIndex(questLogIndex)
+            local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(questID)
+
+            -- If last quest is valid and closer than the new quest then don't change.
             if lastQuest then
-                -- Check validity of last quest.
                 if C_QuestLog.IsOnQuest(lastQuest) and not C_QuestLog.ReadyForTurnIn(lastQuest) then
-                    -- Check that new quest is not closer than last quest.
                     if lastDist and lastDist < distanceSq then return end
                     if not onContinent then return end
                 end
