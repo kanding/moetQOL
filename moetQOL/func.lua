@@ -129,18 +129,18 @@ local function SetupGuildFrame()
 
         -- All this to be able to open the guild frame in combat :-)
         -- Above function will still cause 'taint'.
-        hooksecurefunc("ShowUIPanel", function(frame,force,duplicated)
+        hooksecurefunc("ShowUIPanel", function(frame, force, duplicated)
             if frame and not frame:GetName() == "GuildFrame" then return end
 
             if frame and not frame:IsShown() and not duplicated and InCombatLockdown() and not WorldMapFrame:IsShown() then
                 local point,_,relativePoint,xOff,yOff = frame:GetPoint()
                 frame:ClearAllPoints()
-                frame:SetPoint(point or "TOPLEFT",UIParent,relativePoint or "TOPLEFT",xOff or 16,yOff or -116.00000762939)
+                frame:SetPoint(point or "TOPLEFT",UIParent,relativePoint or "TOPLEFT",xOff or 16,yOff or -116)
                 frame:Show()
             end
         end)
 
-        hooksecurefunc("HideUIPanel", function(frame,force,duplicated)
+        hooksecurefunc("HideUIPanel", function(frame, force, duplicated)
             if frame and not frame:GetName() == "GuildFrame" then return end
 
             if frame and frame:IsShown() and not duplicated and InCombatLockdown() then
@@ -178,8 +178,26 @@ local function AutoShareQuest(questID)
         local title = C_QuestLog.GetTitleForQuestID(questID)
         C_QuestLog.SetSelectedQuest(questID)
         QuestLogPushQuest();
-        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq|r: Attempting to share %s with your group...", F_COLOR, title));
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq|r: Attempting to share %s with your group...", F_COLOR, title), 255, 255, 0);
     end
+end
+
+local function GetGreedyRewardIndex()
+    local index = 1
+    local money = 0
+
+    for i=1, GetNumQuestChoices() do
+        local link = GetQuestItemLink("choice", i)
+        if link then
+            local m = select(11, GetItemInfo(link))
+            if m > money then
+                money = m
+                index = i
+            end
+        end
+    end
+
+    return index
 end
 
 local function HandleQuests(self, e, ...)
@@ -210,21 +228,7 @@ local function HandleQuests(self, e, ...)
             local force = moetQOLDB["autoquest"][ns.Core.OPTION] == "force"
             if not force then return end
 
-            local index = 1
-            local money = 0
-
-            for i=1, GetNumQuestChoices() do
-                local link = GetQuestItemLink("choice", i)
-                if link then
-                    local m = select(11, GetItemInfo(link))
-                    if m > money then
-                        money = m
-                        index = i
-                    end
-                end
-            end
-
-            GetQuestReward(index)
+            GetQuestReward(GetGreedyRewardIndex())
         end
     end
 end
@@ -812,7 +816,6 @@ function Func:HideChatInCombat()
     f:RegisterEvent("PLAYER_REGEN_DISABLED")
     f:SetScript("OnEvent", function(self, e, ...)
         if instance and select(2, GetInstanceInfo()) == "none" then return end
-        --if boss and not UnitInRaid("player") then return end
 
         if boss then
             if e == "ENCOUNTER_START" then
@@ -861,7 +864,7 @@ function Func:QuestItemButton()
             -- If last quest is valid and closer than the new quest then don't change.
             if lastQuest then
                 if C_QuestLog.IsOnQuest(lastQuest) and not C_QuestLog.ReadyForTurnIn(lastQuest) then
-                    if lastDist and lastDist < distanceSq then return end
+                    if lastDist and distanceSq and lastDist < distanceSq then return end
                     if not onContinent then return end
                 end
             end
@@ -872,14 +875,17 @@ function Func:QuestItemButton()
             lastDist = distanceSq
 
             -- CREATE A TEMPORARY KEYBIND
-            if not GetBindingKey("USEMOSTRECENTQUESTITEM") then
+            local keybind = GetBindingKey("USEMOSTRECENTQUESTITEM")
+            if not keybind then
                 print(string.format("|c%smq:|r Attempted to create Keybind to use %s, but none is set! Set bind to use in Key Bindings/AddOns!", F_COLOR, link))
                 return
             end
 
             ClearOverrideBindings(buttonFrame)
-            SetOverrideBindingItem(buttonFrame, false, GetBindingKey("USEMOSTRECENTQUESTITEM"), itemName)
-            print(string.format("|c%smq:|r Created temporary keybind %s to use %s", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link))
+            SetOverrideBindingItem(buttonFrame, true, keybind, itemName)
+            DEFAULT_CHAT_FRAME:AddMessage(
+                string.format("|c%smq:|r Created temporary keybind %s to use %s", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link), 255, 255, 0
+            )
         end
     end)
 end

@@ -16,6 +16,8 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Nazgrim"] = 1,
     ["Lady Jaina Proudmoore"] = 1,
     ["Highlord Darion Mograine"] = 1,
+    ["Ve'nari"] = 1,
+    ["Alexandros Mograine"] = 1,
 
     --Bastion
     ["Kleia"] = 1,
@@ -48,6 +50,8 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Foul-Tongue Cyrlix"] = 1,
     ["Boil Master Yetch"] = 1,
     ["Baroness Vashj"] = {1,2},
+    ["Aspirant Thales"] = 1,
+    ["Salvaged Praetor"] = 1,
 
     --Ardenweald
     ["Hunt-Captain Korayn"] = 1,
@@ -58,8 +62,18 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Wagonmaster Derawyn"] = 1,
     ["Nelwyn"] = 1,
     ["\"Granny\""] = 1,
-    ["Dreamweaver"] = 3,
+    ["Dreamweaver"] = {2,3},
     ["Ara'lon"] = 1,
+    ["Rury"] = 1,
+    ["Slanknen"] = 1,
+    ["Groonoomcrooek"] = 1,
+    ["Elder Finnan"] = 1,
+    ["Elder Gwenna"] = 1,
+    ["Niya"] = 1,
+    ["Proglo"] = 1,
+    ["Dreamer's Vision"] = 1,
+    ["Droman Aliothe"] = 1,
+    ["Winter Queen"] = 1,
 
     --Revendreth
     ["Lord Chamberlain"] = 1,
