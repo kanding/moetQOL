@@ -178,12 +178,12 @@ local function AutoShareQuest(questID)
         local title = C_QuestLog.GetTitleForQuestID(questID)
         C_QuestLog.SetSelectedQuest(questID)
         QuestLogPushQuest();
-        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq|r: Attempting to share %s with your group...", F_COLOR, title), 255, 255, 0);
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq|r: Sharing [%s] with your group...", F_COLOR, title), 255, 255, 0);
     end
 end
 
 local function GetGreedyRewardIndex()
-    local index = 1
+    local index = 1 --guard
     local money = 0
 
     for i=1, GetNumQuestChoices() do
@@ -290,9 +290,9 @@ local function HandleGossip(self, e, ...)
     end
 
     if gossip and gossipOptions > 0 then
-        local target = UnitName("target")
+        local target = UnitName("target") or GameTooltipTextLeft1:GetText()
         if not DATA.SHADOWLANDS_GOSSIP[target] then
-            print(string.format("GOSSIP: %s NOT IN TABLE.", target))
+            print(string.format("GOSSIP: %s NOT IN TABLE.", tostring(target)))
             return
         end
         local choice = DATA.SHADOWLANDS_GOSSIP[target]
@@ -301,7 +301,7 @@ local function HandleGossip(self, e, ...)
         if type(choice) == "table" then
             local max = math.max(unpack(DATA.SHADOWLANDS_GOSSIP[target]))
             choice = max
-            if max >= gossipOptions then choice = gossipOptions end
+            if choice >= gossipOptions then choice = gossipOptions end
         end
 
         if choice <= gossipOptions then
@@ -847,7 +847,7 @@ function Func:HideChatInCombat()
     end)
 end
 
-function Func:QuestItemButton()
+function Func:QuestItemBind()
     local buttonFrame = CreateFrame("FRAME", "moetQOL_QuestItemButton")
     buttonFrame:Hide()
     local lastItem, lastQuest, lastDist

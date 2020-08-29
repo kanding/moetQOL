@@ -105,7 +105,7 @@ Core.MQdefault = {
     ["dynamicspellqueue"] = {"Off", "automatically adjust spellqueue based on ranged or melee", Func.DynamicSpellQueue, 280},
     ["autoquest"] = {"Off", "auto accept/deliver/share quests (hold SHIFT to disable)", Func.AutoQuest, "noforce"},
     ["combatchat"] = {"Off", "fades chat when in combat", Func.HideChatInCombat, "always"},
-    ["questitembind"] = {"Off", "adds a keybind (set in Key Bindings/AddOns) to use the closest watched quest item", Func.QuestItemButton},
+    ["questitembind"] = {"Off", "adds a keybind (set in Key Bindings/AddOns) to use the closest watched quest item", Func.QuestItemBind},
 }
 
 function Core:ActivateFunctions()

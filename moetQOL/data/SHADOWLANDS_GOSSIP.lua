@@ -52,6 +52,13 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Baroness Vashj"] = {1,2},
     ["Aspirant Thales"] = 1,
     ["Salvaged Praetor"] = 1,
+    ["Gunn Gorgebone"] = 1,
+    ["Scrapper Minoire"] = 1,
+    ["Rencissa the Dynamo"] = 1,
+    ["Marcel Mullby"] = 1,
+    ["Tester Sahaari"] = 1,
+    ["Valuator Malus"] = 1,
+    ["Ta'eran"] = 1,
 
     --Ardenweald
     ["Hunt-Captain Korayn"] = 1,
@@ -82,6 +89,22 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Tubbins"] = 2,
     ["Theotar"] = 1,
     ["Projection of Prince Renathal"] = 1,
+    ["Courier Rokalai"] = 1,
+    ["Soul of Keltesh"] = 1,
+    ["Globknob"] = 1,
+    ["Ilka"] = 1,
+    ["Samu"] = 1,
+    ["Darkhaven Villager"] = 1,
+    ["Courier Araak"] = 1,
+    ["Cobwobble"] = 1,
+    ["Dobwobble"] = 1,
+    ["Slobwobble"] = 1,
+    ["Sinreader Nicola"] = 1,
+    ["The Fearstalker"] = 1,
+    ["The Accuser"] = 1,
+    ["Venthyr Writing Desk"] = 1, -- (not a unit)
+    ["Tubbins"] = 1,
+    ["Prince Renathal"] = 1,
 
     --Oribos
     ["Protector Captain"] = 1,
