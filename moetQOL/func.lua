@@ -221,14 +221,15 @@ local function HandleQuests(self, e, ...)
         end
     elseif e == "QUEST_COMPLETE" then
         if GetNumQuestChoices() == 0 then
-            GetQuestReward(nil);
+            GetQuestReward(nil)
         elseif GetNumQuestChoices() == 1 then
-            GetQuestReward(1);
+            GetQuestReward(1)
         elseif GetNumQuestChoices() > 1 then
             local force = moetQOLDB["autoquest"][ns.Core.OPTION] == "force"
             if not force then return end
 
-            GetQuestReward(GetGreedyRewardIndex())
+            --GetQuestReward(GetGreedyRewardIndex())
+            GetQuestReward(1)
         end
     end
 end
@@ -292,7 +293,7 @@ local function HandleGossip(self, e, ...)
     if gossip and gossipOptions > 0 then
         local target = UnitName("target") or GameTooltipTextLeft1:GetText()
         if not DATA.SHADOWLANDS_GOSSIP[target] then
-            print(string.format("GOSSIP: %s NOT IN TABLE.", tostring(target)))
+            --print(string.format("GOSSIP: %s NOT IN TABLE.", tostring(target)))
             return
         end
         local choice = DATA.SHADOWLANDS_GOSSIP[target]
@@ -305,7 +306,7 @@ local function HandleGossip(self, e, ...)
         end
 
         if choice <= gossipOptions then
-            print("GOSSIP: PICKING CHOICE "..tostring(choice))
+            --print("GOSSIP: PICKING CHOICE "..tostring(choice))
             C_GossipInfo.SelectOption(choice)
         end
     end
@@ -882,7 +883,7 @@ function Func:QuestItemBind()
             end
 
             ClearOverrideBindings(buttonFrame)
-            SetOverrideBindingItem(buttonFrame, true, keybind, itemName)
+            SetOverrideBindingItem(buttonFrame, false, keybind, itemName)
             DEFAULT_CHAT_FRAME:AddMessage(
                 string.format("|c%smq:|r Created temporary keybind %s to use %s", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link), 255, 255, 0
             )

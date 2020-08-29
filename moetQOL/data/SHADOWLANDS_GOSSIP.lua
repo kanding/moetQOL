@@ -36,6 +36,8 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Mikanikos"] = 1,
     ["Polemarch Adrestes"] = 1,
     ["Thanikos"] = 1,
+    ["Caretaker Mirene"] = 1, --innkeep set hearthstone
+    ["Akiris"] = 1, --fast pick steward
 
     --Maldraxxus
     ["Arena Spectator"] = 1,
@@ -55,10 +57,11 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Gunn Gorgebone"] = 1,
     ["Scrapper Minoire"] = 1,
     ["Rencissa the Dynamo"] = 1,
-    ["Marcel Mullby"] = 1,
+    ["Marcel Mullby"] = 2,
     ["Tester Sahaari"] = 1,
     ["Valuator Malus"] = 1,
     ["Ta'eran"] = 1,
+    ["Odew Testan"] = 1, --set hearthstone battlefield
 
     --Ardenweald
     ["Hunt-Captain Korayn"] = 1,
@@ -72,6 +75,7 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Dreamweaver"] = {2,3},
     ["Ara'lon"] = 1,
     ["Rury"] = 1,
+    ["Awool"] = 1,
     ["Slanknen"] = 1,
     ["Groonoomcrooek"] = 1,
     ["Elder Finnan"] = 1,
@@ -81,6 +85,8 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Dreamer's Vision"] = 1,
     ["Droman Aliothe"] = 1,
     ["Winter Queen"] = 1,
+    ["Taiba"] = 2, --Innkeeper hibernal
+    ["Nolon"] = 2, --Innkeeper first place
 
     --Revendreth
     ["Lord Chamberlain"] = 1,
@@ -89,7 +95,7 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Tubbins"] = 2,
     ["Theotar"] = 1,
     ["Projection of Prince Renathal"] = 1,
-    ["Courier Rokalai"] = 1,
+    ["Courier Rokalai"] = 2,
     ["Soul of Keltesh"] = 1,
     ["Globknob"] = 1,
     ["Ilka"] = 1,
@@ -105,6 +111,7 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Venthyr Writing Desk"] = 1, -- (not a unit)
     ["Tubbins"] = 1,
     ["Prince Renathal"] = 1,
+    ["Tremen Winefang"] = 1, --innkeeper Darkhaven
 
     --Oribos
     ["Protector Captain"] = 1,
