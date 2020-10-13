@@ -1,14 +1,15 @@
---moetQOL v2.6.3beta
+--moetQOL v2.6.7
 
-Added more specific options for combatchat and combattooltip.
+Added CombatChat option to hide chat in different types of combat.
 
-Added questitembutton which creates a keybind that uses the
-most recent quest item.
+Added QuestItemBind which creates a keybind that uses the
+closest watched quest item.
 
+Added AutoQuest option with shadowlands auto gossip. This feature
+picks up quests automatically, shares if in group and auto gossips
+certain quest related gossip options.
 
+Removed Tweaks into own UI
 
---moetQOL v2.6.1
-
-Moved HideBlizzardBorders and UI specific stuff into new moetUI addon.
-
-Fixed skipmovies option.
+Removed fastislands since BFA is over and if you're still doing 
+islands you should get out fast.

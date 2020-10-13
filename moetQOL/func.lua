@@ -292,10 +292,7 @@ local function HandleGossip(self, e, ...)
 
     if gossip and gossipOptions > 0 then
         local target = UnitName("target") or GameTooltipTextLeft1:GetText()
-        if not DATA.SHADOWLANDS_GOSSIP[target] then
-            --print(string.format("GOSSIP: %s NOT IN TABLE.", tostring(target)))
-            return
-        end
+        if not DATA.SHADOWLANDS_GOSSIP[target] then return end
         local choice = DATA.SHADOWLANDS_GOSSIP[target]
 
         -- doesnt cover extreme obscure cases but most
@@ -306,7 +303,6 @@ local function HandleGossip(self, e, ...)
         end
 
         if choice <= gossipOptions then
-            --print("GOSSIP: PICKING CHOICE "..tostring(choice))
             C_GossipInfo.SelectOption(choice)
         end
     end
@@ -603,17 +599,6 @@ function Func:HideTalkingHead()
     hooksecurefunc("TalkingHeadFrame_PlayCurrent", function()
         TalkingHeadFrame_CloseImmediately()
     end)
-end
-
-function Func:InstantQueueMythicIsland()
-    local f = CreateFrame("FRAME")
-    f:RegisterEvent("ISLANDS_QUEUE_OPEN")
-    f:SetScript("OnEvent", function(self, event, ...)
-        if event == "ISLANDS_QUEUE_OPEN" then
-            C_IslandsQueue.QueueForIsland(1737)
-        end
-    end)
-    f:Hide()
 end
 
 function Func:SetMaxZoom()
