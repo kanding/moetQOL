@@ -800,7 +800,15 @@ function Func:HideChatInCombat()
     f:RegisterEvent("ENCOUNTER_END")
     f:RegisterEvent("PLAYER_REGEN_ENABLED")
     f:RegisterEvent("PLAYER_REGEN_DISABLED")
+    f:RegisterEvent("PLAYER_ENTERING_WORLD") -- If we zone out always show chat
     f:SetScript("OnEvent", function(self, e, ...)
+        if e == "PLAYER_ENTERING_WORLD" then
+            for _, f in pairs(MouseoverFrames) do
+                f.ShouldHide = false
+                f:FadeIn()
+            end
+        end
+
         if instance and select(2, GetInstanceInfo()) == "none" then return end
 
         if boss then
