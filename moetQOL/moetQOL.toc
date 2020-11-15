@@ -1,9 +1,9 @@
-## Interface: 90001
+## Interface: 90002
 
 ## Title: moetQOL
 ## Author: moet
 
-## Version: 2.6.8
+## Version: 2.6.9
 ## Notes: Lightweight quality of life improvements.
 ## SavedVariables: moetQOLDB
 
