@@ -37,7 +37,7 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Polemarch Adrestes"] = 1,
     ["Thanikos"] = 1,
     ["Caretaker Mirene"] = 1, --innkeep set hearthstone
-    ["Akiris"] = 1, --fast pick steward
+    ["Akiris"] = {1,2}, --fast pick steward
 
     --Maldraxxus
     ["Arena Spectator"] = 1,
@@ -120,9 +120,10 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Ebon Blade Acolyte"] = 1,
     ["Foreman Au'brak"] = 1,
     ["Caretaker Kah-Rahm"] = 1,
-    ["Host Ta'rela"] = 1,
+    ["Host Ta'rela"] = 2,
     ["Fatescribe Roh-Tahl"] = 1,
     ["Overseer Ta'readon"] = 1,
     ["Overseer Kah-Sher"] = 1,
+    ["Pathscribe Roh-Avonavi"] = 1,
 
 }
