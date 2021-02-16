@@ -53,7 +53,7 @@ local function UpdateAlphasAndScale()
 end
 
 local function ModifyActionBar()
-    UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomLeft"].yOffset = -8
+    UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomLeft"].baseY = 5
     --UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomRight"].xOffset = 4
     MultiBarBottomRightButton7:ClearAllPoints()
     MultiBarBottomRightButton7:SetPoint("BOTTOMLEFT", MultiBarBottomRightButton1, "TOPLEFT", 0, 5)
