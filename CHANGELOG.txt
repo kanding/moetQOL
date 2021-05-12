@@ -1,3 +1,3 @@
---moetQOL v2.6.10
+--moetQOL v2.6.11
 
 Fixed issue with quest item bind unable to set keybind in combat.

@@ -3,7 +3,7 @@
 ## Title: moetUI
 ## Author: moet
 
-## Version: 1.0
+## Version: 1.1
 ## Notes: My own personal changes to the default Blizzard UI
 
 moetUI.lua
