@@ -1,15 +1,3 @@
---moetQOL v2.6.7
+--moetQOL v2.6.10
 
-Added CombatChat option to hide chat in different types of combat.
-
-Added QuestItemBind which creates a keybind that uses the
-closest watched quest item.
-
-Added AutoQuest option with shadowlands auto gossip. This feature
-picks up quests automatically, shares if in group and auto gossips
-certain quest related gossip options.
-
-Removed Tweaks into own UI
-
-Removed fastislands since BFA is over and if you're still doing 
-islands you should get out fast.
+Fixed issue with quest item bind unable to set keybind in combat.

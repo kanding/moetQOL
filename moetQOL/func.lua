@@ -844,41 +844,71 @@ end
 function Func:QuestItemBind()
     local buttonFrame = CreateFrame("FRAME", "moetQOL_QuestItemButton")
     buttonFrame:Hide()
-    local lastItem, lastQuest, lastDist
+    buttonFrame.lastItem = ""
+    buttonFrame.lastQuest = 0
+    buttonFrame.lastDist = 0
+    buttonFrame.CheckAfter = false;
+
+    buttonFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    buttonFrame:SetScript("OnEvent", function(self, e)
+        if not buttonFrame.CheckAfter then return end
+        buttonFrame.CheckAfter = false
+
+        if e == "PLAYER_REGEN_ENABLED" and buttonFrame.lastItem ~= "" then
+            ClearOverrideBindings(buttonFrame)
+            SetOverrideBindingItem(buttonFrame, false, GetBindingKey("USEMOSTRECENTQUESTITEM"), buttonFrame.lastItem)
+            DEFAULT_CHAT_FRAME:AddMessage(
+                string.format("|c%smq:|r Created temporary keybind %s to use %s.", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), buttonFrame.lastLink), 255, 255, 0
+            )
+        end
+    end)
 
     hooksecurefunc("QuestObjectiveItem_Initialize", function(itemButton, questLogIndex)
+        local questID = C_QuestLog.GetQuestIDForLogIndex(questLogIndex)
+        local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(questID)
+
+        -- UPDATE DISTANCE IF SAME QUEST
+        if buttonFrame.lastQuest and buttonFrame.lastQuest == questID then
+            buttonFrame.lastDist = distanceSq
+            return
+        end
+
         -- GET NEW ITEM TO USE
         local link, item, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex)
         local itemName = GetItemInfo(link)
 
-        if itemName and itemName ~= lastItem then
-            local questID = C_QuestLog.GetQuestIDForLogIndex(questLogIndex)
-            local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(questID)
-
-            -- If last quest is valid and closer than the new quest then don't change.
-            if lastQuest then
-                if C_QuestLog.IsOnQuest(lastQuest) and not C_QuestLog.ReadyForTurnIn(lastQuest) then
-                    if lastDist and distanceSq and lastDist < distanceSq then return end
-                    if not onContinent then return end
-                end
+        -- If last quest is valid and closer than the new quest then don't change.
+        if buttonFrame.lastQuest then
+            if C_QuestLog.IsOnQuest(buttonFrame.lastQuest) and not C_QuestLog.ReadyForTurnIn(buttonFrame.lastQuest) then
+                if not onContinent then return end
+                -- Add 20000 as a safety in case two quests are on top of each other.
+                if buttonFrame.lastDist and distanceSq and buttonFrame.lastDist < distanceSq + 20000 then return end
             end
+        end
 
-            -- UPDATE QUEST TO KEYBIND
-            lastItem = itemName
-            lastQuest = questID
-            lastDist = distanceSq
+        -- UPDATE QUEST TO KEYBIND
+        buttonFrame.lastItem = itemName
+        buttonFrame.lastQuest = questID
+        buttonFrame.lastDist = distanceSq
+        buttonFrame.lastLink = link
 
-            -- CREATE A TEMPORARY KEYBIND
-            local keybind = GetBindingKey("USEMOSTRECENTQUESTITEM")
-            if not keybind then
-                print(string.format("|c%smq:|r Attempted to create Keybind to use %s, but none is set! Set bind to use in Key Bindings/AddOns!", F_COLOR, link))
-                return
-            end
+        -- CREATE A TEMPORARY KEYBIND
+        local keybind = GetBindingKey("USEMOSTRECENTQUESTITEM")
+        if not keybind then
+            print(string.format("|c%smq:|r Attempted to create Keybind to use %s, but none is set! Set bind to use in Key Bindings/AddOns!", F_COLOR, link))
+            return
+        end
 
+        if InCombatLockdown() then
+            DEFAULT_CHAT_FRAME:AddMessage(
+                string.format("|c%smq:|r Unable to set keybind for %s while |cffff0000in combat|r. Trying again after.. ", F_COLOR, link), 255, 255, 0
+            )
+            buttonFrame.CheckAfter = true
+        else
             ClearOverrideBindings(buttonFrame)
             SetOverrideBindingItem(buttonFrame, false, keybind, itemName)
             DEFAULT_CHAT_FRAME:AddMessage(
-                string.format("|c%smq:|r Created temporary keybind %s to use %s", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link), 255, 255, 0
+                string.format("|c%smq:|r Created temporary keybind %s to use %s.", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link), 255, 255, 0
             )
         end
     end)
