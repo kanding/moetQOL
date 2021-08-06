@@ -17,13 +17,11 @@ local function Line_OnEnter(self)
     GameTooltip:Hide()
     GameTooltip:SetOwner(self, "TOP")
     GameTooltip:AddLine(self.title:GetText())
-    GameTooltip:AddLine(self.desc)
+    GameTooltip:AddLine(self.desc..".")
     GameTooltip:Show()
 end
 
-local function Line_OnLeave(self)
-    GameTooltip:Hide()
-end
+local function Line_OnLeave(self) GameTooltip:Hide() end
 
 local function Tab_OnClick(self)
     PanelTemplates_SetTab(self:GetParent(), self:GetID())
@@ -106,10 +104,6 @@ local function InitializeDropDownMenu(self, level)
     end
 end
 
-local function EditBox_OnEnterPressed(self)
-    self:ClearFocus() 
-end
-
 local function EditBox_OnFocusLost(self)
     GameTooltip:Hide()
     --Update DB Key
@@ -124,13 +118,11 @@ local function EditBox_OnFocusLost(self)
     end
 end
 
-local function EditBox_OnEnable(self)
-    self:SetText(moetQOLDB[self.key].custom)
-end
+local function EditBox_OnEnterPressed(self) self:ClearFocus() end
 
-local function EditBox_OnDisable(self)
-    self:SetText(" ")
-end
+local function EditBox_OnEnable(self) self:SetText(moetQOLDB[self.key].custom) end
+
+local function EditBox_OnDisable(self) self:SetText(" ") end
 
 local function EditBox_OnFocusGained(self)
     GameTooltip:Hide()
@@ -171,7 +163,6 @@ local function SortDatabaseByCategory()
     return sorted
 end
 
-
 local function AddCustomOption(f, options, key)
     if options.min and options.max then
         f.editbox = CreateFrame("EditBox", f:GetName().."Edit", f, "InputBoxTemplate")
@@ -202,7 +193,6 @@ local function AddCustomOption(f, options, key)
         UIDropDownMenu_SetSelectedValue(f.dropdown, moetQOLDB[key].custom)
     end
 end
-
 
 local function AddFunctions(parent, sorted_db_functions)
     local i = 0
@@ -239,9 +229,7 @@ local function AddFunctions(parent, sorted_db_functions)
         f.Bg = f:CreateTexture(nil, "BACKGROUND")
         f.Bg:SetAllPoints(true)
 
-        if fcustom then
-            AddCustomOption(f, v.custom, k)
-        end
+        if fcustom then AddCustomOption(f, v.custom, k) end
 
         if f.state:GetChecked() then
             f.Bg:SetColorTexture(0,1,0, TAB_LINE_ALPHA)
