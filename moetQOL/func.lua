@@ -225,7 +225,7 @@ local function HandleQuests(self, e, ...)
         elseif GetNumQuestChoices() == 1 then
             GetQuestReward(1)
         elseif GetNumQuestChoices() > 1 then
-            local force = moetQOLDB["autoquest"][ns.Core.OPTION] == "force"
+            local force = moetQOLDB["autoquest"].custom == "force"
             if not force then return end
 
             --GetQuestReward(GetGreedyRewardIndex())
@@ -396,7 +396,7 @@ end
 
 local function AdjustSpellQueue()
     local ranged = IsPlayerRanged()
-    local rangedValue = moetQOLDB["dynamicspellqueue"][ns.Core.OPTION] or 280
+    local rangedValue = moetQOLDB["dynamicspellqueue"].custom or 280
 
     if ranged then
         SetCVar("SpellQueueWindow", rangedValue)
@@ -470,11 +470,11 @@ function Func:EnableEasyDelete()
 end
 
 function Func:CreateSellButton()
-    local option = moetQOLDB["sell"][ns.Core.OPTION]
+    local option = moetQOLDB["sell"].custom
     local auto = option == "auto"
     local manual = option == "manual"
     if not manual and not auto then
-        print(string.format("|c%ssell:|r ineligible custom option: %s", F_COLOR, option))
+        print(string.format("|c%ssell:|r ineligible custom option: %s", F_COLOR, tostring(option)))
         print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
     end
 
@@ -693,12 +693,12 @@ function Func:RealIDCounter()
 end
 
 function Func:HideTooltipInCombat()
-    local option = moetQOLDB["combattooltip"][ns.Core.OPTION]
+    local option = moetQOLDB["combattooltip"].custom
     local always = option == "always"
     local instance = option == "instance"
     local raid = option == "raid"
     if not instance and not raid and not always then
-        print(string.format("|c%scombattooltip:|r ineligible custom option: %s", F_COLOR, option))
+        print(string.format("|c%scombattooltip:|r ineligible custom option: %s", F_COLOR, tostring(option)))
         print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
     end
 
@@ -748,7 +748,7 @@ function Func:DynamicSpellQueue()
 end
 
 function Func:AutoQuest()
-    local option = moetQOLDB["autoquest"][ns.Core.OPTION]
+    local option = moetQOLDB["autoquest"].custom
     local noforce = option == "noforce"
     local force = option == "force"
     if not noforce and not force then
@@ -773,12 +773,12 @@ end
 -- by Urtgard
 -- https://www.curseforge.com/wow/addons/hcic
 function Func:HideChatInCombat()
-    local option = moetQOLDB["combatchat"][ns.Core.OPTION]
+    local option = moetQOLDB["combatchat"].custom
     local always = option == "always"
     local instance = option == "instance"
     local boss = option == "boss"
     if not always and not instance and not boss then
-        print(string.format("|c%scombatchat:|r ineligible custom option: %s", F_COLOR, option))
+        print(string.format("|c%scombatchat:|r ineligible custom option: %s", F_COLOR, tostring(option)))
         print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
     end
 
@@ -879,10 +879,13 @@ function Func:QuestItemBind()
 
         -- If last quest is valid and closer than the new quest then don't change.
         if buttonFrame.lastQuest then
-            if C_QuestLog.IsOnQuest(buttonFrame.lastQuest) and not C_QuestLog.ReadyForTurnIn(buttonFrame.lastQuest) then
+            if C_QuestLog.IsOnQuest(buttonFrame.lastQuest) then
                 if not onContinent then return end
                 -- Add 20000 as a safety in case two quests are on top of each other.
-                if buttonFrame.lastDist and distanceSq and buttonFrame.lastDist < distanceSq + 20000 then return end
+                if C_QuestLog.ReadyForTurnIn(buttonFrame.lastQuest) and C_QuestLog.ReadyForTurnIn(questID) then return end
+                if not C_QuestLog.ReadyForTurnIn(buttonFrame.lastQuest) then
+                    if buttonFrame.lastDist and distanceSq and buttonFrame.lastDist < distanceSq + 20000 then return end
+                end
             end
         end
 

@@ -5,13 +5,10 @@
 ---------------------------------------------------
 local _, ns = ...
 _G.moetQOLDB = moetQOLDB or {}
-ns.ADDON_VERSION = GetAddOnMetadata("moetQOL", "Version")
-local SHORTCUT = "/mq"
 local COLOR	= "00CC0F00" -- red
 local COLOR2 = "FF00FF00" -- green
-local WELCOME_MESSAGE = string.format("|c%smoetQOL|r loaded: v%s - |c%s%s|r to toggle features.", COLOR, ns.ADDON_VERSION, COLOR, SHORTCUT)
+local WELCOME_MESSAGE = string.format("|c%smoetQOL|r loaded: v%s - |c%s%s|r to toggle features.", COLOR, ns.ADDON_VERSION, COLOR, ns.Core.CHATCMD)
 local statesChanged = 0 -- avoid spamming with /reload requests
-local default = ns.Core.MQdefault
 --indices for state, description and associated function in default table
 local STATE, DESC, FUNC, OPTION = ns.Core.STATE, ns.Core.DESC, ns.Core.FUNC, ns.Core.OPTION
 
@@ -21,10 +18,12 @@ local STATE, DESC, FUNC, OPTION = ns.Core.STATE, ns.Core.DESC, ns.Core.FUNC, ns.
 -- argument is passed to ChangeState() or ChangeOptions().
 ---------------------------------------------------
 local mqCommands = {
-    ["help"] = ns.Core.PrintHelp,
+    ["help"] = ns.Config.ToggleFrame,
     ["flags"] = ns.Core.PrintFlags,
+    ["mappinhelp"] = ns.Core.MapPinUsage,
+    ["mappinvalue"] = ns.Core.MapPinError,
     ["hardreset"] = function()
-        moetQOLDB = default
+        moetQOLDB = ns.Core.MQdefault
         print(string.format("|c%smq:|r Database set to default, values set to Off.", COLOR))
     end,
 }
@@ -33,6 +32,7 @@ local mqCommands = {
 -- FUNCTIONS
 ---------------------------------------------------
 local function ChangeState(str)
+    --[[
     if str == nil then return end
 
     if moetQOLDB[str] then
@@ -55,9 +55,11 @@ local function ChangeState(str)
             "|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.",
             COLOR, COLOR2))
     end
+    --]]
 end
 
 local function ChangeOptions(str, option)
+    --[[
     if str == nil or option == nil then return end
 
     if moetQOLDB[str][OPTION] then
@@ -80,6 +82,7 @@ local function ChangeOptions(str, option)
     if statesChanged == 1 then
         print(string.format("|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", COLOR, COLOR2))
     end
+    ]]
 end
 
 local function HandleSlashCommands(str)
@@ -117,29 +120,37 @@ local function HandleSlashCommands(str)
     end
 end
 
-local function CheckDatabaseErrors()
-    for k,v in pairs(default) do
-        --create if not exist
-        if not moetQOLDB[k] then
-            if v[OPTION] then
-                moetQOLDB[k] = {v[STATE], v[DESC], v[OPTION]}
-            else
-                moetQOLDB[k] = {v[STATE], v[DESC]}
-            end
-        end
+local function HandlePin(str, ...)
+    if #str == 0 then mqCommands.mappinhelp() return false end
+    local args = { string.split(' ', str) }
+    -- Two coordinates: X and Y.
+    if #args ~= 2 then mqCommands.mappinhelp() return false end
 
-        --update if outdated
-        if moetQOLDB[k][DESC] and moetQOLDB[k][DESC] ~= default[k][DESC] then
-            moetQOLDB[k][DESC] = default[k][DESC]
-        end
+    local x = tonumber(args[1])
+    local y = tonumber(args[2])
+    if type(x) ~= "number" or type(y) ~= "number" then
+        mqCommands:mappinvalue(args[1], args[2])
+        return false
+    end
 
-        if default[k][OPTION] and (not moetQOLDB[k][OPTION] or
-        (moetQOLDB[k][OPTION] and type(moetQOLDB[k][OPTION]) ~= type(default[k][OPTION])))
-        then
-            moetQOLDB[k][OPTION] = default[k][OPTION]
-        elseif moetQOLDB[k][OPTION] and not default[k][OPTION] then
-            moetQOLDB[k][OPTION] = nil
-        end
+    if x < 0 or y < 0 then mqCommands.mappinhelp() return false end
+    -- Coordinates have to be between 0 (top) and 1 (bottom).
+    -- If we typed in 34.4 or something we map it between 0 and 1
+    if x > 1 then x = x / 100 end
+    if y > 1 then y = y / 100 end
+
+    ns.Core:CreateMapPin(x, y)
+end
+
+local function HandlePinShare(str, ...)
+    HandlePin(str, ...)
+    local waypointlink = C_Map.GetUserWaypointHyperlink()
+    if UnitInRaid("player") then
+        SendChatMessage(waypointlink, "RAID")
+    elseif UnitInParty("player") then
+        SendChatMessage(waypointlink, "PARTY")
+    else
+        SendChatMessage(waypointlink)
     end
 end
 
@@ -151,14 +162,18 @@ local function Init(self, event, name)
     BINDING_NAME_USEMOSTRECENTQUESTITEM = "Use the closest watched quest item (requires feature enabled)"
 
     -- custom slash commands
-    SLASH_moetQOL1 = SHORTCUT
-    SLASH_CLEAR1 = "/clear"
-    SLASH_RL1 = "/rl"
+    SLASH_moetQOL1 = ns.Core.CHATCMD
+    SLASH_CLEAR1 = ns.Core.CLEAR
+    SLASH_RL1 = ns.Core.RELOAD
+    SLASH_PIN1 = ns.Core.PIN
+    SLASH_PINSHARE1 = ns.Core.PINSHARE
     SlashCmdList.moetQOL = HandleSlashCommands
     SlashCmdList.CLEAR = function() ChatFrame1:Clear() end
     SlashCmdList.RL = function() ReloadUI() end
+    SlashCmdList.PIN = HandlePin
+    SlashCmdList.PINSHARE = HandlePinShare
 
-    CheckDatabaseErrors()
+    ns.Core.CheckDatabaseErrors()
     ns.Core.ActivateFunctions()
 
     print(WELCOME_MESSAGE)
