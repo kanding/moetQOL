@@ -4,6 +4,7 @@ local _, ns = ...
 ns.Config = {}
 local Config = ns.Config
 
+local F_COLOR = "00CC0F00" -- change ref from this to some core color
 local DISTANCE_BETWEEN_TABS = -14
 local HEIGHT_PER_FUNCTION_ENTRY = 35
 local CUSTOM_OPTION_WIDTH = 100
@@ -258,25 +259,21 @@ end
 local function AddCategoryTabs(parent)
     local db_sorted = SortDatabaseByCategory()
 
-    for i=1, parent.numTabs do
-        local name = ns.Core:GetKeyName(ns.Core.FunctionCategory, i)
+    for i=2, parent.numTabs do
+        local category_index = i-1 -- account for general tab
+        local name = ns.Core:GetKeyName(ns.Core.FunctionCategory, category_index)
         local tabName = parent:GetName()..name.."Tab"
         local tab = CreateFrame("Button", tabName, parent, "CharacterFrameTabButtonTemplate")
         tab:SetID(i)
         tab:SetText(name)
         tab:SetScript("OnClick", Tab_OnClick)
-
-        if i == 1 then
-            tab:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 3, 7);
-        else
-            tab:SetPoint("TOPLEFT", parent.Tabs[i-1], "TOPRIGHT", DISTANCE_BETWEEN_TABS, 0);
-        end
+        tab:SetPoint("TOPLEFT", parent.Tabs[i-1], "TOPRIGHT", DISTANCE_BETWEEN_TABS, 0)
 
         tab.content = CreateFrame("Frame", tabName..i.."Body", parent)
         tab.content:SetWidth(parent:GetWidth()*0.85)
         tab.content:Hide()
 
-        local entries = AddFunctionsForCategory(tab.content, db_sorted[i])
+        local entries = AddFunctionsForCategory(tab.content, db_sorted[category_index])
         tab.content:SetHeight(entries * HEIGHT_PER_FUNCTION_ENTRY)
 
         parent.Tabs[i] = tab
@@ -284,9 +281,44 @@ local function AddCategoryTabs(parent)
 end
 
 local function IntializeTabs(parent)
-    PanelTemplates_SetNumTabs(parent, #ns.Core.FunctionCategory)
+    PanelTemplates_SetNumTabs(parent, 1 + #ns.Core.FunctionCategory)
     parent.Tabs = {}
 
+    --Add General Tab
+    local name = "General"
+    local id = 1
+    local tabName = parent:GetName()..name.."Tab"
+    local tab = CreateFrame("Button", tabName, parent, "CharacterFrameTabButtonTemplate")
+    tab:SetID(id)
+    tab:SetText(name)
+    tab:SetScript("OnClick", Tab_OnClick)
+    tab:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 3, 7)
+    tab.content = CreateFrame("Frame", tabName..id.."Body", parent)
+    tab.content:SetWidth(parent:GetWidth()*0.85)
+    tab.content:SetHeight(300)
+    tab.content:Hide()
+
+    tab.content.title = tab.content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    tab.content.title:SetPoint("LEFT", parent:GetName().."TopBorder", "LEFT", 5, -60)
+    tab.content.title:SetText("Chat Commands")
+
+    for i=1,5 do
+        local info = ns.Core.ChatCommands[i]
+        if info then
+            local cmd = tab.content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+            cmd:SetPoint("LEFT", parent:GetName().."TopBorder", "LEFT", 5, -60 - (30 * i))
+            cmd:SetFormattedText("|c%s%s|r - %s", F_COLOR, info[1], info[2])
+        end
+    end
+
+    tab.content.source = tab.content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    tab.content.source:SetPoint("CENTER", parent:GetName().."BottomBorder", "CENTER", 0, 40)
+    tab.content.source:SetText("For issues, requests and source:")
+    tab.content.sourcelink = tab.content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
+    tab.content.sourcelink:SetPoint("CENTER", parent:GetName().."BottomBorder", "CENTER", 0, 25)
+    tab.content.sourcelink:SetText(ns.SOURCE)
+    
+    parent.Tabs[1] = tab
     AddCategoryTabs(parent)
 
     Tab_OnClick(parent.Tabs[1])
@@ -305,7 +337,7 @@ function Config:SetupConfig()
     cframe:RegisterForDrag("LeftButton")
     cframe:SetScript("OnDragStart", cframe.StartMoving)
     cframe:SetScript("OnDragStop", cframe.StopMovingOrSizing)
-    tinsert(UISpecialFrames, ns.Config.Frame:GetName())
+    tinsert(UISpecialFrames, cframe:GetName())
 
     cframe.close = CreateFrame("Button", cframe:GetName().."CloseButton", cframe, "UIPanelCloseButton")
     cframe.close:SetPoint("CENTER", cframe:GetName().."TopRightCorner", "CENTER", -5, -5)

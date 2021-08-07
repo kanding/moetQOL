@@ -6,6 +6,7 @@
 local _, ns	= ...
 ns.Core	= {} -- add the core to the namespace
 ns.ADDON_VERSION = GetAddOnMetadata("moetQOL", "Version")
+ns.SOURCE = "https://github.com/kanding/moetQOL/"
 local Core = ns.Core
 
 -- Chat cmds
@@ -15,15 +16,18 @@ Core.RELOAD = "/rl"
 Core.PIN = "/pin"
 Core.PINSHARE = "/pinshare"
 
+--temp
+Core.ChatCommands = {
+    [1] = {Core.CHATCMD,"Open the config window."},
+    [2] =  {Core.CLEAR, "Clears the primary chat window."},
+    [3] = {Core.RELOAD, "Reloads the UI."},
+    [4] = {Core.PIN, "Creates a map pin. Usage: /pin x y"},
+    [5] = {Core.PINSHARE, "Creates a map pin and shares it in chat."},
+}
+
 local Func = ns.Func
 local F_COLOR = "00CC0F00" -- red
 local F_COLOR2 = "FF00FF00" -- green
---indices for state, description and associated function in default table
-Core.STATE = 1
-Core.DESC = 2
-Core.FUNC = 3
-Core.OPTION = 4
-local STATE, DESC, FUNC, OPTION = Core.STATE, Core.DESC, Core.FUNC, Core.OPTION
 
 local function enum(tbl)
     local length = #tbl
@@ -63,50 +67,14 @@ eventFrame:Hide()
 ---------------------------------------------------
 -- CORE FUNCTIONS
 ---------------------------------------------------
-function Core:PrintFlags(state)
-    --[[
+function Core:PrintFlags()
     for key, value in pairs(moetQOLDB) do
-        if Core.MQdefault[key] then
-            if state then
-                state = state:lower()
-                if value[STATE]:lower() == state then
-                    if state == "off" then
-                        print(string.format("|c%s%s|r: %s", F_COLOR, key, value[STATE]))
-                    else
-                        if value[OPTION] then
-                            print(string.format("|c%s%s|r: |c%s%s|r, %s", F_COLOR, key, F_COLOR2, value[STATE], value[OPTION]))
-                        else
-                            print(string.format("|c%s%s|r: |c%s%s|r", F_COLOR, key, F_COLOR2, value[STATE]))
-                        end
-                    end
-                end
-            else
-                if value[STATE] == "Off" then
-                    print(string.format("|c%s%s|r: %s", F_COLOR, key, value[STATE]))
-                else
-                    if value[OPTION] then
-                        print(string.format("|c%s%s|r: |c%s%s|r, %s", F_COLOR, key, F_COLOR2, value[STATE], value[OPTION]))
-                    else
-                        print(string.format("|c%s%s|r: |c%s%s|r", F_COLOR, key, F_COLOR2, value[STATE]))
-                    end
-                end
-            end
+        if Core.MQdefault[key] then 
+            print(string.format("|c%s%s|r: |c%s%s|r", F_COLOR, key, value.state and F_COLOR2 or "ffffffff", tostring(value.state)))
         else
             moetQOLDB[key] = nil -- remove unsupported key
         end
     end
-    ]]
-end
-
-function Core:PrintHelp()
-    --[[
-    print("|c"..F_COLOR.."moetQOL|r v"..ns.ADDON_VERSION.." List of commands:")
-    print("/mq |c" .. F_COLOR2 .. "flags|r - to show your current settings.")
-    print("/mq |c" .. F_COLOR2 .. "hardreset|r - to reset all saved settings to default (off).")
-    for key, value in pairs(Core.MQdefault) do
-        print(string.format("/mq |c%s%s|r - %s.", F_COLOR, key, value[DESC]))
-    end
-    ]]
 end
 
 function Core:PrintMessage(str)
@@ -152,7 +120,6 @@ function Core:CheckDatabaseErrors()
         end
 
         --update if outdated
-        --todo double check we cant just use v?
         if moetQOLDB[k].desc and moetQOLDB[k].desc ~= v.desc then
             moetQOLDB[k].desc = v.desc
         end
