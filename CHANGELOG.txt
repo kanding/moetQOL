@@ -4,6 +4,9 @@ Removed most slash command interaction with the addon
 Added /pin x y slash command to create map pins.
 Added /pinshare x y slash command to create map pin and share link in raid else party else say.
 
+Fixed paragontooltip for 9.1
+
+
 --moetQOL v2.6.11
 
 Fixed issue with quest item bind unable to set keybind in combat.

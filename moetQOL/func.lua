@@ -673,7 +673,7 @@ function Func:AutoRepair()
 end
 
 -- Inspired by ExaltedPlus
--- reworked :>
+-- reworked :-)
 -- original: https://www.curseforge.com/wow/addons/exaltedplus
 function Func:ParagonTooltip()
     local line = "" --safety
@@ -688,8 +688,8 @@ function Func:ParagonTooltip()
 
         line = format(ARCHAEOLOGY_COMPLETION, turnins)
 
-        EmbeddedItemTooltip:AddLine(line)
-        EmbeddedItemTooltip:Show()
+        GameTooltip:AddLine(line)
+        GameTooltip:Show()
     end)
 
     hooksecurefunc("ReputationParagonFrame_OnLeave", function(self)
