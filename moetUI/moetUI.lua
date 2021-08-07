@@ -54,24 +54,27 @@ end
 
 local function ModifyActionBar()
     --taint
-    UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomLeft"].baseY = 5
+    --UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomLeft"].baseY = 5
     --UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomRight"].xOffset = 4
-    --MultiBarBottomLeft:ClearAllPoints()
-    --MultiBarBottomLeft:SetPoint("TOP", MainMenuBarArtFrame, "TOP", 0, 16) -- default anchor
+    MultiBarBottomLeft:ClearAllPoints()
+    MultiBarBottomLeft:SetPoint("TOP", MainMenuBarArtFrame, "TOP", 0, 16) -- default anchor
+    MultiBarBottomLeft:SetPoint("BOTTOMLEFT", ActionButton1, "TOPLEFT", 0, 5)
+    MultiBarBottomRightButton7:ClearAllPoints()
+    MultiBarBottomRightButton7:SetPoint("BOTTOMLEFT", MultiBarBottomRightButton1, "TOPLEFT", 0, 5)
+    MultiBarBottomLeft.ignoreFramePositionManager = true
+    MultiBarBottomRight.ignoreFramePositionManager = true
     --[[
     MultiBarBottomLeft:HookScript("OnUpdate", function()
         if not InCombatLockdown() then
             MultiBarBottomLeft:SetPoint("BOTTOMLEFT", ActionButton1, "TOPLEFT", 0, 5)
         end
     end)]]
-    MultiBarBottomRightButton7:ClearAllPoints()
-    MultiBarBottomRightButton7:SetPoint("BOTTOMLEFT", MultiBarBottomRightButton1, "TOPLEFT", 0, 5)
 end
 
 local function MoveAlternatePowerBar()
     -- UI Parent manage position
-    -- taint?
-    UIPARENT_ALTERNATE_FRAME_POSITIONS["PlayerPowerBarAlt_Bottom"] = {baseY = false, yOffset = altPower.y, xOffset = altPower.x};
+    -- This taints hard.
+    --UIPARENT_ALTERNATE_FRAME_POSITIONS["PlayerPowerBarAlt_Bottom"] = {baseY = false, yOffset = altPower.y, xOffset = altPower.x};
 
     --keep status text shown
     --[[
@@ -230,16 +233,19 @@ local function HideBlizzardFrames()
     RegisterStateDriver(StanceBarFrame, 'visibility', 'hide') -- hide stance bar
     MicroButtonAndBagsBar:Hide()
 
-    VERTICAL_MULTI_BAR_HEIGHT = 800;
+    -- mega taint
+    --VERTICAL_MULTI_BAR_HEIGHT = 800;
 
     MultiBarRight:HookScript('OnUpdate', function()
         if not InCombatLockdown() and MultiBarRight:GetScale() ~= SCALE then
+            VerticalMultiBarsContainer:SetPoint("RIGHT", UIParent, "RIGHT", 0, 100)
             MultiBarRight:SetScale(SCALE)
         end
     end)
 
     MultiBarLeft:HookScript('OnUpdate', function()
         if not InCombatLockdown() and MultiBarLeft:GetScale() ~= SCALE then
+            VerticalMultiBarsContainer:SetPoint("RIGHT", UIParent, "RIGHT", 0, 100)
             MultiBarLeft:SetScale(SCALE)
         end
     end)
