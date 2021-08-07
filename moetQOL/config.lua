@@ -4,7 +4,6 @@ local _, ns = ...
 ns.Config = {}
 local Config = ns.Config
 
-local F_COLOR = "00CC0F00" -- change ref from this to some core color
 local DISTANCE_BETWEEN_TABS = -14
 local HEIGHT_PER_FUNCTION_ENTRY = 35
 local CUSTOM_OPTION_WIDTH = 100
@@ -104,9 +103,9 @@ local function InitializeDropDownMenu(self, level)
     end
 end
 
+--Update DB Key
 local function EditBox_OnFocusLost(self)
     GameTooltip:Hide()
-    --Update DB Key
     self:HighlightText(0,0)
     local entered = tonumber(self:GetText())
     if entered and entered >= self.min and entered <= self.max then
@@ -307,7 +306,7 @@ local function IntializeTabs(parent)
         if info then
             local cmd = tab.content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
             cmd:SetPoint("LEFT", parent:GetName().."TopBorder", "LEFT", 5, -60 - (30 * i))
-            cmd:SetFormattedText("|c%s%s|r - %s", F_COLOR, info[1], info[2])
+            cmd:SetFormattedText("|c%s%s|r - %s", ns.REDCOLOR, info[1], info[2])
         end
     end
 
@@ -317,7 +316,7 @@ local function IntializeTabs(parent)
     tab.content.sourcelink = tab.content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     tab.content.sourcelink:SetPoint("CENTER", parent:GetName().."BottomBorder", "CENTER", 0, 25)
     tab.content.sourcelink:SetText(ns.SOURCE)
-    
+
     parent.Tabs[1] = tab
     AddCategoryTabs(parent)
 

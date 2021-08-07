@@ -1,13 +1,9 @@
 -- moet, 2020
 
----------------------------------------------------
--- SETUP
----------------------------------------------------
 local _, ns = ...
 _G.moetQOLDB = moetQOLDB or {}
-local COLOR	= "00CC0F00" -- red
-local COLOR2 = "FF00FF00" -- green
-local WELCOME_MESSAGE = string.format("|c%smoetQOL|r loaded: v%s - |c%s%s|r to toggle features.", COLOR, ns.ADDON_VERSION, COLOR, ns.Core.CHATCMD)
+
+local WELCOME_MESSAGE = string.format("|c%smoetQOL|r loaded: v%s - |c%s%s|r to toggle features.", ns.REDCOLOR, ns.ADDON_VERSION, ns.REDCOLOR, ns.Core.CHATCMD)
 local statesChanged = 0
 
 ---------------------------------------------------
@@ -25,29 +21,26 @@ local mqCommands = {
     end,
 }
 
----------------------------------------------------
--- FUNCTIONS
----------------------------------------------------
 local function ChangeState(str)
     if str == nil then return end
 
     if moetQOLDB[str] then
         if moetQOLDB[str].state == true then
             moetQOLDB[str].state = false
-            ns.Core.PrintMessage(string.format("|c%s%s|r: Off", COLOR, str))
+            ns.Core.PrintMessage(string.format("|c%s%s|r: Off", ns.REDCOLOR, str))
         elseif moetQOLDB[str].state == false then
             moetQOLDB[str].state = true
-            ns.Core.PrintMessage(string.format("|c%s%s|r: |c%sOn|r", COLOR, str, COLOR2))
+            ns.Core.PrintMessage(string.format("|c%s%s|r: |c%sOn|r", ns.REDCOLOR, str, ns.GREENCOLOR))
         end
         statesChanged = statesChanged + 1
     else
-        ns.Core.PrintMessage(string.format("|c%smq:|r %s is not a valid command.", COLOR, str))
+        ns.Core.PrintMessage(string.format("|c%smq:|r %s is not a valid command.", ns.REDCOLOR, str))
         return
     end
 
     -- only 1 reload needed per set of changes
     if statesChanged == 1 then
-        ns.Core.PrintMessage(string.format("|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", COLOR2))
+        ns.Core.PrintMessage(string.format("|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", ns.GREENCOLOR))
     end
 end
 
@@ -93,40 +86,9 @@ local function HandleSlashCommands(str)
     end
 end
 
-local function HandlePin(str, ...)
-    if #str == 0 then mqCommands.mappinhelp() return false end
-    local args = { string.split(' ', str) }
-    -- Two coordinates: X and Y.
-    if #args ~= 2 then mqCommands.mappinhelp() return false end
-
-    local x = tonumber(args[1])
-    local y = tonumber(args[2])
-    if type(x) ~= "number" or type(y) ~= "number" then
-        mqCommands:mappinvalue(args[1], args[2])
-        return false
-    end
-
-    if x < 0 or y < 0 then mqCommands.mappinhelp() return false end
-    -- Coordinates have to be between 0 (top) and 1 (bottom).
-    -- If we typed in 34.4 or something we map it between 0 and 1
-    if x > 1 then x = x / 100 end
-    if y > 1 then y = y / 100 end
-
-    ns.Core:CreateMapPin(x, y)
-end
-
-local function HandlePinShare(str, ...)
-    HandlePin(str, ...)
-    local waypointlink = C_Map.GetUserWaypointHyperlink()
-    if UnitInRaid("player") then
-        SendChatMessage(waypointlink, "RAID")
-    elseif UnitInParty("player") then
-        SendChatMessage(waypointlink, "PARTY")
-    else
-        SendChatMessage(waypointlink)
-    end
-end
-
+---------------------------------------------------
+-- FUNCTIONS
+---------------------------------------------------
 local function StoreDBSnapshot()
     local t = {}
     for k,v in pairs(moetQOLDB) do t[k] = v.state end
@@ -140,7 +102,7 @@ local function Init(self, event, name)
     BINDING_HEADER_MOETQOL = "moetQOL"
     BINDING_NAME_USEMOSTRECENTQUESTITEM = "Use the closest watched quest item (requires feature enabled)"
 
-    -- custom slash commands
+    -- slash commands
     SLASH_moetQOL1 = ns.Core.CHATCMD
     SLASH_CLEAR1 = ns.Core.CLEAR
     SLASH_RL1 = ns.Core.RELOAD
@@ -149,14 +111,15 @@ local function Init(self, event, name)
     SlashCmdList.moetQOL = HandleSlashCommands
     SlashCmdList.CLEAR = function() ChatFrame1:Clear() end
     SlashCmdList.RL = function() ReloadUI() end
-    SlashCmdList.PIN = HandlePin
-    SlashCmdList.PINSHARE = HandlePinShare
+    SlashCmdList.PIN = ns.Core.HandlePin
+    SlashCmdList.PINSHARE = ns.Core.HandlePinShare
 
     ns.Core.CheckDatabaseErrors()
     ns.Core.ActivateFunctions()
-    
+
     ns.LOADED_DB = StoreDBSnapshot() -- store copy of DB we loaded with
     print(WELCOME_MESSAGE)
+    addonLoadedEvents = nil
 end
 
 ---------------------------------------------------

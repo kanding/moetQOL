@@ -7,10 +7,11 @@
 ---------------------------------------------------
 local _, ns	= ...
 ns.Func	= {} -- add the core to the namespace
+ns.REDCOLOR = "00CC0F00"
+ns.GREENCOLOR = "FF00FF00"
+
 local Func = ns.Func
 local DATA = ns.Data
-local F_COLOR = "00CC0F00" -- red
-local F_COLOR2 = "FF00FF00" -- green
 
 Func.onLogin = {}
 ---------------------------------------------------
@@ -28,6 +29,39 @@ local function IsInArray(array, s)
     end
     return false
 end
+--[[
+local function VerifyCustomOption(key)
+    if not Core.MQdefault[key] then
+        ns.Core:PrintMessage("Failed to verify custom option for non-existing key: "..key)
+        return false
+    end
+
+    local current_option = moetQOLDB[key].custom
+    if not current_option then
+        ns.Core:PrintMessage("Failed to verify custom option with no current option for: "..key)
+        return false
+    end
+
+    local available_options = Core.MQdefault[key].custom
+
+    if available_options.min and available_options.max then
+        --numerical custom option
+        current_option = tonumber(current_option)
+        if not current_option then return false end
+        if current_option >= available_options.min and current_option <= available_options.max then
+            return true
+        end
+    else
+        --choice custom option
+        for i=1,#available_options do 
+            if available_options[i] == current_option then return true end
+        end
+    end
+
+    ns.Core:PrintMessage(string.format("|c%s%s:|r unable to verify custom option: %s", ns.REDCOLOR, key, tostring(current_option)))
+    return false
+end
+--]]
 
 --NOTE: this only sells 12 items at a time, rest will say object is busy.
 local function SellGreyItems()
@@ -178,7 +212,7 @@ local function AutoShareQuest(questID)
         local title = C_QuestLog.GetTitleForQuestID(questID)
         C_QuestLog.SetSelectedQuest(questID)
         QuestLogPushQuest();
-        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq|r: Sharing [%s] with your group...", F_COLOR, title), 255, 255, 0);
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq|r: Sharing [%s] with your group...", ns.REDCOLOR, title), 255, 255, 0);
     end
 end
 
@@ -470,13 +504,10 @@ function Func:EnableEasyDelete()
 end
 
 function Func:CreateSellButton()
+    --if not VerifyCustomOption("sell") then return end
     local option = moetQOLDB["sell"].custom
     local auto = option == "auto"
     local manual = option == "manual"
-    if not manual and not auto then
-        print(string.format("|c%ssell:|r ineligible custom option: %s", F_COLOR, tostring(option)))
-        print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
-    end
 
     local merchantButton = CreateFrame("Button", "moetQOL_SellButton", MerchantFrame, "LFGListMagicButtonTemplate")
     merchantButton:SetPoint("BOTTOMLEFT", 87, 4)
@@ -693,14 +724,11 @@ function Func:RealIDCounter()
 end
 
 function Func:HideTooltipInCombat()
+    --if not VerifyCustomOption("combattooltip") then return end
     local option = moetQOLDB["combattooltip"].custom
     local always = option == "always"
     local instance = option == "instance"
     local raid = option == "raid"
-    if not instance and not raid and not always then
-        print(string.format("|c%scombattooltip:|r ineligible custom option: %s", F_COLOR, tostring(option)))
-        print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
-    end
 
     --hide if player enters combat with unit as mouseover
     local f = CreateFrame("FRAME")
@@ -748,13 +776,10 @@ function Func:DynamicSpellQueue()
 end
 
 function Func:AutoQuest()
+    --if not VerifyCustomOption("autoquest") then return end
     local option = moetQOLDB["autoquest"].custom
     local noforce = option == "noforce"
     local force = option == "force"
-    if not noforce and not force then
-        print(string.format("|c%sautoquest:|r ineligible custom option: %s", F_COLOR, option))
-        print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
-    end
 
     local questFrame = CreateFrame("FRAME", "moetQOL_QuestFrame")
     questFrame:RegisterEvent("QUEST_DETAIL")
@@ -773,14 +798,11 @@ end
 -- by Urtgard
 -- https://www.curseforge.com/wow/addons/hcic
 function Func:HideChatInCombat()
+    --if not VerifyCustomOption("combatchat") then return end
     local option = moetQOLDB["combatchat"].custom
     local always = option == "always"
     local instance = option == "instance"
     local boss = option == "boss"
-    if not always and not instance and not boss then
-        print(string.format("|c%scombatchat:|r ineligible custom option: %s", F_COLOR, tostring(option)))
-        print(string.format("|c%smq:|r Please see https://github.com/kanding/moetQOL/releases for possible options.", F_COLOR))
-    end
 
     local MouseoverFrames = SetupMouseoverFrames()
 
@@ -858,7 +880,7 @@ function Func:QuestItemBind()
             ClearOverrideBindings(self)
             SetOverrideBindingItem(self, false, GetBindingKey("USEMOSTRECENTQUESTITEM"), self.lastItem)
             DEFAULT_CHAT_FRAME:AddMessage(
-                string.format("|c%smq:|r Created temporary keybind %s to use %s.", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), self.lastLink), 255, 255, 0
+                string.format("|c%smq:|r Created temporary keybind %s to use %s.", ns.REDCOLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), self.lastLink), 255, 255, 0
             )
         end
     end)
@@ -898,20 +920,20 @@ function Func:QuestItemBind()
         -- CREATE A TEMPORARY KEYBIND
         local keybind = GetBindingKey("USEMOSTRECENTQUESTITEM")
         if not keybind then
-            print(string.format("|c%smq:|r Attempted to create Keybind to use %s, but none is set! Set bind to use in Key Bindings/AddOns!", F_COLOR, link))
+            print(string.format("|c%smq:|r Attempted to create Keybind to use %s, but none is set! Set bind to use in Key Bindings/AddOns!", ns.REDCOLOR, link))
             return
         end
 
         if InCombatLockdown() then
             DEFAULT_CHAT_FRAME:AddMessage(
-                string.format("|c%smq:|r Unable to set keybind for %s while |cffff0000in combat|r. Trying again after.. ", F_COLOR, link), 255, 255, 0
+                string.format("|c%smq:|r Unable to set keybind for %s while |cffff0000in combat|r. Trying again after.. ", ns.REDCOLOR, link), 255, 255, 0
             )
             buttonFrame.CheckAfter = true
         else
             ClearOverrideBindings(buttonFrame)
             SetOverrideBindingItem(buttonFrame, false, keybind, itemName)
             DEFAULT_CHAT_FRAME:AddMessage(
-                string.format("|c%smq:|r Created temporary keybind %s to use %s.", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link), 255, 255, 0
+                string.format("|c%smq:|r Created temporary keybind %s to use %s.", ns.REDCOLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), link), 255, 255, 0
             )
         end
     end)

@@ -1,33 +1,26 @@
 -- moet, 2020
 
----------------------------------------------------
--- SETUP
----------------------------------------------------
 local _, ns	= ...
-ns.Core	= {} -- add the core to the namespace
+ns.Core	= {} 
 ns.ADDON_VERSION = GetAddOnMetadata("moetQOL", "Version")
 ns.SOURCE = "https://github.com/kanding/moetQOL/"
+
 local Core = ns.Core
-
--- Chat cmds
-Core.CHATCMD = "/mq"
-Core.CLEAR = "/clear"
-Core.RELOAD = "/rl"
-Core.PIN = "/pin"
-Core.PINSHARE = "/pinshare"
-
---temp
-Core.ChatCommands = {
-    [1] = {Core.CHATCMD,"Open the config window."},
-    [2] =  {Core.CLEAR, "Clears the primary chat window."},
-    [3] = {Core.RELOAD, "Reloads the UI."},
-    [4] = {Core.PIN, "Creates a map pin. Usage: /pin x y"},
-    [5] = {Core.PINSHARE, "Creates a map pin and shares it in chat."},
-}
-
 local Func = ns.Func
-local F_COLOR = "00CC0F00" -- red
-local F_COLOR2 = "FF00FF00" -- green
+
+ns.Core.CHATCMD = "/mq"
+ns.Core.CLEAR = "/clear"
+ns.Core.RELOAD = "/rl"
+ns.Core.PIN = "/pin"
+ns.Core.PINSHARE = "/pinshare"
+
+ns.Core.ChatCommands = {
+    [1] = {ns.Core.CHATCMD.." [option]", "Toggle [option] on/off."},
+    [2] =  {ns.Core.CLEAR, "Clears the primary chat window."},
+    [3] = {ns.Core.RELOAD, "Reloads the UI."},
+    [4] = {ns.Core.PIN, "Creates a map pin. Usage: /pin x y"},
+    [5] = {ns.Core.PINSHARE, "Creates a map pin and shares it in chat."},
+}
 
 local function enum(tbl)
     local length = #tbl
@@ -47,30 +40,46 @@ Core.FunctionCategory = enum {
 }
 
 ---------------------------------------------------
--- INVOKE ON LOGIN
----------------------------------------------------
-local function InvokeLoginFunctions()
-    for i=1, #Func.onLogin do
-        if type(Func.onLogin[i]) == "function" then
-            Func.onLogin[i]()
-        end
-    end
-
-    Func.onLogin = nil
-    eventFrame = nil
-end
-
-local eventFrame = CreateFrame("FRAME")
-eventFrame:RegisterEvent("PLAYER_LOGIN")
-eventFrame:SetScript("OnEvent", InvokeLoginFunctions)
-eventFrame:Hide()
----------------------------------------------------
 -- CORE FUNCTIONS
 ---------------------------------------------------
+function Core:HandlePin(str, ...)
+    if #str == 0 then mqCommands.mappinhelp() return false end
+    local args = { string.split(' ', str) }
+    -- Two coordinates: X and Y.
+    if #args ~= 2 then mqCommands.mappinhelp() return false end
+
+    local x = tonumber(args[1])
+    local y = tonumber(args[2])
+    if type(x) ~= "number" or type(y) ~= "number" then
+        mqCommands:mappinvalue(args[1], args[2])
+        return false
+    end
+
+    if x < 0 or y < 0 then mqCommands.mappinhelp() return false end
+    -- Coordinates have to be between 0 (top) and 1 (bottom).
+    -- If we typed in 34.4 or something we map it between 0 and 1
+    if x > 1 then x = x / 100 end
+    if y > 1 then y = y / 100 end
+
+    ns.Core:CreateMapPin(x, y)
+end
+
+function Core:HandlePinShare(str, ...)
+    HandlePin(str, ...)
+    local waypointlink = C_Map.GetUserWaypointHyperlink()
+    if UnitInRaid("player") then
+        SendChatMessage(waypointlink, "RAID")
+    elseif UnitInParty("player") then
+        SendChatMessage(waypointlink, "PARTY")
+    else
+        SendChatMessage(waypointlink)
+    end
+end
+
 function Core:PrintFlags()
     for key, value in pairs(moetQOLDB) do
-        if Core.MQdefault[key] then 
-            print(string.format("|c%s%s|r: |c%s%s|r", F_COLOR, key, value.state and F_COLOR2 or "ffffffff", tostring(value.state)))
+        if Core.MQdefault[key] then
+            print(string.format("|c%s%s|r: |c%s%s|r", ns.REDCOLOR, key, value.state and ns.GREENCOLOR or "ffffffff", tostring(value.state)))
         else
             moetQOLDB[key] = nil -- remove unsupported key
         end
@@ -78,27 +87,27 @@ function Core:PrintFlags()
 end
 
 function Core:PrintMessage(str)
-    print(string.format("|c%smq:|r %s", F_COLOR, str))
+    print(string.format("|c%smq:|r %s", ns.REDCOLOR, str))
 end
 
 function Core:MapPinUsage()
-    print(string.format("|c%smq|r: Pass only positive X and Y values to create a pin! Usage: /pin x y", F_COLOR))
+    print(string.format("|c%smq|r: Pass only positive X and Y values to create a pin! Usage: /pin x y", ns.REDCOLOR))
 end
 
 function Core:MapPinError(X, Y)
-    print(string.format("|c%smq|r: Could not convert %s and %s to numbers.", F_COLOR, X or "", Y or ""))
+    print(string.format("|c%smq|r: Could not convert %s and %s to numbers.", ns.REDCOLOR, X or "", Y or ""))
 end
 
 function Core:CreateMapPin(X, Y)
     local mapID = C_Map.GetBestMapForUnit("player")
     if not C_Map.CanSetUserWaypointOnMap(mapID) then
-        print(string.format("|c%smq|r: Cannot create pins on this mapID.", F_COLOR))
+        print(string.format("|c%smq|r: Cannot create pins on this mapID.", ns.REDCOLOR))
         return
     end
 
     C_Map.SetUserWaypoint({uiMapID=mapID, position={x=X, y=Y}})
     DEFAULT_CHAT_FRAME:AddMessage(
-        string.format("|c%smq|r: Created map pin at (%s, %s).", F_COLOR, X, Y), 255, 255, 0
+        string.format("|c%smq|r: Created map pin at (%s, %s).", ns.REDCOLOR, X, Y), 255, 255, 0
     )
 end
 
@@ -116,7 +125,7 @@ function Core:CheckDatabaseErrors()
                 moetQOLDB[k] = {state = v.state, desc = v.desc, custom = v.custom[1]}
             else
                 moetQOLDB[k] = {state = v.state, desc = v.desc}
-            end 
+            end
         end
 
         --update if outdated
@@ -145,7 +154,7 @@ function Core:CheckDatabaseErrors()
                     end
                 elseif option then
                     local found = false
-                    for i=1,#v.custom do 
+                    for i=1,#v.custom do
                         if v.custom[i] == option then found = true end
                     end
 
@@ -157,6 +166,22 @@ function Core:CheckDatabaseErrors()
         end
     end
 end
+
+local function InvokeLoginFunctions()
+    for i=1, #Func.onLogin do
+        if type(Func.onLogin[i]) == "function" then
+            Func.onLogin[i]()
+        end
+    end
+
+    Func.onLogin = nil
+    eventFrame = nil
+end
+
+local eventFrame = CreateFrame("FRAME")
+eventFrame:RegisterEvent("PLAYER_LOGIN")
+eventFrame:SetScript("OnEvent", InvokeLoginFunctions)
+eventFrame:Hide()
 
 ---------------------------------------------------
 -- MAIN FUNCTION
@@ -189,7 +214,7 @@ function Core:ActivateFunctions()
             if Core.MQdefault[k].func then
                 Core.MQdefault[k].func()
             else
-                print("|c"..F_COLOR.."mq|r: "..k.." is missing an associated function.")
+                print("|c"..ns.REDCOLOR.."mq|r: "..k.." is missing an associated function.")
             end
         end
     end
