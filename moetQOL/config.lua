@@ -5,10 +5,9 @@ ns.Config = {}
 local Config = ns.Config
 
 local DISTANCE_BETWEEN_TABS = -14
-local HEIGHT_PER_FUNCTION_ENTRY = 30
+local HEIGHT_PER_FUNCTION_ENTRY = 35
 local CUSTOM_OPTION_WIDTH = 100
 local TAB_LINE_ALPHA = 0.25
-local CHANGES_MADE = false
 
 ---------------------------------------------------
 -- WIDGET EVENT HANDLERS
@@ -17,7 +16,7 @@ local function Line_OnEnter(self)
     GameTooltip:Hide()
     GameTooltip:SetOwner(self, "TOP")
     GameTooltip:AddLine(self.title:GetText())
-    GameTooltip:AddLine(self.desc..".")
+    GameTooltip:AddLine(self.desc..".", 1, 1, 1, true)
     GameTooltip:Show()
 end
 
@@ -136,16 +135,27 @@ end
 ---------------------------------------------------
 -- FRAME CREATION
 ---------------------------------------------------
+local function CheckForPendingChanges()
+    for k, storedstate in pairs(ns.LOADED_DB) do
+        local state = moetQOLDB[k].state
+        if state ~= nil and storedstate ~= state then return true end
+    end
+
+    return false
+end
+
 function Config:UpdatePendingChanges()
-    if not CHANGES_MADE then
-        CHANGES_MADE = true
+    local changes_made = CheckForPendingChanges()
+    if changes_made then
         cframe.changes:SetText("Pending changes! To optimize memory a /rl is required.")
+    elseif cframe.changes:GetText() ~= "" then
+        cframe.changes:SetText("")
     end
 end
 
 local function SortDatabaseByCategory()
     local sorted = {}
-    
+
     for k,v in pairs(ns.Core.MQdefault) do
         if v.category then
             if not sorted[v.category] then
@@ -194,7 +204,7 @@ local function AddCustomOption(f, options, key)
     end
 end
 
-local function AddFunctions(parent, sorted_db_functions)
+local function AddFunctionsForCategory(parent, sorted_db_functions)
     local i = 0
     for k,v in pairs(sorted_db_functions) do
         i = i + 1
@@ -202,7 +212,7 @@ local function AddFunctions(parent, sorted_db_functions)
         local fdesc = v.desc
         local fcustom = v.custom and moetQOLDB[k].custom or nil
         local fstate = moetQOLDB[k].state
-        
+
         local f = CreateFrame("Frame", parent:GetName().."Line"..i, parent)
         if i == 1 then
             f:SetPoint("TOPLEFT", parent, "TOPLEFT")
@@ -216,7 +226,7 @@ local function AddFunctions(parent, sorted_db_functions)
         f:SetScript("OnLeave", Line_OnLeave)
 
         f.title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal_NoShadow")
-        f.title:SetPoint("LEFT", f, "LEFT")
+        f.title:SetPoint("LEFT", f, "LEFT", 3, 0)
         f.title:SetText(fname)
         f.desc = fdesc
 
@@ -245,9 +255,7 @@ local function AddFunctions(parent, sorted_db_functions)
     return i
 end
 
-local function AddTabs(parent)
-    PanelTemplates_SetNumTabs(parent, #ns.Core.FunctionCategory)
-    parent.Tabs = {}
+local function AddCategoryTabs(parent)
     local db_sorted = SortDatabaseByCategory()
 
     for i=1, parent.numTabs do
@@ -264,24 +272,28 @@ local function AddTabs(parent)
             tab:SetPoint("TOPLEFT", parent.Tabs[i-1], "TOPRIGHT", DISTANCE_BETWEEN_TABS, 0);
         end
 
-        -- Add Content
         tab.content = CreateFrame("Frame", tabName..i.."Body", parent)
         tab.content:SetWidth(parent:GetWidth()*0.85)
         tab.content:Hide()
 
-        local entries = AddFunctions(tab.content, db_sorted[i])
+        local entries = AddFunctionsForCategory(tab.content, db_sorted[i])
         tab.content:SetHeight(entries * HEIGHT_PER_FUNCTION_ENTRY)
 
         parent.Tabs[i] = tab
     end
+end
+
+local function IntializeTabs(parent)
+    PanelTemplates_SetNumTabs(parent, #ns.Core.FunctionCategory)
+    parent.Tabs = {}
+
+    AddCategoryTabs(parent)
 
     Tab_OnClick(parent.Tabs[1])
 end
 
 function Config:SetupConfig()
     cframe = CreateFrame("Frame", "mq_Config", UIParent, "TranslucentFrameTemplate")
-    --cframe.Bg:SetTexture("Interface\\FrameGeneral\\UIFrameNecrolordBackground")
-    ns.Config.Frame = cframe
     cframe:SetSize(400, 500)
     cframe:SetPoint("CENTER", 0, 50)
     cframe:SetFrameStrata("HIGH")
@@ -309,7 +321,7 @@ function Config:SetupConfig()
     cframe.ScrollFrame:SetScript("OnMouseWheel", ScrollFrame_OnMouseWheel)
 
     --Tabs and Functions
-    AddTabs(cframe)
+    IntializeTabs(cframe)
 
     --Interface Options
     local panel = CreateFrame("FRAME", "moetQOL_BlizzOptions")

@@ -154,6 +154,12 @@ local function HandlePinShare(str, ...)
     end
 end
 
+local function StoreDBSnapshot()
+    local t = {}
+    for k,v in pairs(moetQOLDB) do t[k] = v.state end
+    return t
+end
+
 local function Init(self, event, name)
     if name ~= "moetQOL" then return end
 
@@ -175,7 +181,8 @@ local function Init(self, event, name)
 
     ns.Core.CheckDatabaseErrors()
     ns.Core.ActivateFunctions()
-
+    
+    ns.LOADED_DB = StoreDBSnapshot() -- store copy of DB we loaded with
     print(WELCOME_MESSAGE)
 end
 

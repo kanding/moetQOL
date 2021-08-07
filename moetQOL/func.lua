@@ -851,14 +851,14 @@ function Func:QuestItemBind()
 
     buttonFrame:RegisterEvent("PLAYER_REGEN_ENABLED")
     buttonFrame:SetScript("OnEvent", function(self, e)
-        if not buttonFrame.CheckAfter then return end
-        buttonFrame.CheckAfter = false
+        if not self.CheckAfter then return end
+        self.CheckAfter = false
 
-        if e == "PLAYER_REGEN_ENABLED" and buttonFrame.lastItem ~= "" then
-            ClearOverrideBindings(buttonFrame)
-            SetOverrideBindingItem(buttonFrame, false, GetBindingKey("USEMOSTRECENTQUESTITEM"), buttonFrame.lastItem)
+        if e == "PLAYER_REGEN_ENABLED" and self.lastItem ~= "" then
+            ClearOverrideBindings(self)
+            SetOverrideBindingItem(self, false, GetBindingKey("USEMOSTRECENTQUESTITEM"), self.lastItem)
             DEFAULT_CHAT_FRAME:AddMessage(
-                string.format("|c%smq:|r Created temporary keybind %s to use %s.", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), buttonFrame.lastLink), 255, 255, 0
+                string.format("|c%smq:|r Created temporary keybind %s to use %s.", F_COLOR, GetBindingKey("USEMOSTRECENTQUESTITEM"), self.lastLink), 255, 255, 0
             )
         end
     end)
