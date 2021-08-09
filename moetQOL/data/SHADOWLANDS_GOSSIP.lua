@@ -11,6 +11,8 @@ local _, ns	= ...
     with talking frame open.
 ]]
 
+--TODO Should add the questID required for auto gossip.
+
 ns.Data.SHADOWLANDS_GOSSIP = {
     --Maw
     ["Nazgrim"] = 1,

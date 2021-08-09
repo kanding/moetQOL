@@ -27,20 +27,22 @@ local function ChangeState(str)
     if moetQOLDB[str] then
         if moetQOLDB[str].state == true then
             moetQOLDB[str].state = false
-            ns.Core.PrintMessage(string.format("|c%s%s|r: Off", ns.REDCOLOR, str))
+            print(string.format("|c%s%s|r: Off", ns.REDCOLOR, str))
         elseif moetQOLDB[str].state == false then
             moetQOLDB[str].state = true
-            ns.Core.PrintMessage(string.format("|c%s%s|r: |c%sOn|r", ns.REDCOLOR, str, ns.GREENCOLOR))
+            print(string.format("|c%s%s|r: |c%sOn|r", ns.REDCOLOR, str, ns.GREENCOLOR))
         end
+
+        ns.Config:UpdateStates()
         statesChanged = statesChanged + 1
     else
-        ns.Core.PrintMessage(string.format("|c%smq:|r %s is not a valid command.", ns.REDCOLOR, str))
+        ns.Core:PrintMessage(string.format("%s is not a valid command.", str))
         return
     end
 
     -- only 1 reload needed per set of changes
     if statesChanged == 1 then
-        ns.Core.PrintMessage(string.format("|c%smq|r: Make sure you |c%s/reload|r for the change to take effect.", ns.GREENCOLOR))
+        ns.Core:PrintMessage(string.format("Make sure you |c%s/reload|r for the change to take effect.", ns.GREENCOLOR))
     end
 end
 

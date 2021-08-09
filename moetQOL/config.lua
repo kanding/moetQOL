@@ -9,6 +9,9 @@ local HEIGHT_PER_FUNCTION_ENTRY = 35
 local CUSTOM_OPTION_WIDTH = 100
 local TAB_LINE_ALPHA = 0.25
 
+-- easy access to tab line frames
+Config.Lines = {}
+
 ---------------------------------------------------
 -- WIDGET EVENT HANDLERS
 ---------------------------------------------------
@@ -53,10 +56,9 @@ local function ScrollFrame_OnMouseWheel(self, delta)
 	self:SetVerticalScroll(newValue)
 end
 
-local function State_OnClick(self)
-    PlaySound(856)
-    moetQOLDB[self.key].state = self:GetChecked()
+local function State_OnChanged(self)
     ns.Config:UpdatePendingChanges()
+    self:SetChecked(moetQOLDB[self.key].state)
 
     --Update bg color based on checked
     local parent = self:GetParent()
@@ -89,6 +91,12 @@ local function State_OnClick(self)
             editbox:Disable()
         end
     end
+end
+
+local function State_OnClick(self)
+    PlaySound(856)
+    moetQOLDB[self.key].state = self:GetChecked()
+    State_OnChanged(self)
 end
 
 local function InitializeDropDownMenu(self, level)
@@ -214,6 +222,7 @@ local function AddFunctionsForCategory(parent, sorted_db_functions)
         local fstate = moetQOLDB[k].state
 
         local f = CreateFrame("Frame", parent:GetName().."Line"..i, parent)
+        table.insert(Config.Lines, f)
         if i == 1 then
             f:SetPoint("TOPLEFT", parent, "TOPLEFT")
         else
@@ -261,14 +270,14 @@ local function AddCategoryTabs(parent)
     for i=2, parent.numTabs do
         local category_index = i-1 -- account for general tab
         local name = ns.Core:GetKeyName(ns.Core.FunctionCategory, category_index)
-        local tabName = parent:GetName()..name.."Tab"
+        local tabName = parent:GetName().."Tab"..i
         local tab = CreateFrame("Button", tabName, parent, "CharacterFrameTabButtonTemplate")
         tab:SetID(i)
         tab:SetText(name)
         tab:SetScript("OnClick", Tab_OnClick)
         tab:SetPoint("TOPLEFT", parent.Tabs[i-1], "TOPRIGHT", DISTANCE_BETWEEN_TABS, 0)
 
-        tab.content = CreateFrame("Frame", tabName..i.."Body", parent)
+        tab.content = CreateFrame("Frame", tabName.."Body", tab)
         tab.content:SetWidth(parent:GetWidth()*0.85)
         tab.content:Hide()
 
@@ -279,20 +288,15 @@ local function AddCategoryTabs(parent)
     end
 end
 
-local function IntializeTabs(parent)
-    PanelTemplates_SetNumTabs(parent, 1 + #ns.Core.FunctionCategory)
-    parent.Tabs = {}
-
-    --Add General Tab
-    local name = "General"
+local function AddGeneralTab(parent)
     local id = 1
-    local tabName = parent:GetName()..name.."Tab"
+    local tabName = parent:GetName().."Tab"..id
     local tab = CreateFrame("Button", tabName, parent, "CharacterFrameTabButtonTemplate")
     tab:SetID(id)
-    tab:SetText(name)
+    tab:SetText("General")
     tab:SetScript("OnClick", Tab_OnClick)
     tab:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 3, 7)
-    tab.content = CreateFrame("Frame", tabName..id.."Body", parent)
+    tab.content = CreateFrame("Frame", tabName.."Body", parent)
     tab.content:SetWidth(parent:GetWidth()*0.85)
     tab.content:SetHeight(300)
     tab.content:Hide()
@@ -318,6 +322,13 @@ local function IntializeTabs(parent)
     tab.content.sourcelink:SetText(ns.SOURCE)
 
     parent.Tabs[1] = tab
+end
+
+local function IntializeTabs(parent)
+    PanelTemplates_SetNumTabs(parent, 1 + #ns.Core.FunctionCategory)
+    parent.Tabs = {}
+
+    AddGeneralTab(parent)
     AddCategoryTabs(parent)
 
     Tab_OnClick(parent.Tabs[1])
@@ -366,10 +377,22 @@ function Config:SetupConfig()
     end)
     InterfaceOptions_AddCategory(panel)
 
+    ns.Config:UpdatePendingChanges()
     cframe:Hide()
 end
 
 function Config:ToggleFrame()
     if not cframe then Config:SetupConfig() end
     cframe:SetShown(not cframe:IsShown())
+end
+
+function Config:UpdateStates()
+    if not cframe then return end
+    
+    for i=1,#Config.Lines do
+        local frame = Config.Lines[i] or nil
+        if frame and frame.state then
+            State_OnChanged(frame.state)
+        end
+    end
 end
