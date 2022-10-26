@@ -271,7 +271,7 @@ local function AddCategoryTabs(parent)
         local category_index = i-1 -- account for general tab
         local name = ns.Core:GetKeyName(ns.Core.FunctionCategory, category_index)
         local tabName = parent:GetName().."Tab"..i
-        local tab = CreateFrame("Button", tabName, parent, "CharacterFrameTabButtonTemplate")
+        local tab = CreateFrame("Button", tabName, parent, C_EditMode and "CharacterFrameTabTemplate" or "CharacterFrameTabButtonTemplate")
         tab:SetID(i)
         tab:SetText(name)
         tab:SetScript("OnClick", Tab_OnClick)
@@ -291,7 +291,7 @@ end
 local function AddGeneralTab(parent)
     local id = 1
     local tabName = parent:GetName().."Tab"..id
-    local tab = CreateFrame("Button", tabName, parent, "CharacterFrameTabButtonTemplate")
+    local tab = CreateFrame("Button", tabName, parent, C_EditMode and "CharacterFrameTabTemplate" or "CharacterFrameTabButtonTemplate")
     tab:SetID(id)
     tab:SetText("General")
     tab:SetScript("OnClick", Tab_OnClick)
@@ -325,11 +325,13 @@ local function AddGeneralTab(parent)
 end
 
 local function IntializeTabs(parent)
-    PanelTemplates_SetNumTabs(parent, 1 + #ns.Core.FunctionCategory)
     parent.Tabs = {}
-
+    local numT = 1 + #ns.Core.FunctionCategory
+    parent.numTabs = numT
+    
     AddGeneralTab(parent)
     AddCategoryTabs(parent)
+    PanelTemplates_SetNumTabs(parent, numT)
 
     Tab_OnClick(parent.Tabs[1])
 end
@@ -365,20 +367,24 @@ function Config:SetupConfig()
     --Tabs and Functions
     IntializeTabs(cframe)
 
+    ns.Config:UpdatePendingChanges()
+    cframe:Hide()
+end
+
+function Config:SetupInterfaceOption()
     --Interface Options
     local panel = CreateFrame("FRAME", "moetQOL_BlizzOptions")
     panel.name = "moetQOL"
-    panel.configbtn = CreateFrame("Button", "ScrapButton_Panel", panel, "OptionsButtonTemplate")
+    panel.configbtn = CreateFrame("Button", "moetQOL_OptionsButton", panel, "UIPanelButtonTemplate")
     panel.configbtn:SetText("Config")
     panel.configbtn:SetPoint("CENTER", panel, "TOP", 0, -100)
     panel.configbtn:SetScript("OnClick", function()
         while CloseWindows() do end
         return Config:ToggleFrame()
     end)
+    -- Deprecated in 10.0
+    -- see Blizzard_ImplementationReadme.lua
     InterfaceOptions_AddCategory(panel)
-
-    ns.Config:UpdatePendingChanges()
-    cframe:Hide()
 end
 
 function Config:ToggleFrame()

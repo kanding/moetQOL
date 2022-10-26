@@ -192,6 +192,7 @@ local function IsPlayerRanged()
         ["SHAMAN"] = {["Elemental"]=true,["Restoration"]=true},
         ["DRUID"] = {["Balance"]=true, ["Restoration"]=true},
         ["PRIEST"] = true,
+        ["EVOKER"] = true,
     }
 
     local currentSpec = GetSpecialization()
@@ -626,9 +627,13 @@ function Func:HideCommunities()
 end
 
 function Func:HideTalkingHead()
-    LoadAddOn("Blizzard_TalkingHeadUI")
-    hooksecurefunc("TalkingHeadFrame_PlayCurrent", function()
-        TalkingHeadFrame_CloseImmediately()
+    local f = CreateFrame("FRAME")
+
+    f:RegisterEvent("TALKINGHEAD_REQUESTED")
+    f:SetScript("OnEvent", function(self, event, ...)
+        if event == "TALKINGHEAD_REQUESTED" then
+            C_TalkingHead.IgnoreCurrentTalkingHead();
+        end
     end)
 end
 

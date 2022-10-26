@@ -118,6 +118,7 @@ local function Init(self, event, name)
 
     ns.Core.CheckDatabaseErrors()
     ns.Core.ActivateFunctions()
+    ns.Config.SetupInterfaceOption()
 
     ns.LOADED_DB = StoreDBSnapshot() -- store copy of DB we loaded with
     print(WELCOME_MESSAGE)
