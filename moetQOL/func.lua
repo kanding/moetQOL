@@ -53,7 +53,7 @@ local function VerifyCustomOption(key)
         end
     else
         --choice custom option
-        for i=1,#available_options do 
+        for i=1,#available_options do
             if available_options[i] == current_option then return true end
         end
     end
@@ -68,14 +68,16 @@ local function SellGreyItems()
     if not MerchantFrame:IsVisible() then return end
 
     for bag = 0, 4 do
-        for slot = 1, GetContainerNumSlots(bag) do
-            local item = GetContainerItemLink(bag, slot)
+        for slot = 1, C_Container.GetContainerNumSlots(bag) do
+            local item = C_Container.GetContainerItemLink(bag, slot)
             if item ~= nil then
                 local grey = string.find(item, "|cff9d9d9d") -- grey
                 if grey then
-                    currPrice = (select(11, GetItemInfo(item)) or 0) * select(2, GetContainerItemInfo(bag, slot))
+                    local sellPrice = (select(11, GetItemInfo(item)) or 0)
+                    --local itemCount = (select(2, C_Container.GetContainerItemInfo(bag, slot)) or 0)
+                    currPrice = sellPrice
                     if currPrice > 0 then
-                        PickupContainerItem(bag, slot)
+                        C_Container.PickupContainerItem(bag, slot)
                         PickupMerchantItem()
                     end
                 end
@@ -515,8 +517,7 @@ function Func:CreateSellButton()
     merchantButton:SetText("Sell Greys")
     merchantButton:SetScript("OnClick", SellGreyItems)
 
-    merchantButton:RegisterEvent("MERCHANT_SHOW")
-    merchantButton:SetScript("OnEvent", function()
+    MerchantFrame:HookScript("OnShow", function()
         if auto then SellGreyItems() end
 
         if MerchantExtraCurrencyBg:IsVisible() then
