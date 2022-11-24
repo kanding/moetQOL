@@ -1,4 +1,4 @@
-## Interface: 100000
+## Interface: 100002
 
 ## Title: moetQOL
 ## Author: moet
@@ -8,7 +8,6 @@
 ## SavedVariables: moetQOLDB
 
 data/data.lua
-data/SHADOWLANDS_GOSSIP.lua
 
 func.lua
 core.lua

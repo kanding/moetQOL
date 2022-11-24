@@ -329,8 +329,19 @@ local function HandleGossip(self, e, ...)
 
     if gossip and gossipOptions > 0 then
         local target = UnitName("target") or GameTooltipTextLeft1:GetText()
-        if not DATA.SHADOWLANDS_GOSSIP[target] then return end
-        local choice = DATA.SHADOWLANDS_GOSSIP[target]
+        local player_level = UnitLevel("player")
+        local gossip_data = nil
+
+        if (player_level >= DATA.SHADOWLANDS_GOSSIP.MinLevel and player_level <= DATA.SHADOWLANDS_GOSSIP.MaxLevel) then
+            gossip_data = DATA.SHADOWLANDS_GOSSIP[target]
+        end
+
+        if (player_level >= DATA.DRAGONLANDS_GOSSIP.MinLevel and player_level <= DATA.DRAGONLANDS_GOSSIP.MaxLevel) then
+            gossip_data = DATA.DRAGONLANDS_GOSSIP[target]
+        end
+
+        if gossip_data == nil then return end
+        local choice = gossip_data.choice
 
         -- doesnt cover extreme obscure cases but most
         if type(choice) == "table" then
