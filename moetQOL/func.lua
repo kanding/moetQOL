@@ -639,13 +639,11 @@ function Func:HideCommunities()
 end
 
 function Func:HideTalkingHead()
-    local f = CreateFrame("FRAME")
-
-    f:RegisterEvent("TALKINGHEAD_REQUESTED")
-    f:SetScript("OnEvent", function(self, event, ...)
-        if event == "TALKINGHEAD_REQUESTED" then
-            C_TalkingHead.IgnoreCurrentTalkingHead();
-        end
+    hooksecurefunc(TalkingHeadFrame, "PlayCurrent", function(self)
+        self:Hide()
+        local option = moetQOLDB["talkinghead"].custom
+        local should_mute = option == "muteaudio"
+        if should_mute then C_TalkingHead.IgnoreCurrentTalkingHead() end
     end)
 end
 
@@ -955,3 +953,17 @@ function Func:QuestItemBind()
         end
     end)
 end
+
+function Func:DisableMinimapTracking()
+    print("yo")
+    local TARGET_TRACKING_ID = 20
+    local option = moetQOLDB["minimaptracking"].custom
+    if option == "all" then
+        for i=1,C_Minimap.GetNumTrackingTypes() do
+            C_Minimap.SetTracking(i, false)
+        end
+    end
+    print("yep")
+    C_Minimap.SetTracking(TARGET_TRACKING_ID, false)
+end
+    --["minimaptracking"] = {state = false, desc="Disables target icon on minimap, alternatively disables all tracking on minimap.", func = Func.DisableMinimapTracking, custom = {"target", "all"}, category=Core.FunctionCategory.UI},
