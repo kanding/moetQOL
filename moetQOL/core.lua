@@ -206,6 +206,7 @@ Core.MQdefault = {
     ["autoquest"] = {state = false, desc="Auto accept/deliver/share quests (hold SHIFT to disable). Additionally will automatically gossip certain quest NPCs. Select force to auto turn in quests with rewards (WARNING! This is irrevocable)", func=Func.AutoQuest, custom={"noforce", "force"}, category=Core.FunctionCategory.Quest},
     ["combatchat"] = {state = false, desc="Fade chat when in combat. Select always to fade chat in combat everywhere, instance to fade in combat in instances, or boss to fade when in an encounter (usually a boss)", func=Func.HideChatInCombat, custom={"always","instance","boss"}, category=Core.FunctionCategory.UI},
     ["questitembind"] = {state = false, desc="Add a keybind to use the closest watched quest item. This keybind can be set in Key Bindings/AddOns", func = Func.QuestItemBind, category=Core.FunctionCategory.Quest},
+    ["minimaptracking"] = {state = false, desc="Disables target icon on minimap, alternatively disables all tracking on minimap", func = Func.DisableMinimapTracking, custom = {"target", "all"}, category=Core.FunctionCategory.UI},
 }
 
 function Core:ActivateFunctions()

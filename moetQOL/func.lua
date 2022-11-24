@@ -955,15 +955,15 @@ function Func:QuestItemBind()
 end
 
 function Func:DisableMinimapTracking()
-    print("yo")
     local TARGET_TRACKING_ID = 20
     local option = moetQOLDB["minimaptracking"].custom
     if option == "all" then
-        for i=1,C_Minimap.GetNumTrackingTypes() do
-            C_Minimap.SetTracking(i, false)
-        end
+        RunOnLogin(function()
+            for i=1,C_Minimap.GetNumTrackingTypes() do
+                C_Minimap.SetTracking(i, false)
+            end
+        end)
     end
-    print("yep")
-    C_Minimap.SetTracking(TARGET_TRACKING_ID, false)
+    
+    RunOnLogin(function() C_Minimap.SetTracking(TARGET_TRACKING_ID, false) end)
 end
-    --["minimaptracking"] = {state = false, desc="Disables target icon on minimap, alternatively disables all tracking on minimap.", func = Func.DisableMinimapTracking, custom = {"target", "all"}, category=Core.FunctionCategory.UI},
