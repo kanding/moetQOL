@@ -349,7 +349,7 @@ local function HandleGossip(self, e, ...)
         
         -- doesnt cover extreme obscure cases but most
         if type(choice) == "table" then
-            local max = math.max(unpack(DATA.SHADOWLANDS_GOSSIP[target]))
+            local max = math.max(unpack(choice))
             choice = max
             if choice >= numGossipOptions then choice = numGossipOptions end
         end
