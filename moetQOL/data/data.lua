@@ -85,6 +85,8 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Baskilan"] = {choice=1},
     ["Talonstalker Kavia"] = {choice=1},
     ["Alexstrasza the Life-Binder"] = {choice=1},
+    ["Beleaguered Explorer"] = {choice=1},
+    ["Elementalist Taiyang"] = {choice=1},
 
     --Ohn'ahran Plains
     ["Sansok Khan"] = {choice=1},
@@ -102,9 +104,12 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Gemisath"] = {choice=4},
     ["Khansguard Akato"] = {choice=1},
     ["Quartermaster Gensai"] = {choice=1},
+    ["Scout Khenyug"] = {choice=1},
+    ["Herbalist Agura"] = {choice=1},
     ["Khansguard Hojin"] = {choice=1},
     ["Boku's Belongings"] = {choice=1},
     ["Unidentified Centaur"] = {choice=1},
+    ["Himia, The Blessed"] = {choice=1},
     --Think it was at this point set hearth at Ohn'iri springs to avoid awful backtrack?
     ["Khanam Matra Sarest"] = {choice=1},
     --Dismount green dargon and fly

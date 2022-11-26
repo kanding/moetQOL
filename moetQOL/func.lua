@@ -276,7 +276,8 @@ local function HandleGossip(self, e, ...)
 
     local numAvailableQuests = 0
     local numActiveQuests = 0
-    local gossipOptions = C_GossipInfo.GetNumOptions()
+    local gossipOptions = C_GossipInfo.GetOptions()
+    local numGossipOptions = #gossipOptions
     local gossip = true --don't gossip if handing-in/picking up
 
     if e == "QUEST_GREETING" then
@@ -327,7 +328,7 @@ local function HandleGossip(self, e, ...)
         end
     end
 
-    if gossip and gossipOptions > 0 then
+    if gossip and numGossipOptions > 0 then
         local target = UnitName("target") or GameTooltipTextLeft1:GetText()
         local player_level = UnitLevel("player")
         local gossip_data = nil
@@ -342,16 +343,19 @@ local function HandleGossip(self, e, ...)
 
         if gossip_data == nil then return end
         local choice = gossip_data.choice
-
+        
         -- doesnt cover extreme obscure cases but most
         if type(choice) == "table" then
             local max = math.max(unpack(DATA.SHADOWLANDS_GOSSIP[target]))
             choice = max
-            if choice >= gossipOptions then choice = gossipOptions end
+            if choice >= numGossipOptions then choice = numGossipOptions end
         end
+        
+        local gossipTable = gossipOptions[choice] or nil
+        local c = gossipTable.gossipOptionID or nil
 
-        if choice <= gossipOptions then
-            C_GossipInfo.SelectOption(choice)
+        if c ~= nil and choice <= numGossipOptions then
+            C_GossipInfo.SelectOption(c)
         end
     end
 end
