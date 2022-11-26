@@ -291,22 +291,25 @@ local function HandleGossip(self, e, ...)
     end
 
     if numAvailableQuests > 0 then
+        local availableQuests = C_GossipInfo.GetAvailableQuests()
         gossip = false
-        for i = 1, numAvailableQuests do
-            if e == "QUEST_GREETING" then
-                SelectAvailableQuest(i);
-            elseif e == "GOSSIP_SHOW" then
-                C_GossipInfo.SelectAvailableQuest(i);
+        if #availableQuests ~= 0 then
+            for i, quest in pairs(availableQuests) do
+                if e == "QUEST_GREETING" then
+                    SelectAvailableQuest(i);
+                elseif e == "GOSSIP_SHOW" then
+                    C_GossipInfo.SelectAvailableQuest(quest.questID);
+                end
             end
         end
     end
 
     if numActiveQuests > 0 then
-        local quests = C_GossipInfo.GetActiveQuests()
+        local activeQuests = C_GossipInfo.GetActiveQuests()
         --quests can be empty on quest greeting event.
         --getactivequests/getavailablequests returns empty table
-        if #quests ~= 0 then
-            for i, quest in pairs(quests) do
+        if #activeQuests ~= 0 then
+            for i, quest in pairs(activeQuests) do
                 if quest.isComplete then
                     gossip = false
                     if e == "QUEST_GREETING" then
