@@ -47,26 +47,25 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Archmage Khadgar"] = {choice=1},
 
     --Waking Shores
-    ["Sendrax"] = {choice=1},
     ["Ambassador Fastrasz"] = {choice=2}, --assuming hs counts
     ["Embassy Visitor Log"] = {choice=1},
-    ["Sendrax"] = {choice=1},
-    ["Majordomo Selistra"] = {choice=3},
-    ["Sendrax"] = {choice=3},
+    ["Sendrax"] = {choice={1,3}},
     ["Talonstalker Kavia"] = {choice=1},
     ["Right"] = {choice=1},
     ["Left"] = {choice=1},
-    ["Sendrax"] = {choice=1},
-    ["Sendrax"] = {choice=1},
-    ["Majordomo Selistra"] = {choice=1},
+    ["Majordomo Selistra"] = {choice={1,3}},
     ["Alexstrasza The Life-Binder"] = {choice=1},
     ["Xius"] = {choice=1},
     ["Akxall"] = {choice=1},
     ["Mother Elion"] = {choice=1},
+    ["Thomas Bright"] = {choice=1},
+    ["Lifecaller Tzadrak"] = {choice=1}, --HS ruby life
+    ["Veritistrasza"] = {choice=2},
+    ["Sabellian"] = {choice=1},
+    ["Celormu"] = {choice=1},
     ["Zahkrana"] = {choice=1},
     ["Lord Andestrasz"] = {choice=1},
     ["Lithragosa"] = {choice=2},
-    ["Majordomo Selistra"] = {choice=1},
     ["Scalecommander Emberthal"] = {choice=1},
     ["Tong the Fixer"] = {choice=3}, -- sets hearth?
     ["Archivist Edress"] = {choice=1},
@@ -74,33 +73,24 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Fao the Relentless"] = {choice=1},
     ["Blacktalon Avenger"] = {choice=1},
     ["Blacktalon Assassin"] = {choice=1},
-    ["Talonstalker Kavia"] = {choice=1},
     ["Wrathion"] = {choice=1},
     --Don't use wrathion ride option for 1st part of quest, use mount
-    ["Wrathion"] = {choice=1},
-    ["Wrathion"] = {choice=1},
-    ["Left"] = {choice=1},
-    ["Archivist Edress"] = {choice=1},
-    ["Forgemaster Bazentus"] = {choice=1},
     ["Baskilan"] = {choice=1},
-    ["Talonstalker Kavia"] = {choice=1},
     ["Alexstrasza the Life-Binder"] = {choice=1},
     ["Beleaguered Explorer"] = {choice=1},
     ["Elementalist Taiyang"] = {choice=1},
 
     --Ohn'ahran Plains
-    ["Sansok Khan"] = {choice=1},
+    ["Sansok Khan"] = {choice={1,4,2,3}},
     ["Aru"] = {choice=1},
     ["Belika"] = {choice=1},
     ["Beastmaster Nuqut"] = {choice=1},
-    ["Ohn Seshteng"] = {choice=1},
+    ["Ohn Seshteng"] = {choice={1,2}},
     ["Scout Tomul"] = {choice=1},
     --Centaur caravan chain skippable escorts
-    ["Ohn Seshteng"] = {choice=2},
     ["Nokhud Fighter"] = {choice=1},
     ["Nokhud Spearthrower"] = {choice=1},
     ["Nokhud Brute"] = {choice=1},
-    ["Sansok Khan"] = {choice={1,4,2,3}},
     ["Gemisath"] = {choice=4},
     ["Khansguard Akato"] = {choice=1},
     ["Quartermaster Gensai"] = {choice=1},
@@ -111,25 +101,16 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Unidentified Centaur"] = {choice=1},
     ["Himia, The Blessed"] = {choice=1},
     --Think it was at this point set hearth at Ohn'iri springs to avoid awful backtrack?
-    ["Khanam Matra Sarest"] = {choice=1},
+    ["Khanam Matra Sarest"] = {choice={1,3}},
     --Dismount green dargon and fly
     ["Guard-Captain Alowen"] = {choice=1},
     ["Sidra the Mender"] = {choice=1},
     ["Sariosa"] = {choice=1},
     ["Viranikus"] = {choice=1},
-    ["Belika"] = {choice=1},
     ["Boku"] = {choice=1},
-    ["Ohn Seshteng"] = {choice=1},
-    --Leave eagle for insta completion
     ["Merithra"] = {choice=1},
     ["Gerithus"] = {choice=1},
-    ["Sansok Khan"] = {choice=1},
-    ["Merithra"] = {choice=1},
     ["Tigari Khan"] = {choice=3},
-    ["Merithra"] = {choice=1},
-    ["Khanam Matra Sarest"] = {choice=3},
-    ["Merithra"] = {choice=1},
-    ["Khanam Matra Sarest"] = {choice=1},
 
     --Azure Span
     ["Vel Tal IX"] = {choice=1}, -- sets hearth
@@ -146,30 +127,21 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Kalecgos"] = {choice=1},
     --Elder Nappa ez quest, don't set hearth
     ["Elder Poa"] = {choice=1}, -- {choice=1} repeatedly
-    ["Brena"] = {choice=1},
-    ["Kalecgos"] = {choice=1},
     ["Sindragosa"] = {choice=1},
 
     --Valdrakken
-    ["Alexstrasza the Life-Binder"] = {choice=1},
     ["Tithris"] = {choice=1}, --set hearth
     ["Valdrakken Citizen"] = {choice=1},
     ["Badly Injured Guardian"] = {choice=1},
     ["Mangled Corpse"] = {choice=1},
     ["Private Shikzar"] = {choice=1},
     ["Guardian Velomir"] = {choice=1},
-    ["Chromie"] = {choice=1},
+    ["Chromie"] = {choice={1,6}},
     ["Andantenormu"] = {choice=1},
     ["Siaszerathel"] = {choice=1},
     ["Aeonormu"] = {choice=1},
-    ["Chromie"] = {choice=6},
     ["Soridormi"] = {choice=1},
-    ["Siaszerathel"] = {choice=1},
-    ["Andantenormu"] = {choice=1},
     ["Nozdormu"] = {choice=1},
-    ["Chromie"] = {choice=1},
-    ["Alexstrasza the Life-Binder"] = {choice=1},
-
 }
 
 ns.Data.SHADOWLANDS_GOSSIP = {
