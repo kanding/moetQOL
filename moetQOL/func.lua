@@ -312,7 +312,7 @@ local function HandleGossip(self, e, ...)
                     if e == "QUEST_GREETING" then
                         SelectActiveQuest(i);
                     elseif e == "GOSSIP_SHOW" then
-                        C_GossipInfo.SelectActiveQuest(i);
+                        C_GossipInfo.SelectActiveQuest(quest.questID);
                     end
                 end
             end
