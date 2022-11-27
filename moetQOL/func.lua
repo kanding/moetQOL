@@ -338,29 +338,83 @@ local function HandleGossip(self, e, ...)
         local player_level = UnitLevel("player")
         local gossip_data = nil
 
-        if (player_level >= DATA.SHADOWLANDS_GOSSIP.MinLevel and player_level <= DATA.SHADOWLANDS_GOSSIP.MaxLevel) then
+        if player_level >= DATA.SHADOWLANDS_GOSSIP.MinLevel and player_level <= DATA.SHADOWLANDS_GOSSIP.MaxLevel then
             gossip_data = DATA.SHADOWLANDS_GOSSIP[target]
         end
 
-        if (player_level >= DATA.DRAGONLANDS_GOSSIP.MinLevel and player_level <= DATA.DRAGONLANDS_GOSSIP.MaxLevel) then
+        if player_level >= DATA.DRAGONLANDS_GOSSIP.MinLevel and player_level <= DATA.DRAGONLANDS_GOSSIP.MaxLevel then
             gossip_data = DATA.DRAGONLANDS_GOSSIP[target]
         end
 
-        if gossip_data == nil then return end
-        local choice = gossip_data.choice
-        
-        -- doesnt cover extreme obscure cases but most
-        if type(choice) == "table" then
-            local max = math.max(unpack(choice))
-            choice = max
-            if choice >= numGossipOptions then choice = numGossipOptions end
+        if gossip_data == nil then
+            return
         end
-        
-        local gossipTable = gossipOptions[choice] or nil
-        local c = gossipTable.gossipOptionID or nil
+        local gossipOptionID = nil
 
-        if c ~= nil and choice <= numGossipOptions then
-            C_GossipInfo.SelectOption(c)
+        -- Handle sequence if exists and possible
+        local sequence = gossip_data.sequence or nil
+        if sequence ~= nil then
+            --Verify that we can successfully select sequence
+            local success = 0
+            for _, gos in pairs(gossipOptions) do
+                if sequence[gos.gossipOptionID] then
+                    success = success + 1
+                end
+            end
+
+            if success == #sequence then
+                for i=1,#sequence do
+                    local gosID = sequence[i]
+                    C_GossipInfo.SelectOption(gosID)
+                end
+                return
+            end
+        end
+
+        -- Handle gossip by phrase if exists and possible
+        local phrase = gossip_data.phrase or nil
+        if phrase ~= nil then
+            local selected = false
+            for _, gos in pairs(gossipOptions) do
+                local n = gos.name;
+                if type(phrase) == "table" then
+                    for i = 1, #phrase do
+                        if string.find(n, phrase[i]) then
+                            C_GossipInfo.SelectOption(gos.gossipOptionID)
+                            selected = true
+                        end
+                    end
+                elseif string.find(n, phrase) then
+                    C_GossipInfo.SelectOption(gos.gossipOptionID)
+                    selected = true
+                end
+
+                --return if we managed to select a phrase
+                if selected then return end
+            end
+        end
+
+        -- Handle choice by index
+        local choice = gossip_data.choice
+        if choice ~= nil then
+            -- doesnt cover extreme obscure cases but most
+            if type(choice) == "table" then
+                local max = math.max(unpack(choice))
+                choice = max
+                if choice >= numGossipOptions then
+                    choice = numGossipOptions
+                end
+            end
+
+            local gossipTable = gossipOptions[choice] or nil
+            if gossipTable == nil then
+                return
+            end
+            gossipOptionID = gossipTable.gossipOptionID or nil
+        end
+
+        if gossipOptionID ~= nil then
+            C_GossipInfo.SelectOption(gossipOptionID)
         end
     end
 end
