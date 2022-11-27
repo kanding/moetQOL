@@ -45,11 +45,11 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Pathfinder Tacha"] = {choice=1},
     ["Kodethi"] = {choice=1},
     ["Archmage Khadgar"] = {choice=1},
-
+    
     --Waking Shores
     ["Ambassador Fastrasz"] = {choice=2}, --assuming hs counts
     ["Embassy Visitor Log"] = {choice=1},
-    ["Sendrax"] = {choice={1,3}},
+    ["Sendrax"] = {choice={1,3}}, -- THIS BUGS AT START
     ["Talonstalker Kavia"] = {choice=1},
     ["Right"] = {choice=1},
     ["Left"] = {choice=1},
@@ -60,7 +60,7 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Mother Elion"] = {choice=1},
     ["Thomas Bright"] = {choice=1},
     ["Lifecaller Tzadrak"] = {choice=1}, --HS ruby life
-    ["Veritistrasza"] = {choice=2},
+    ["Veritistrasz"] = {choice=2}, 
     ["Sabellian"] = {choice=1},
     ["Celormu"] = {choice=1},
     ["Zahkrana"] = {choice=1},
@@ -82,16 +82,17 @@ ns.Data.DRAGONLANDS_GOSSIP = {
 
     --Ohn'ahran Plains
     ["Sansok Khan"] = {choice={1,4,2,3}},
+    ["Mirojin"] = {choice=1}, --hs ohinir
     ["Aru"] = {choice=1},
     ["Belika"] = {choice=1},
     ["Beastmaster Nuqut"] = {choice=1},
-    ["Ohn Seshteng"] = {choice={1,2}},
+    ["Ohn Seshteng"] = {choice={1,2}}, --broken
     ["Scout Tomul"] = {choice=1},
     --Centaur caravan chain skippable escorts
     ["Nokhud Fighter"] = {choice=1},
     ["Nokhud Spearthrower"] = {choice=1},
     ["Nokhud Brute"] = {choice=1},
-    ["Gemisath"] = {choice=4},
+    ["Gemisath"] = {choice=3},
     ["Khansguard Akato"] = {choice=1},
     ["Quartermaster Gensai"] = {choice=1},
     ["Scout Khenyug"] = {choice=1},
@@ -105,7 +106,7 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     --Dismount green dargon and fly
     ["Guard-Captain Alowen"] = {choice=1},
     ["Sidra the Mender"] = {choice=1},
-    ["Sariosa"] = {choice=1},
+    ["Sariosa"] = {choice=2},
     ["Viranikus"] = {choice=1},
     ["Boku"] = {choice=1},
     ["Merithra"] = {choice=1},
@@ -114,7 +115,8 @@ ns.Data.DRAGONLANDS_GOSSIP = {
 
     --Azure Span
     ["Vel Tal IX"] = {choice=1}, -- sets hearth
-    ["Korrikunit the whalebringer"] = {choice=1},
+    ["Korrikunit the Whalebringer"] = {choice=1},
+    ["Supply Portal"] = {choice=1},
     ["Jokomuupat"] = {choice=1},
     ["Babunituk"] = {choice=1},
     ["Brena"] = {choice=1},
@@ -128,6 +130,7 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     --Elder Nappa ez quest, don't set hearth
     ["Elder Poa"] = {choice=1}, -- {choice=1} repeatedly
     ["Sindragosa"] = {choice=1},
+    ["Lingering Image"] = {choice=1},
 
     --Valdrakken
     ["Tithris"] = {choice=1}, --set hearth

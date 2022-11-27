@@ -334,7 +334,7 @@ local function HandleGossip(self, e, ...)
     end
 
     if gossip and numGossipOptions > 0 then
-        local target = UnitName("target") or GameTooltipTextLeft1:GetText()
+        local target = GossipFrame.TitleContainer.TitleText:GetText() or UnitName("target") or GameTooltipTextLeft1:GetText()
         local player_level = UnitLevel("player")
         local gossip_data = nil
 
