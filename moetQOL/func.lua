@@ -293,11 +293,13 @@ local function HandleGossip(self, e, ...)
     if numAvailableQuests > 0 then
         local availableQuests = C_GossipInfo.GetAvailableQuests()
         gossip = false
-        if #availableQuests ~= 0 then
-            for i, quest in pairs(availableQuests) do
-                if e == "QUEST_GREETING" then
-                    SelectAvailableQuest(i);
-                elseif e == "GOSSIP_SHOW" then
+        if e == "QUEST_GREETING" then
+            for i=1,numAvailableQuests do
+                SelectAvailableQuest(i);
+            end
+        elseif e == "GOSSIP_SHOW" then
+            if #availableQuests ~= 0 then
+                for i, quest in pairs(availableQuests) do
                     C_GossipInfo.SelectAvailableQuest(quest.questID);
                 end
             end
