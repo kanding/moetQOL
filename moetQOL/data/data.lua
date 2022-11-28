@@ -131,6 +131,10 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Elder Poa"] = {choice=1}, -- {choice=1} repeatedly
     ["Sindragosa"] = {choice=1},
     ["Lingering Image"] = {choice=1},
+    ["Julk"] = {choice=1},
+    ["Old Grimtusk"] = {choice=1},
+    ["Alia Sunsoar"] = {choice=1},
+    ["Mysterious Apparition"] = {choice=1},
 
     --Valdrakken
     ["Tithris"] = {choice=1}, --set hearth
@@ -139,12 +143,13 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Mangled Corpse"] = {choice=1},
     ["Private Shikzar"] = {choice=1},
     ["Guardian Velomir"] = {choice=1},
-    ["Chromie"] = {choice={1,6}},
+    ["Chromie"] = {choice=1, phrase="Tell Chromie you're ready"},
     ["Andantenormu"] = {choice=1},
     ["Siaszerathel"] = {choice=1},
     ["Aeonormu"] = {choice=1},
     ["Soridormi"] = {choice=1},
     ["Nozdormu"] = {choice=1},
+    ["Aesthis"] = {choice=1},
 }
 
 ns.Data.SHADOWLANDS_GOSSIP = {
