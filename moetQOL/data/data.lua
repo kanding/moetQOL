@@ -49,7 +49,7 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     --Waking Shores
     ["Ambassador Fastrasz"] = {choice=2}, --assuming hs counts
     ["Embassy Visitor Log"] = {choice=1},
-    ["Sendrax"] = {choice={1,3}}, -- THIS BUGS AT START
+    ["Sendrax"] = {choice=1, phrase={"Why aren't the dragons here", "Send the signal flare"}}, --fix 3
     ["Talonstalker Kavia"] = {choice=1},
     ["Right"] = {choice=1},
     ["Left"] = {choice=1},
@@ -81,18 +81,18 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Elementalist Taiyang"] = {choice=1},
 
     --Ohn'ahran Plains
-    ["Sansok Khan"] = {choice={1,4,2,3}},
+    ["Sansok Khan"] = {choice=1},
     ["Mirojin"] = {choice=1}, --hs ohinir
     ["Aru"] = {choice=1},
     ["Belika"] = {choice=1},
     ["Beastmaster Nuqut"] = {choice=1},
-    ["Ohn Seshteng"] = {choice={1,2}}, --broken
+    ["Ohn Seshteng"] = {choice=1, phrase="I am ready"},
     ["Scout Tomul"] = {choice=1},
     --Centaur caravan chain skippable escorts
     ["Nokhud Fighter"] = {choice=1},
     ["Nokhud Spearthrower"] = {choice=1},
     ["Nokhud Brute"] = {choice=1},
-    ["Gemisath"] = {choice=3},
+    ["Gemisath"] = {phrase="I am here to help"},
     ["Khansguard Akato"] = {choice=1},
     ["Quartermaster Gensai"] = {choice=1},
     ["Scout Khenyug"] = {choice=1},
@@ -135,6 +135,7 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     ["Old Grimtusk"] = {choice=1},
     ["Alia Sunsoar"] = {choice=1},
     ["Mysterious Apparition"] = {choice=1},
+    ["Valthrux"] = {choice=1},
 
     --Valdrakken
     ["Tithris"] = {choice=1}, --set hearth
