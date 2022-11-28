@@ -49,7 +49,7 @@ ns.Data.DRAGONLANDS_GOSSIP = {
     --Waking Shores
     ["Ambassador Fastrasz"] = {choice=2}, --assuming hs counts
     ["Embassy Visitor Log"] = {choice=1},
-    ["Sendrax"] = {choice=1, phrase={"Why aren't the dragons here", "Send the signal flare"}}, --fix 3
+    ["Sendrax"] = {choice=1, phrase={"Why aren't the dragons here", "Send the signal flare", "Lead me to Dragonheart"}}, --fix 3
     ["Talonstalker Kavia"] = {choice=1},
     ["Right"] = {choice=1},
     ["Left"] = {choice=1},
