@@ -1023,10 +1023,16 @@ function Func:DisableMinimapTracking()
     if option == "all" then
         RunOnLogin(function()
             for i=1,C_Minimap.GetNumTrackingTypes() do
-                C_Minimap.SetTracking(i, false)
+                local info = select(1,C_Minimap.GetTrackingInfo(i))
+                if info ~= "Track Quest POIs" and info ~= "Track Digsites" and info ~= "Flight Master" then
+                    C_Minimap.SetTracking(i, false)
+                end
             end
         end)
     end
     
-    RunOnLogin(function() C_Minimap.SetTracking(TARGET_TRACKING_ID, false) end)
+    RunOnLogin(function() 
+        C_Minimap.SetTracking(TARGET_TRACKING_ID, false)
+        C_Minimap.SetTracking(TARGET_TRACKING_ID + 1, false) -- focus
+    end)
 end
