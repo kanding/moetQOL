@@ -88,6 +88,40 @@ local function HandleSlashCommands(str)
     end
 end
 
+local function HandlePin(str, ...)
+    if #str == 0 then mqCommands.mappinhelp() return false end
+    local args = { string.split(' ', str) }
+    -- Two coordinates: X and Y.
+    if #args ~= 2 then mqCommands.mappinhelp() return false end
+
+    local x = tonumber(args[1])
+    local y = tonumber(args[2])
+    if type(x) ~= "number" or type(y) ~= "number" then
+        mqCommands.mappinvalue(args[1], args[2])
+        return false
+    end
+
+    if x < 0 or y < 0 then mqCommands.mappinhelp() return false end
+    -- Coordinates have to be between 0 (top) and 1 (bottom).
+    -- If we typed in 34.4 or something we map it between 0 and 1
+    if x > 1 then x = x / 100 end
+    if y > 1 then y = y / 100 end
+
+    ns.Core:CreateMapPin(x, y)
+end
+
+local function HandlePinShare(str, ...)
+    HandlePin(str, ...)
+    local waypointlink = C_Map.GetUserWaypointHyperlink()
+    if UnitInRaid("player") then
+        SendChatMessage(waypointlink, "RAID")
+    elseif UnitInParty("player") then
+        SendChatMessage(waypointlink, "PARTY")
+    else
+        SendChatMessage(waypointlink)
+    end
+end
+
 ---------------------------------------------------
 -- FUNCTIONS
 ---------------------------------------------------
@@ -113,8 +147,8 @@ local function Init(self, event, name)
     SlashCmdList.moetQOL = HandleSlashCommands
     SlashCmdList.CLEAR = function() ChatFrame1:Clear() end
     SlashCmdList.RL = function() ReloadUI() end
-    SlashCmdList.PIN = ns.Core.HandlePin
-    SlashCmdList.PINSHARE = ns.Core.HandlePinShare
+    SlashCmdList.PIN = HandlePin
+    SlashCmdList.PINSHARE = HandlePinShare
 
     ns.Core.CheckDatabaseErrors()
     ns.Core.ActivateFunctions()
