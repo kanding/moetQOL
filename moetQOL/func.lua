@@ -1018,21 +1018,24 @@ function Func:QuestItemBind()
 end
 
 function Func:DisableMinimapTracking()
-    local TARGET_TRACKING_ID = 20
     local option = moetQOLDB["minimaptracking"].custom
     if option == "all" then
         RunOnLogin(function()
             for i=1,C_Minimap.GetNumTrackingTypes() do
                 local info = select(1,C_Minimap.GetTrackingInfo(i))
-                if info ~= "Track Quest POIs" and info ~= "Track Digsites" and info ~= "Flight Master" then
+                if info ~= "Track Quest POIs" and info ~= "Track Digsites" and info ~= "Flight Master" and info ~= "Points of Interest" then
+                    C_Minimap.SetTracking(i, false)
+                end
+            end
+        end)
+    else
+        RunOnLogin(function()
+            for i=1,C_Minimap.GetNumTrackingTypes() do
+                local info = select(1,C_Minimap.GetTrackingInfo(i))
+                if info == "Target" or info == "Focus Target" then
                     C_Minimap.SetTracking(i, false)
                 end
             end
         end)
     end
-    
-    RunOnLogin(function() 
-        C_Minimap.SetTracking(TARGET_TRACKING_ID, false)
-        C_Minimap.SetTracking(TARGET_TRACKING_ID + 1, false) -- focus
-    end)
 end
