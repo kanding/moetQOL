@@ -50,205 +50,16 @@ local function UpdateAlphasAndScale()
     if FULLSCREEN_WORLDMAP then
         WorldMapFrame:SetFrameStrata("FULLSCREEN")
     end
-end
 
-local function ModifyActionBar()
-    --taint
-    --UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomLeft"].baseY = 5
-    --UIPARENT_MANAGED_FRAME_POSITIONS["MultiBarBottomRight"].xOffset = 4
-    MultiBarBottomLeft:ClearAllPoints()
-    MultiBarBottomLeft:SetPoint("TOP", MainMenuBarArtFrame, "TOP", 0, 16) -- default anchor
-    MultiBarBottomLeft:SetPoint("BOTTOMLEFT", ActionButton1, "TOPLEFT", 0, 5)
-    MultiBarBottomRightButton7:ClearAllPoints()
-    MultiBarBottomRightButton7:SetPoint("BOTTOMLEFT", MultiBarBottomRightButton1, "TOPLEFT", 0, 5)
-    MultiBarBottomLeft.ignoreFramePositionManager = true
-    MultiBarBottomRight.ignoreFramePositionManager = true
-    --[[
-    MultiBarBottomLeft:HookScript("OnUpdate", function()
-        if not InCombatLockdown() then
-            MultiBarBottomLeft:SetPoint("BOTTOMLEFT", ActionButton1, "TOPLEFT", 0, 5)
-        end
-    end)]]
-end
-
-local function MoveAlternatePowerBar()
-    -- UI Parent manage position
-    -- This taints hard.
-    --UIPARENT_ALTERNATE_FRAME_POSITIONS["PlayerPowerBarAlt_Bottom"] = {baseY = false, yOffset = altPower.y, xOffset = altPower.x};
-
-    --keep status text shown
-    --[[
-    hooksecurefunc("UnitPowerBarAlt_OnEvent", function(self, event, ...)
-        if self.statusFrame and self.statusFrame:IsShown() or MouseIsOver(self) then return end
-
-        local arg1, arg2 = ...
-
-        if event == "UNIT_POWER_UPDATE" then
-            if arg1 == self.unit and arg2 == "ALTERNATE" then
-                self.statusFrame:Show()
-            end
-        end
-    end)
-
-    hooksecurefunc("UnitPowerBarAlt_OnEnter", function(self)
-        if self.displayedValue and self.displayedValue > 0 then
-            self.statusFrame:Hide()
-        end
-    end)
-
-    hooksecurefunc("UnitPowerBarAlt_OnLeave", function(self)
-        if self.displayedValue and self.displayedValue > 0 then
-            self.statusFrame:Show()
-        end
-    end)
-    ]]
-end
-
-local function MicroFrame_OnLeave(self)
-    local f = GetMouseFocus()
-    -- we are on the same strata to prevent absorbing clicks
-    -- so check if we are leaving mouseover frame into microbutton or bags
-    if f.GetBagID or f.OnEnter then return end
-
-    if self.HideFrame then
-        for _, frame in pairs(self.HideFrame) do
-            local alpha = frame:GetAlpha()
-            UIFrameFadeOut(frame, 0.5 * alpha, alpha, 0)
-        end
-    end
-end
-
-local function MicroFrame_OnEnter(self)
-    if self.HideFrame then
-        for _, frame in pairs(self.HideFrame) do
-            local alpha = frame:GetAlpha()
-            UIFrameFadeIn(frame, 0.5 * (1 - alpha), alpha, 1)
-        end
-    end
-end
-
-local function SetupMouseoverMicroBar()
-    if not MicroButtonAndBagsBar:IsShown() then return end
-
-    local mouseoverFrame = CreateFrame("Frame", "moetUI_MicroHide", UIParent)
-    mouseoverFrame:SetPoint("TOPLEFT", MicroButtonAndBagsBar, "TOPLEFT", 0, 0)
-    mouseoverFrame:SetPoint("BOTTOMRIGHT", MicroButtonAndBagsBar, "BOTTOMRIGHT", 0, 0)
-    mouseoverFrame:SetFrameStrata("MEDIUM")
-
-    mouseoverFrame.HideFrame = {
-        MicroButtonAndBagsBar,
-        CharacterMicroButton,
-        SpellbookMicroButton,
-        TalentMicroButton,
-        AchievementMicroButton,
-        QuestLogMicroButton,
-        GuildMicroButton,
-        LFDMicroButton,
-        CollectionsMicroButton,
-        EJMicroButton,
-        StoreMicroButton,
-        MainMenuMicroButton
-    }
-
-    mouseoverFrame.FadeOut = function(self) MicroFrame_OnLeave(self) end
-    mouseoverFrame.FadeIn = function(self) MicroFrame_OnEnter(self) end
-    mouseoverFrame:SetScript("OnEnter", function(self) self:FadeIn(self) end)
-    mouseoverFrame:SetScript("OnLeave", function(self) self:FadeOut(self) end)
-
-    for _, frame in pairs(mouseoverFrame.HideFrame) do
-        frame:Hide()
-    end
-
-    -- for some reason StoreMicroButton is the only button with a show in update
-    -- so we have hook to ensure it stays hidden.
-    hooksecurefunc("UpdateMicroButtons", function()
-        if not MicroButtonAndBagsBar:IsShown() then
-            StoreMicroButton:Hide()
-        end
-    end)
-end
-
-local function MultiBar_OnEnter(self)
-    local Lalpha = self.LeftBar:GetAlpha()
-    local Ralpha = self.RightBar:GetAlpha()
-
-    for i=1,12 do
-        local fl = "MultiBarLeftButton"..i
-        local fr = "MultiBarRightButton"..i
-        fl:Show()
-        fr:Show()
-    end
-
-    UIFrameFadeIn(self.LeftBar, 0.5 * (1 - Lalpha), Lalpha, 1)
-    UIFrameFadeIn(self.RightBar, 0.5 * (1 - Ralpha), Ralpha, 1)
-end
-
-local function MultiBar_OnLeave(self)
-    local Lalpha = self.LeftBar:GetAlpha()
-    local Ralpha = self.RightBar:GetAlpha()
-
-    for i=1,12 do
-        local fl = "MultiBarLeftButton"..i
-        local fr = "MultiBarRightButton"..i
-        fl:Hide()
-        fr:Hide()
-    end
-
-    UIFrameFadeOut(self.LeftBar, 0.5 * Lalpha, Lalpha, 0)
-    UIFrameFadeOut(self.RightBar, 0.5 * Ralpha, Ralpha, 0)
-end
-
-local function SetupHideRightActionBars()
-    --if not MultiBarLeft:IsShown() and not MultiBarRight:IsShown() then return end
-
-    local mouseoverFrame = CreateFrame("Frame", "moetUI_MultiBarHide", UIParent)
-    -- Problem if only 1 of them is shown.
-    mouseoverFrame:SetPoint("TOPLEFT", MultiBarLeft, "TOPLEFT", 0, 0)
-    mouseoverFrame:SetPoint("BOTTOMRIGHT", MultiBarRight, "BOTTOMRIGHT", 0, 0)
-    mouseoverFrame:SetFrameStrata("HIGH")
-
-    mouseoverFrame.LeftBar = MultiBarLeft
-    mouseoverFrame.RightBar = MultiBarRight
-
-    mouseoverFrame.FadeOut = function(self) MultiBar_OnLeave(self) end
-    mouseoverFrame.FadeIn = function(self) MultiBar_OnEnter(self) end
-    mouseoverFrame:SetScript("OnEnter", function(self) self:FadeIn(self) end)
-    mouseoverFrame:SetScript("OnLeave", function(self) self:FadeOut(self) end)
-    
-    MultiBarLeft:Hide();
-    MultiBarRight:Hide();
+    -- for i=1,5 do
+    --    local f = "ContainerFrame"..i
+    --    print(f)
+    --    if f then f:SetFrameStrata("HIGH") end
+    -- end
 end
 
 local function HideBlizzardFrames()
-    CastingBarFrame.Border:SetParent(hiddenFrame)
-    CastingBarFrame.Flash:SetParent(hiddenFrame)
-    PetCastingBarFrame.Border:SetParent(hiddenFrame)
-    PetCastingBarFrame.Flash:SetParent(hiddenFrame)
-    TargetFrameSpellBar.Border:SetParent(hiddenFrame)
-    TargetFrameSpellBar.Flash:SetParent(hiddenFrame)
-    MirrorTimer1Border:SetParent(hiddenFrame)
-    MainMenuBarArtFrame.LeftEndCap:SetParent(hiddenFrame)
-    MainMenuBarArtFrame.RightEndCap:SetParent(hiddenFrame)
-    MainMenuBarArtFrameBackground:Hide()
-    RegisterStateDriver(StanceBarFrame, 'visibility', 'hide') -- hide stance bar
     MicroButtonAndBagsBar:Hide()
-
-    -- mega taint
-    --VERTICAL_MULTI_BAR_HEIGHT = 800;
-
-    MultiBarRight:HookScript('OnUpdate', function()
-        if not InCombatLockdown() and MultiBarRight:GetScale() ~= SCALE then
-            VerticalMultiBarsContainer:SetPoint("RIGHT", UIParent, "RIGHT", 0, 100)
-            MultiBarRight:SetScale(SCALE)
-        end
-    end)
-
-    MultiBarLeft:HookScript('OnUpdate', function()
-        if not InCombatLockdown() and MultiBarLeft:GetScale() ~= SCALE then
-            VerticalMultiBarsContainer:SetPoint("RIGHT", UIParent, "RIGHT", 0, 100)
-            MultiBarLeft:SetScale(SCALE)
-        end
-    end)
 
     hooksecurefunc("UpdateMicroButtons", function()
         if not MicroButtonAndBagsBar:IsShown() then
@@ -259,11 +70,17 @@ local function HideBlizzardFrames()
     end)
 end
 
+local function MakeDungeonFinderIconMoveable()
+    QueueStatusButton:SetMovable(true);    
+    QueueStatusButton:EnableMouse(true);    
+    QueueStatusButton:RegisterForDrag("LeftButton");    
+    QueueStatusButton:SetScript("OnDragStart", function(self) self:StartMoving() end);    
+    QueueStatusButton:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end);
+end
+
 local function OnLogin()
     UpdatePlayerFramePosition(pFrame, tFrame)
     UpdateAlphasAndScale()
-    MoveAlternatePowerBar()
-    ModifyActionBar()
 end
 
 
@@ -281,6 +98,7 @@ local function Init(self, event, name)
     --SetupMouseoverMicroBar()
     --SetupHideRightActionBars()
     HideBlizzardFrames()
+    MakeDungeonFinderIconMoveable()
 end
 
 local addonLoadedEvents = CreateFrame("FRAME")
