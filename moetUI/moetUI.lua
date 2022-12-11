@@ -8,6 +8,10 @@ local altPower = {x = -390, y = 800}
 local ALPHA = 0.2
 local SCALE = 0.8
 local FULLSCREEN_WORLDMAP = true
+
+local FINDER_POS_ANCHOR = "CENTER"
+local FINDER_POS_X = -70
+local FINDER_POS_Y = -35
 --
 
 local MICRO_BUTTONS = {
@@ -70,17 +74,22 @@ local function HideBlizzardFrames()
     end)
 end
 
-local function MakeDungeonFinderIconMoveable()
-    QueueStatusButton:SetMovable(true);    
-    QueueStatusButton:EnableMouse(true);    
-    QueueStatusButton:RegisterForDrag("LeftButton");    
-    QueueStatusButton:SetScript("OnDragStart", function(self) self:StartMoving() end);    
-    QueueStatusButton:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end);
+local function AnchorDungeonFinderIconToMinimap()
+    QueueStatusButton:SetMovable(true)
+    QueueStatusButton:ClearAllPoints()
+    QueueStatusButton:SetPoint("CENTER", Minimap, "CENTER", FINDER_POS_X, FINDER_POS_Y)
+    QueueStatusButton:SetUserPlaced(true)
+    --QueueStatusButton:EnableMouse(true);
+    --QueueStatusButton:RegisterForDrag("LeftButton");    
+    --QueueStatusButton:SetScript("OnDragStart", function(self) self:StartMoving() end);    
+    --QueueStatusButton:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end);
+    
 end
 
 local function OnLogin()
     UpdatePlayerFramePosition(pFrame, tFrame)
     UpdateAlphasAndScale()
+    AnchorDungeonFinderIconToMinimap()
 end
 
 
@@ -97,8 +106,7 @@ local function Init(self, event, name)
 
     --SetupMouseoverMicroBar()
     --SetupHideRightActionBars()
-    HideBlizzardFrames()
-    MakeDungeonFinderIconMoveable()
+    --HideBlizzardFrames()
 end
 
 local addonLoadedEvents = CreateFrame("FRAME")
