@@ -54,12 +54,6 @@ local function UpdateAlphasAndScale()
     if FULLSCREEN_WORLDMAP then
         WorldMapFrame:SetFrameStrata("FULLSCREEN")
     end
-
-    -- for i=1,5 do
-    --    local f = "ContainerFrame"..i
-    --    print(f)
-    --    if f then f:SetFrameStrata("HIGH") end
-    -- end
 end
 
 local function HideBlizzardFrames()
@@ -75,21 +69,18 @@ local function HideBlizzardFrames()
 end
 
 local function AnchorDungeonFinderIconToMinimap()
-    QueueStatusButton:SetMovable(true)
     QueueStatusButton:ClearAllPoints()
+    QueueStatusButton:SetParent(Minimap)
+    QueueStatusButton:SetMovable(true)
     QueueStatusButton:SetPoint("CENTER", Minimap, "CENTER", FINDER_POS_X, FINDER_POS_Y)
     QueueStatusButton:SetUserPlaced(true)
-    --QueueStatusButton:EnableMouse(true);
-    --QueueStatusButton:RegisterForDrag("LeftButton");    
-    --QueueStatusButton:SetScript("OnDragStart", function(self) self:StartMoving() end);    
-    --QueueStatusButton:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end);
-    
 end
 
 local function OnLogin()
+    AnchorDungeonFinderIconToMinimap()
     UpdatePlayerFramePosition(pFrame, tFrame)
     UpdateAlphasAndScale()
-    AnchorDungeonFinderIconToMinimap()
+    HideBlizzardFrames()
 end
 
 
@@ -103,10 +94,6 @@ local function Init(self, event, name)
     loginEvent:RegisterEvent("PLAYER_LOGIN")
     loginEvent:SetScript("OnEvent", OnLogin)
     loginEvent:Hide()
-
-    --SetupMouseoverMicroBar()
-    --SetupHideRightActionBars()
-    --HideBlizzardFrames()
 end
 
 local addonLoadedEvents = CreateFrame("FRAME")
