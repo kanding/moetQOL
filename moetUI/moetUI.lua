@@ -74,6 +74,7 @@ local function AnchorDungeonFinderIconToMinimap()
     QueueStatusButton:SetMovable(true)
     QueueStatusButton:SetPoint("CENTER", Minimap, "CENTER", FINDER_POS_X, FINDER_POS_Y)
     QueueStatusButton:SetUserPlaced(true)
+    QueueStatusButtonIcon:SetScale(0.8)
 end
 
 local function OnLogin()
