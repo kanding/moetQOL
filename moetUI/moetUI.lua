@@ -16,6 +16,7 @@ local FINDER_POS_Y = -35
 
 local MICRO_BUTTONS = {
     MicroButtonAndBagsBar,
+    BagsBar,
     CharacterMicroButton,
     SpellbookMicroButton,
     TalentMicroButton,
@@ -64,6 +65,18 @@ local function HideBlizzardFrames()
             for _, frame in pairs(MICRO_BUTTONS) do
                 frame:Hide()
             end
+        end
+    end)
+
+    EssencePlayerFrame:HookScript("OnShow", function()
+        if EssencePlayerFrame:IsVisible() then
+          EssencePlayerFrame:Hide()
+        end
+    end)
+
+    ComboPointPlayerFrame:HookScript("OnShow", function()
+        if ComboPointPlayerFrame:IsVisible() then
+          ComboPointPlayerFrame:Hide()
         end
     end)
 end
