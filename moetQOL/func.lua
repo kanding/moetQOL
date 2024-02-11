@@ -1039,3 +1039,26 @@ function Func:DisableMinimapTracking()
         end)
     end
 end
+
+function Func:AddSpellIdTooltipPostHooks()
+    local function TooltipAddSpellID(self,spellid)
+        if not spellid then return end
+        self:AddDoubleLine("|cff0099ffSpell ID|r",spellid)
+        self:Show()
+    end
+
+    hooksecurefunc(GameTooltip, "SetUnitAura", function(self,...)
+        TooltipAddSpellID(self,select(10,UnitAura(...)))
+    end)
+
+    hooksecurefunc("SetItemRef", function(link)
+        local type, value = link:match("(%a+):(.+)")
+        if type == "spell" then
+            TooltipAddSpellID(ItemRefTooltip,value:match("([^:]+)"))
+        end
+    end)
+
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(self)
+        TooltipAddSpellID(self,select(3,self:GetSpell()))
+    end)
+end

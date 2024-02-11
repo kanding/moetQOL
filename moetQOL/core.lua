@@ -173,6 +173,7 @@ Core.MQdefault = {
     ["combatchat"] = {state = false, desc="Fade chat when in combat. Select always to fade chat in combat everywhere, instance to fade in combat in instances, or boss to fade when in an encounter (usually a boss)", func=Func.HideChatInCombat, custom={"always","instance","boss"}, category=Core.FunctionCategory.UI},
     ["questitembind"] = {state = false, desc="Add a keybind to use the closest watched quest item. This keybind can be set in Key Bindings/AddOns", func = Func.QuestItemBind, category=Core.FunctionCategory.Quest},
     ["minimaptracking"] = {state = false, desc="Disables target and focus icons on minimap, alternatively disables all tracking except for flight masters and crucial quests or dots", func = Func.DisableMinimapTracking, custom = {"target", "all"}, category=Core.FunctionCategory.UI},
+    ["spellidtooltip"] = {state = false, desc="Adds spell id to item, auras and spell tooltips.", func = Func.AddSpellIdTooltipPostHooks, category=Core.FunctionCategory.UI},
 }
 
 function Core:ActivateFunctions()
