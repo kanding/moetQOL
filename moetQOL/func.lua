@@ -520,7 +520,8 @@ end
 -- MAIN FUNCTIONS
 ---------------------------------------------------
 function Func:HidePortraitNumbers()
-    PlayerHitIndicator.Show = function() end
+    -- PlayerHitIndicator.Show = function() end
+    PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HitIndicator:Hide();
     PetHitIndicator.Show = function() end
     CombatFeedback_OnCombatEvent = function() end
 end
