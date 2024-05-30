@@ -145,7 +145,7 @@ local function InvokeLoginFunctions()
 end
 
 local eventFrame = CreateFrame("FRAME")
-eventFrame:RegisterEvent("PLAYER_LOGIN")
+eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
 eventFrame:SetScript("OnEvent", InvokeLoginFunctions)
 eventFrame:Hide()
 

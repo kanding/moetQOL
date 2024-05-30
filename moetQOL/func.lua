@@ -29,39 +29,6 @@ local function IsInArray(array, s)
     end
     return false
 end
---[[
-local function VerifyCustomOption(key)
-    if not Core.MQdefault[key] then
-        ns.Core:PrintMessage("Failed to verify custom option for non-existing key: "..key)
-        return false
-    end
-
-    local current_option = moetQOLDB[key].custom
-    if not current_option then
-        ns.Core:PrintMessage("Failed to verify custom option with no current option for: "..key)
-        return false
-    end
-
-    local available_options = Core.MQdefault[key].custom
-
-    if available_options.min and available_options.max then
-        --numerical custom option
-        current_option = tonumber(current_option)
-        if not current_option then return false end
-        if current_option >= available_options.min and current_option <= available_options.max then
-            return true
-        end
-    else
-        --choice custom option
-        for i=1,#available_options do
-            if available_options[i] == current_option then return true end
-        end
-    end
-
-    ns.Core:PrintMessage(string.format("|c%s%s:|r unable to verify custom option: %s", ns.REDCOLOR, key, tostring(current_option)))
-    return false
-end
---]]
 
 --NOTE: this only sells 12 items at a time, rest will say object is busy.
 local function SellGreyItems()
@@ -712,7 +679,11 @@ function Func:HideTalkingHead()
 end
 
 function Func:SetMaxZoom()
-    RunOnLogin(function() SetCVar("cameraDistanceMaxZoomFactor", 2.6) end)
+    if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+        RunOnLogin(function() SetCVar("cameraDistanceMaxZoomFactor", 2.6) end)
+    else
+        RunOnLogin(function() SetCVar("cameraDistanceMaxZoomFactor", 4) end)
+    end
 end
 
 -- Hide Error Messages inspired by zork rError (here for continued maintenance)
