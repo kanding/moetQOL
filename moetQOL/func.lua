@@ -117,42 +117,6 @@ local function InfoStringTooltip(self)
     addons = nil
 end
 
-local function SetupGuildFrame()
-    if IsInGuild() then
-        GuildFrame_LoadUI()
-        tinsert(UISpecialFrames, "GuildFrame")
-
-        ToggleGuildFrame = function()
-            if GuildFrame:IsVisible() then
-                HideUIPanel(GuildFrame)
-            else
-                ShowUIPanel(GuildFrame)
-            end
-        end
-
-        -- All this to be able to open the guild frame in combat :-)
-        -- Above function will still cause 'taint'.
-        hooksecurefunc("ShowUIPanel", function(frame, force, duplicated)
-            if frame and not frame:GetName() == "GuildFrame" then return end
-
-            if frame and not frame:IsShown() and not duplicated and InCombatLockdown() and not WorldMapFrame:IsShown() then
-                local point,_,relativePoint,xOff,yOff = frame:GetPoint()
-                frame:ClearAllPoints()
-                frame:SetPoint(point or "TOPLEFT",UIParent,relativePoint or "TOPLEFT",xOff or 16,yOff or -116)
-                frame:Show()
-            end
-        end)
-
-        hooksecurefunc("HideUIPanel", function(frame, force, duplicated)
-            if frame and not frame:GetName() == "GuildFrame" then return end
-
-            if frame and frame:IsShown() and not duplicated and InCombatLockdown() then
-                frame:Hide()
-            end
-        end)
-    end
-end
-
 local function IsPlayerRanged()
     local ranged = {
         ["MAGE"] = true,
@@ -665,10 +629,6 @@ function Func:CreateInfoStrings()
     end)
 end
 
-function Func:HideCommunities()
-    RunOnLogin(SetupGuildFrame)
-end
-
 function Func:HideTalkingHead()
     hooksecurefunc(TalkingHeadFrame, "PlayCurrent", function(self)
         self:Hide()
@@ -728,25 +688,25 @@ end
 function Func:ParagonTooltip()
     local line = "" --safety
 
-    hooksecurefunc("ReputationParagonFrame_SetupParagonTooltip", function(frame)
-        id = frame.factionID
+    -- hooksecurefunc("ReputationFrame_OnEnter", function(frame)
+    --     id = frame.factionID
 
-        curValue, threshold, _, rewardpending = C_Reputation.GetFactionParagonInfo(id)
-        if curValue then
-            turnins = (rewardpending and math.modf(curValue/threshold)-1) or (math.modf(curValue/threshold))
-        end
+    --     curValue, threshold, _, rewardpending = C_Reputation.GetFactionParagonInfo(id)
+    --     if curValue then
+    --         turnins = (rewardpending and math.modf(curValue/threshold)-1) or (math.modf(curValue/threshold))
+    --     end
 
-        line = format(ARCHAEOLOGY_COMPLETION, turnins)
+    --     line = format(ARCHAEOLOGY_COMPLETION, turnins)
 
-        GameTooltip:AddLine(line)
-        GameTooltip:Show()
-    end)
+    --     GameTooltip:AddLine(line)
+    --     GameTooltip:Show()
+    -- end)
 
-    hooksecurefunc("ReputationParagonFrame_OnLeave", function(self)
-        if line then
-            line = ""
-        end
-    end)
+    -- hooksecurefunc("ReputationFrame_OnLeave", function(self)
+    --     if line then
+    --         line = ""
+    --     end
+    -- end)
 end
 
 -- Inspired by RealIDCounter

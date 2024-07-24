@@ -162,7 +162,6 @@ Core.MQdefault = {
     ["skipmovies"] = {state = false, desc="Auto skip all cinematics and cutscenes immediately", func=Func.AutoCancelCutscenes, category=Core.FunctionCategory.Misc},
     ["infostring"] = {state = false, desc="Show addon usage, MS and FPS beneath minimap. Additionally you can click the frame to clear garbage memory. The frame is moveable with ALT+LClick", func=Func.CreateInfoStrings, category=Core.FunctionCategory.UI},
     ["sell"] = {state = false, desc="Add a button on merchants to sell grey items. Alternatively select auto to automatically sell up to 12 grey items when speaking with a vendor", func=Func.CreateSellButton, custom={"manual", "auto"}, category=Core.FunctionCategory.Misc},
-    ["oldguild"] = {state = false, desc="Revert to the old guild roster frame if you're in a guild", func=Func.HideCommunities, category=Core.FunctionCategory.UI},
     ["talkinghead"] = {state = false, desc="Hide talking head frames", func=Func.HideTalkingHead, custom={"audio", "muteaudio"}, category=Core.FunctionCategory.UI},
     ["autorepair"] = {state = false, desc="Automatically repair items when possible using player funds", func=Func.AutoRepair, category=Core.FunctionCategory.Misc},
     ["paragontooltip"] = {state = false, desc="Add total completions to paragon reputations tooltip", func=Func.ParagonTooltip, category=Core.FunctionCategory.UI},
