@@ -27,7 +27,9 @@ local MICRO_BUTTONS = {
     CollectionsMicroButton,
     EJMicroButton,
     StoreMicroButton,
-    MainMenuMicroButton
+    MainMenuMicroButton,
+    ProfessionMicroButton,
+    PlayerSpellsMicroButton,
 }
 
 local hiddenFrame = CreateFrame("FRAME")
@@ -73,25 +75,27 @@ local function HideBlizzardFrames()
           EssencePlayerFrame:Hide()
         end
     end)
-
-    ComboPointPlayerFrame:HookScript("OnShow", function()
-        if ComboPointPlayerFrame:IsVisible() then
-          ComboPointPlayerFrame:Hide()
-        end
-    end)
 end
 
 local function AnchorDungeonFinderIconToMinimap()
     QueueStatusButton:ClearAllPoints()
     QueueStatusButton:SetParent(Minimap)
     QueueStatusButton:SetMovable(true)
-    QueueStatusButton:SetPoint("CENTER", Minimap, "CENTER", FINDER_POS_X, FINDER_POS_Y)
+    QueueStatusButton:SetPoint(FINDER_POS_ANCHOR, Minimap, FINDER_POS_ANCHOR, FINDER_POS_X, FINDER_POS_Y)
     QueueStatusButton:SetUserPlaced(true)
     QueueStatusButtonIcon:SetScale(0.8)
+    
 end
 
 local function OnLogin()
     AnchorDungeonFinderIconToMinimap()
+    hooksecurefunc(QueueStatusButton, "SetPoint", function(self, point, relativeTo, relativePoint, xOfs, yOfs)
+        if relativeTo == Minimap and xOfs == FINDER_POS_X and yOfs == FINDER_POS_Y then
+            return -- Allow setting to the desired position
+        end
+        AnchorDungeonFinderIconToMinimap() -- Reapply the desired position
+    end)
+    
     UpdatePlayerFramePosition(pFrame, tFrame)
     UpdateAlphasAndScale()
     HideBlizzardFrames()
