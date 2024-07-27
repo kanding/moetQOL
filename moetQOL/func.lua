@@ -126,6 +126,11 @@ end
 local function AutoShareQuest(questID)
     if C_QuestLog.IsPushableQuest(questID) then
         local title = C_QuestLog.GetTitleForQuestID(questID)
+        if IsInRaid() then
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq|r: Not auto sharing [%s] as you are in a raid.", ns.REDCOLOR, title), 255, 255, 0);
+            return
+        end
+
         C_QuestLog.SetSelectedQuest(questID)
         QuestLogPushQuest();
         DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq|r: Sharing [%s] with your group...", ns.REDCOLOR, title), 255, 255, 0);
