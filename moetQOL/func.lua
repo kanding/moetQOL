@@ -877,7 +877,7 @@ function Func:QuestItemBind()
         end
     end)
 
-    hooksecurefunc("QuestObjectiveItem_Initialize", function(itemButton, questLogIndex)
+    hooksecurefunc(QuestObjectiveItemButtonMixin, "SetUp", function(itemButton, questLogIndex)
         local questID = C_QuestLog.GetQuestIDForLogIndex(questLogIndex)
         local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(questID)
 
