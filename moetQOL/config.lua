@@ -382,9 +382,12 @@ function Config:SetupInterfaceOption()
         while CloseWindows() do end
         return Config:ToggleFrame()
     end)
-    -- Deprecated in 10.0
-    -- see Blizzard_ImplementationReadme.lua
-    InterfaceOptions_AddCategory(panel)
+    
+    -- Add the panel to the new Settings system
+    local category, layout = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
+
+    -- Add the category to the Blizzard settings
+    Settings.RegisterAddOnCategory(category)
 end
 
 function Config:ToggleFrame()
