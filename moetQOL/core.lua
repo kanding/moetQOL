@@ -164,7 +164,6 @@ Core.MQdefault = {
     ["sell"] = {state = false, desc="Add a button on merchants to sell grey items. Alternatively select auto to automatically sell up to 12 grey items when speaking with a vendor", func=Func.CreateSellButton, custom={"manual", "auto"}, category=Core.FunctionCategory.Misc},
     ["talkinghead"] = {state = false, desc="Hide talking head frames", func=Func.HideTalkingHead, custom={"audio", "muteaudio"}, category=Core.FunctionCategory.UI},
     ["autorepair"] = {state = false, desc="Automatically repair items when possible using player funds", func=Func.AutoRepair, category=Core.FunctionCategory.Misc},
-    ["paragontooltip"] = {state = false, desc="Add total completions to paragon reputations tooltip", func=Func.ParagonTooltip, category=Core.FunctionCategory.UI},
     ["realidcounter"] = {state = false, desc="Add a counter that shows current out of the maximum allowed friends to your social window", func=Func.RealIDCounter, category=Core.FunctionCategory.UI},
     ["combattooltip"] = {state = false, desc="Hide tooltip if in combat. Select always to hide in combat everywhere, instance to hide in combat inside instances and raid to hide in combat inside raids", func=Func.HideTooltipInCombat, custom={"always", "instance", "raid"}, category=Core.FunctionCategory.UI},
     ["dynamicspellqueue"] = {state = false, desc="automatically adjust spellqueue based on ranged or melee", func=Func.DynamicSpellQueue, custom={min=90, max=500}, category=Core.FunctionCategory.Combat},

@@ -339,26 +339,26 @@ end
 
 local function ChatFrame_OnLeave(self)
     if not self.ShouldHide then return end
-
+    
     local focusRegion = GetMouseFoci()
     if focusRegion then 
         local f = focusRegion[0]
-    if f then
-        -- Ensure frame is not just higher strata than mouseover frame
-        if f.messageInfo then return end
-        if IsInArray(self.Frames, f) then return end
+        if f then
+            -- Ensure frame is not just higher strata than mouseover frame
+            if f.messageInfo then return end
+            if IsInArray(self.Frames, f) then return end
 
-        if not f:GetName() then
-            --most likely scrollbar
-        elseif f:GetParent() then
-            f = f:GetParent()
-            if IsInArray(self.Frames, f) then
-                return
-            end
-            if f:GetParent() then
+            if not f:GetName() then
+                --most likely scrollbar
+            elseif f:GetParent() then
                 f = f:GetParent()
                 if IsInArray(self.Frames, f) then
                     return
+                end
+                if f:GetParent() then
+                    f = f:GetParent()
+                    if IsInArray(self.Frames, f) then
+                        return
                     end
                 end
             end
@@ -670,33 +670,6 @@ function Func:AutoRepair()
             end
         end
     end)
-end
-
--- Inspired by ExaltedPlus
--- reworked :-)
--- original: https://www.curseforge.com/wow/addons/exaltedplus
-function Func:ParagonTooltip()
-    local line = "" --safety
-
-    -- hooksecurefunc("ReputationFrame_OnEnter", function(frame)
-    --     id = frame.factionID
-
-    --     curValue, threshold, _, rewardpending = C_Reputation.GetFactionParagonInfo(id)
-    --     if curValue then
-    --         turnins = (rewardpending and math.modf(curValue/threshold)-1) or (math.modf(curValue/threshold))
-    --     end
-
-    --     line = format(ARCHAEOLOGY_COMPLETION, turnins)
-
-    --     GameTooltip:AddLine(line)
-    --     GameTooltip:Show()
-    -- end)
-
-    -- hooksecurefunc("ReputationFrame_OnLeave", function(self)
-    --     if line then
-    --         line = ""
-    --     end
-    -- end)
 end
 
 -- Inspired by RealIDCounter
