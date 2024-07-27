@@ -335,7 +335,9 @@ end
 local function ChatFrame_OnLeave(self)
     if not self.ShouldHide then return end
 
-    local f = GetMouseFocus()
+    local focusRegion = GetMouseFoci()
+    if focusRegion then 
+        local f = focusRegion[0]
     if f then
         -- Ensure frame is not just higher strata than mouseover frame
         if f.messageInfo then return end
@@ -352,6 +354,7 @@ local function ChatFrame_OnLeave(self)
                 f = f:GetParent()
                 if IsInArray(self.Frames, f) then
                     return
+                    end
                 end
             end
         end
