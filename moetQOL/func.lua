@@ -32,25 +32,7 @@ end
 
 --NOTE: this only sells 12 items at a time, rest will say object is busy.
 local function SellGreyItems()
-    if not MerchantFrame:IsVisible() then return end
-
-    for bag = 0, 4 do
-        for slot = 1, C_Container.GetContainerNumSlots(bag) do
-            local item = C_Container.GetContainerItemLink(bag, slot)
-            if item ~= nil then
-                local grey = string.find(item, "|cff9d9d9d") -- grey
-                if grey then
-                    local sellPrice = (select(11, GetItemInfo(item)) or 0)
-                    --local itemCount = (select(2, C_Container.GetContainerItemInfo(bag, slot)) or 0)
-                    currPrice = sellPrice
-                    if currPrice > 0 then
-                        C_Container.PickupContainerItem(bag, slot)
-                        PickupMerchantItem()
-                    end
-                end
-            end
-        end
-    end
+    C_MerchantFrame.SellAllJunkItems()
 end
 
 local function GetFps()
