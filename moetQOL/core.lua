@@ -140,12 +140,12 @@ local function InvokeLoginFunctions()
         end
     end
 
-    Func.onLogin = nil
+    Func.onLogin = {}
     eventFrame = nil
 end
 
 local eventFrame = CreateFrame("FRAME")
-eventFrame:RegisterEvent("PLAYER_ENTERING_WORLD")
+eventFrame:RegisterEvent("PLAYER_LOGIN")
 eventFrame:SetScript("OnEvent", InvokeLoginFunctions)
 eventFrame:Hide()
 
