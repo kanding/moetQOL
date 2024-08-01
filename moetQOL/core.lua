@@ -2,7 +2,7 @@
 
 local _, ns	= ...
 ns.Core	= {} 
-ns.ADDON_VERSION = GetAddOnMetadata("moetQOL", "Version")
+ns.ADDON_VERSION = C_AddOns.GetAddOnMetadata("moetQOL", "Version")
 ns.SOURCE = "https://github.com/kanding/moetQOL/"
 
 local Core = ns.Core

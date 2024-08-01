@@ -1,5 +1,5 @@
 local _, ns = ...
-ns.ADDON_VERSION = GetAddOnMetadata("moetQOL", "Version")
+ns.ADDON_VERSION = C_AddOns.GetAddOnMetadata("moetQOL", "Version")
 
 --OPTIONS
 local pFrame = {anchor = "CENTER", x = -310, y = -270}
