@@ -77,10 +77,10 @@ local function InfoStringTooltip(self)
     UpdateAddOnMemoryUsage()
     GameTooltip:AddLine("Top 50 AddOns", color.r, color.g, color.b)
     GameTooltip:AddLine(" ")
-    for i=1, GetNumAddOns(), 1 do
+    for i=1, C_AddOns.GetNumAddOns(), 1 do
         if GetAddOnMemoryUsage(i) > 0  then
             local memory = GetAddOnMemoryUsage(i)
-            entry = {name = GetAddOnInfo(i), memory = memory}
+            entry = {name = C_AddOns.GetAddOnInfo(i), memory = memory}
             table.insert(addons, entry)
             total = total + memory
         end
