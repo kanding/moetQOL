@@ -943,7 +943,10 @@ function Func:AddSpellIdTooltipPostHooks()
     end
 
     hooksecurefunc(GameTooltip, "SetUnitAura", function(self,...)
-        TooltipAddSpellID(self,select(10,UnitAura(...)))
+        local data = C_UnitAuras.GetAuraDataByIndex(...)
+        if (data["spellId"]) then
+            TooltipAddSpellID(self,data["spellId"])
+        end
     end)
 
     hooksecurefunc("SetItemRef", function(link)
