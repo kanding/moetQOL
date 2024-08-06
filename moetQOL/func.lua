@@ -870,7 +870,7 @@ function Func:QuestItemBind()
 
         -- GET NEW ITEM TO USE
         local link, item, charges, showItemWhenComplete = GetQuestLogSpecialItemInfo(questLogIndex)
-        local itemName = GetItemInfo(link)
+        local itemName = C_Item.GetItemInfo(link)
 
         -- If last quest is valid and closer than the new quest then don't change.
         if buttonFrame.lastQuest then
