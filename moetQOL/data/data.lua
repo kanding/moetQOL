@@ -33,6 +33,14 @@ ns.Data.ERROR_BLACKLIST = {
     ["SPELL_FAILED_NOT_ON_TAXI"] = true,       -- You are in flight
 }
 
+--Quests will not be auto accepted if they are on this list by name or id
+--They will still be completed.
+ns.Data.AUTOQUESTBLACKLIST_ACCEPT = {
+}
+
+ns.Data.AUTOQUESTBLACKLIST_COMPLETION = {
+}
+
 -- KUI SpellList Config
 --weakaura for use Unbreakable Iron Idol delve?
 --outline mode quest objectives only
@@ -42,16 +50,17 @@ ns.Data.WARLANDS_GOSSIP = {
     MinLevel = 70,
     MaxLevel = 79,
 
-    ["Magni Bronzebeard"] = {phrase = "I'm ready"},
+    ["Magni Bronzebeard"] = {phrase = {"I'm ready", "I am ready to go"}},
 
     -- ISLE OF DORN BEGIN
     --Stones of Dornogal quest
+    ["Thrall"] = {phrase = {"What is the plan"}},
     ["Oathsworn Peacekeeper"] = {questName = "Stones of Dornogal", phrase = "Profession Trainer"},
     ["Breem"] = {choice=2,phrase = "Introduce yourself"}, --<Introduce yourself with Councilward's Signet.>
-    ["Ronesh"] = {choice=2,phrase = "Introduce yourself"},
+    ["Ronesh"] = {choice=1,phrase = "Introduce yourself"},
     -- Ronesh also if set hearthstone option 1 (will clash with quest) yes we set hs
     ["Brann Bronzebeard"] = {phrase={"You made it, Brann", "Let's go save the earthen", "What will you do now?", "Moira needs you both"}},
-    ["Merix"] = {choice=2, phrase = "Tell me another time"},
+    ["Merrix"] = {phrase = "Tell me another time"},
     ["Pottery Jar"] = {choice=1},
     ["Kaldrinn"] = {choice=1},
     -- ["Adelgonn"] = choice = 1 <- this needs phrase!
@@ -75,8 +84,22 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Rancher Fuoleim"] = {choice=1},
     ["Rancher Kiespuch"] = {choice=1},
     ["Harmot"] = {choice=1},
-    ["Baelgrim"] = {phrase = {"Let's go. <Queue for follower dungeon.>", "Skip conversation"}} -- quest: Calling the Stormriders, choice = 1, and quest: Lasting Repairs, count = 2
+    ["Baelgrim"] = {phrase = {"Let's go. <Queue for follower dungeon.>", "Skip conversation"}}, -- quest: Calling the Stormriders, choice = 1, and quest: Lasting Repairs, count = 2
     -- ISLE OF DORN END
+
+    -- THE RINGING DEEPS
+    ["Innkeeper Brax"] = {choice=2},-- set hearth
+    ["Speaker Brinthe"] = {phrase = {"Who is this"}},
+    ["Igram Underwing"] = {phrase = {"Are you Underwing"}},
+    ["Speaker Jurlax"] = {phrase = {"Speaker Jurlax"}},
+    ["Watcher Toki"] = {choice = 1, questName = "Cogs in the Machine"},
+    ["Emergency Militia"] = {choice = 3},
+    ["Skitter"] = {phrase = {"I'm ready to retrieve", "Let's get out of here"}}, -- maybe not ? if queue
+    ["Concerned Machine Speaker"] = {choice = 1},
+    ["Scrit"] = {phrase = {"Give the Sticky Wax to Scrit"}},
+    ["Berrund the Gleaming"] = {choice = 1},
+    ["Nebb"] = {phrase = {"Give Nebb the Queen's venom"}},
+    ["Resting Miner"] = {choice = 1},
 }
 
 

@@ -165,6 +165,14 @@ local function HandleQuests(self, e, ...)
     if IsShiftKeyDown() then return end
 
     if e == "QUEST_DETAIL" then
+        local questID = GetQuestID()
+        local questName = GetTitleText()
+
+        if DATA.AUTOQUESTBLACKLIST_ACCEPT[questID] or DATA.AUTOQUESTBLACKLIST_ACCEPT[questName] then
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Not auto accepting %s because it has been blacklisted.", ns.REDCOLOR, questName))
+            return
+        end
+
         if not QuestGetAutoAccept() then
             AcceptQuest()
         end
@@ -280,9 +288,10 @@ local function HandleGossip(self, e, ...)
             local numEntries, numQuests = C_QuestLog.GetNumQuestLogEntries()
             local foundQuestByName = false;
             for questIndex = 1, numEntries do
-                local title, level, _, isHeader, _, isComplete, _, questID = GetQuestLogTitle(questIndex)
-                if not isHeader and title == gossip_data.questName then
+                local questInfo = C_QuestLog.GetInfo(questIndex);
+                if not questInfo["isHeader"] and questInfo["title"] == gossip_data.questName then
                     foundQuestByName = true;
+                    break;
                 end
             end
             if not foundQuestByName then return end
