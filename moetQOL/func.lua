@@ -426,6 +426,8 @@ local function SetupMouseoverFrames()
             chatMouseover.FadeIn = function(self) ChatFrame_OnEnter(self) end
             chatMouseover:SetScript("OnEnter", function(self) self:FadeIn(self) end)
             chatMouseover:SetScript("OnLeave", function(self) self:FadeOut(self) end)
+            chatMouseover:SetMouseMotionEnabled(true)
+            chatMouseover:SetMouseClickEnabled(false)
 
             --add tabs and buttons to chatframe1 to be hidden
             if i == 1 then
@@ -832,6 +834,7 @@ function Func:HideChatInCombat()
                 for _, f in pairs(MouseoverFrames) do
                     f.ShouldHide = true
                     f:FadeOut()
+                    f.Frames[1]:SetHyperlinksEnabled(false)
                 end
             elseif e == "ENCOUNTER_END" then
                 -- if this doesnt fire chat stays hidden
@@ -839,6 +842,7 @@ function Func:HideChatInCombat()
                 for _, f in pairs(MouseoverFrames) do
                     f.ShouldHide = false
                     f:FadeIn()
+                    f.Frames[1]:SetHyperlinksEnabled(true)
                 end
             end
         else
@@ -846,11 +850,13 @@ function Func:HideChatInCombat()
                 for _, f in pairs(MouseoverFrames) do
                     f.ShouldHide = true
                     f:FadeOut()
+                    f.Frames[1]:SetHyperlinksEnabled(false)
                 end
             elseif e == "PLAYER_REGEN_ENABLED" then
                 for _, f in pairs(MouseoverFrames) do
                     f.ShouldHide = false
                     f:FadeIn()
+                    f.Frames[1]:SetHyperlinksEnabled(true)
                 end
             end
         end
