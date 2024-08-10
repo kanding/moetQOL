@@ -665,7 +665,7 @@ function Func:AutoRepair()
             if canRepair and repairAllCost <= GetMoney() then
                 RepairAllItems(false) -- use player funds
                 DEFAULT_CHAT_FRAME:AddMessage(
-                    "Your items have been repaired for "..GetCoinText(repairAllCost,", ")..".", 255, 255, 0
+                    "Your items have been repaired for "..C_CurrencyInfo.GetCoinText(repairAllCost,", ")..".", 255, 255, 0
                 )
             end
         end
