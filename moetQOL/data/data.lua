@@ -33,6 +33,53 @@ ns.Data.ERROR_BLACKLIST = {
     ["SPELL_FAILED_NOT_ON_TAXI"] = true,       -- You are in flight
 }
 
+-- KUI SpellList Config
+--weakaura for use Unbreakable Iron Idol delve?
+--outline mode quest objectives only
+--center bars weakauras load not in vehicle
+
+ns.Data.WARLANDS_GOSSIP = {
+    MinLevel = 70,
+    MaxLevel = 79,
+
+    ["Magni Bronzebeard"] = {phrase = "I'm ready"},
+
+    -- ISLE OF DORN BEGIN
+    --Stones of Dornogal quest
+    ["Oathsworn Peacekeeper"] = {questName = "Stones of Dornogal", phrase = "Profession Trainer"},
+    ["Breem"] = {choice=2,phrase = "Introduce yourself"}, --<Introduce yourself with Councilward's Signet.>
+    ["Ronesh"] = {choice=2,phrase = "Introduce yourself"},
+    -- Ronesh also if set hearthstone option 1 (will clash with quest) yes we set hs
+    ["Brann Bronzebeard"] = {phrase={"You made it, Brann", "Let's go save the earthen", "What will you do now?", "Moira needs you both"}},
+    ["Merix"] = {choice=2, phrase = "Tell me another time"},
+    ["Pottery Jar"] = {choice=1},
+    ["Kaldrinn"] = {choice=1},
+    -- ["Adelgonn"] = choice = 1 <- this needs phrase!
+    -- ^ +1 later: quest: Recompense, phrase = <Skip conversation> We can give them the details later, choice = 2.
+    ["Betta"] = {choice=1},
+    ["Garrak"] = {choice=1},
+    ["Maluc"] = {choice=1},
+    ["Kodun"] = {choice=1, phrase="Hand over the pottery"},
+    ["Kurron"] = {choice=1},
+    ["Opalcreg Worker"] = {choice=1},
+    ["Explorers' League Supplies"] = {choice=1},
+    ["Foreman Pivk"] = {choice=1, phrase={"I'll guard the cart", "Let's get this cart moving"}},
+    ["Eiggard"] = {choice=1},
+    ["Merrimack"] = {choice=1},
+    ["Bertola"] = {choice=1},
+    ["Findorn"] = {choice=1}, --(1,Carry Findorn to the pool)
+    ["Ebona"] = {choice=1}, -- (1,How is Ebona doing?)
+    ["Urtago"] = {choice=1}, -- (1,It is done.)
+    ["Korgran"] = {choice=1}, -- (1,I am ready to begin)
+    ["Rancher Tofstrun"] = {choice=1},
+    ["Rancher Fuoleim"] = {choice=1},
+    ["Rancher Kiespuch"] = {choice=1},
+    ["Harmot"] = {choice=1},
+    ["Baelgrim"] = {phrase = {"Let's go. <Queue for follower dungeon.>", "Skip conversation"}} -- quest: Calling the Stormriders, choice = 1, and quest: Lasting Repairs, count = 2
+    -- ISLE OF DORN END
+}
+
+
 ns.Data.DRAGONLANDS_GOSSIP = {
     --Might change later but simple check for now.
     MinLevel = 60,

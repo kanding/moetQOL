@@ -264,6 +264,10 @@ local function HandleGossip(self, e, ...)
             gossip_data = DATA.DRAGONLANDS_GOSSIP[target]
         end
 
+        if player_level >= DATA.WARLANDS_GOSSIP.MinLevel and player_level <= DATA.WARLANDS_GOSSIP.MaxLevel then
+            gossip_data = DATA.WARLANDS_GOSSIP[target]
+        end
+
         if gossip_data == nil then
             return
         end
