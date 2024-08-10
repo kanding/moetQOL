@@ -271,6 +271,23 @@ local function HandleGossip(self, e, ...)
         if gossip_data == nil then
             return
         end
+
+        --If required quest id on data then make sure player is on that quest.
+        if gossip_data.questId ~= nil and not C_QuestLog.IsOnQuest(gossip_data.questId) then return end
+
+        --If required quest by name on data then make sure the player has that quest at the moment.
+        if gossip_data.questName ~= nil then
+            local numEntries, numQuests = C_QuestLog.GetNumQuestLogEntries()
+            local foundQuestByName = false;
+            for questIndex = 1, numEntries do
+                local title, level, _, isHeader, _, isComplete, _, questID = GetQuestLogTitle(questIndex)
+                if not isHeader and title == gossip_data.questName then
+                    foundQuestByName = true;
+                end
+            end
+            if not foundQuestByName then return end
+        end
+
         local gossipOptionID = nil
 
         -- Handle sequence if exists and possible
