@@ -155,7 +155,7 @@ end
 function Config:UpdatePendingChanges()
     local changes_made = CheckForPendingChanges()
     if changes_made then
-        cframe.changes:SetText("Pending changes! To optimize memory a /rl is required.")
+        cframe.changes:SetText("Type /rl for pending changes to take effect.")
     elseif cframe.changes:GetText() ~= "" then
         cframe.changes:SetText("")
     end
