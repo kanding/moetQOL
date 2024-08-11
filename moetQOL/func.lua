@@ -221,7 +221,13 @@ local function HandleGossip(self, e, ...)
         gossip = false
         if e == "QUEST_GREETING" then
             for i=1,numAvailableQuests do
-                SelectAvailableQuest(i);
+                local title = GetAvailableTitle(i)
+
+                if DATA.AUTOQUESTBLACKLIST_ACCEPT[title] then
+                    DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Not auto accepting %s because it has been blacklisted.", ns.REDCOLOR, questName))
+                else
+                    SelectAvailableQuest(i);
+                end
             end
         elseif e == "GOSSIP_SHOW" then
             if #availableQuests ~= 0 then
@@ -251,7 +257,10 @@ local function HandleGossip(self, e, ...)
             --fallback just select quests, cant check if complete?
             for i = 1, numActiveQuests do
                 if e == "QUEST_GREETING" then
-                    SelectActiveQuest(i);
+                    local title, isComplete = GetActiveTitle(i)
+                    if isComplete then
+                        SelectActiveQuest(i);
+                    end
                 elseif e == "GOSSIP_SHOW" then
                     C_GossipInfo.SelectActiveQuest(i);
                 end

@@ -36,6 +36,7 @@ ns.Data.ERROR_BLACKLIST = {
 --Quests will not be auto accepted if they are on this list by name or id
 --They will still be completed.
 ns.Data.AUTOQUESTBLACKLIST_ACCEPT = {
+    ["Brax's Brass Knuckles"] = true,
 }
 
 ns.Data.AUTOQUESTBLACKLIST_COMPLETION = {
@@ -60,11 +61,10 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Ronesh"] = {choice=1,phrase = "Introduce yourself"},
     -- Ronesh also if set hearthstone option 1 (will clash with quest) yes we set hs
     ["Brann Bronzebeard"] = {phrase={"You made it, Brann", "Let's go save the earthen", "What will you do now?", "Moira needs you both"}},
-    ["Merrix"] = {phrase = "Tell me another time"},
+    ["Merrix"] = {phrase = {"Tell me another time", "Let's do it"}},
     ["Pottery Jar"] = {choice=1},
     ["Kaldrinn"] = {choice=1},
-    -- ["Adelgonn"] = choice = 1 <- this needs phrase!
-    -- ^ +1 later: quest: Recompense, phrase = <Skip conversation> We can give them the details later, choice = 2.
+    ["Adelgonn"] = {phrase = {"Are you Adelgonn", "We can give them the details later"}},
     ["Betta"] = {choice=1},
     ["Garrak"] = {choice=1},
     ["Maluc"] = {choice=1},
@@ -84,18 +84,19 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Rancher Fuoleim"] = {choice=1},
     ["Rancher Kiespuch"] = {choice=1},
     ["Harmot"] = {choice=1},
-    ["Baelgrim"] = {phrase = {"Let's go. <Queue for follower dungeon.>", "Skip conversation"}}, -- quest: Calling the Stormriders, choice = 1, and quest: Lasting Repairs, count = 2
+    ["Baelgrim"] = {phrase = {"Let's go. <Queue for follower dungeon.>", "Skip conversation", "I have finished setting up"}}, -- quest: Calling the Stormriders, choice = 1, and quest: Lasting Repairs, count = 2
     -- ISLE OF DORN END
 
     -- THE RINGING DEEPS
-    ["Innkeeper Brax"] = {choice=2},-- set hearth
+    ["Innkeeper Brax"] = {phrase = {"Make this inn"}},-- set hearth
     ["Speaker Brinthe"] = {phrase = {"Who is this"}},
     ["Igram Underwing"] = {phrase = {"Are you Underwing"}},
     ["Speaker Jurlax"] = {phrase = {"Speaker Jurlax"}},
     ["Watcher Toki"] = {choice = 1, questName = "Cogs in the Machine"},
-    ["Emergency Militia"] = {choice = 3},
+    ["Emergency Militia"] = {phrase = "Speaker Brinthe and I are going to investigate"},
     ["Skitter"] = {phrase = {"I'm ready to retrieve", "Let's get out of here"}}, -- maybe not ? if queue
     ["Concerned Machine Speaker"] = {choice = 1},
+    ["Agitated Machine Speaker"] = {choice = 1},
     ["Scrit"] = {phrase = {"Give the Sticky Wax to Scrit"}},
     ["Berrund the Gleaming"] = {choice = 1},
     ["Nebb"] = {phrase = {"Give Nebb the Queen's venom"}},
