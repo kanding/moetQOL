@@ -51,6 +51,9 @@ ns.Data.WARLANDS_GOSSIP = {
     MinLevel = 70,
     MaxLevel = 79,
 
+    --DALARAN
+    ["Archmage Khadgar"] = {phrase = {"I'll wait for you here", "I'm ready to depart", "What do you need me to do"}},
+    ["Elise Starseeker"] = {phrase = {"Brann wanted me to check"}},
     ["Magni Bronzebeard"] = {phrase = {"I'm ready", "I am ready to go"}},
 
     -- ISLE OF DORN BEGIN
@@ -101,6 +104,9 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Berrund the Gleaming"] = {choice = 1},
     ["Nebb"] = {phrase = {"Give Nebb the Queen's venom"}},
     ["Resting Miner"] = {choice = 1},
+    ["Foreman Gesa"] = {choice = 1},
+    ["Foreman Otan"] = {choice = 1},
+    ["Moira Thaurissan"] = {phrase = {"I'm ready"}},
 }
 
 
