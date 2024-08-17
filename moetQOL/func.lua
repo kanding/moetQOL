@@ -337,11 +337,22 @@ local function HandleGossip(self, e, ...)
                 if type(phrase) == "table" then
                     for i = 1, #phrase do
                         if string.find(n, phrase[i]) then
+                            if DATA.GOSSIPBLACKLIST[n] then
+                                DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Not gossiping [%s] as it has been blacklisted.", ns.REDCOLOR, n), 255, 255, 0)
+                                return
+                            end
+                            DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Selecting gossip: [%s].", ns.REDCOLOR, n), 255, 255, 0)
+
                             C_GossipInfo.SelectOption(gos.gossipOptionID)
                             selected = true
                         end
                     end
                 elseif string.find(n, phrase) then
+                    if DATA.GOSSIPBLACKLIST[n] then
+                        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Not gossiping [%s] as it has been blacklisted.", ns.REDCOLOR, n), 255, 255, 0)
+                        return
+                    end
+                    DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Selecting gossip: [%s]", n, ns.REDCOLOR), 255, 255, 0)
                     C_GossipInfo.SelectOption(gos.gossipOptionID)
                     selected = true
                 end
@@ -371,6 +382,7 @@ local function HandleGossip(self, e, ...)
         end
 
         if gossipOptionID ~= nil then
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Auto gossiping.", ns.REDCOLOR), 255, 255, 0)
             C_GossipInfo.SelectOption(gossipOptionID)
         end
     end
@@ -586,10 +598,12 @@ end
 
 function Func:AutoCancelCutscenes()
     hooksecurefunc("MovieFrame_PlayMovie", function()
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Cancelling movie.", ns.REDCOLOR), 255, 255, 0)
         MovieFrame:Hide()
     end)
 
     CinematicFrame:HookScript("OnShow", function(self, ...)
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Cancelling cinematic.", ns.REDCOLOR), 255, 255, 0)
         CinematicFrame_CancelCinematic()
     end)
 end

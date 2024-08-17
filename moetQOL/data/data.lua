@@ -42,10 +42,9 @@ ns.Data.AUTOQUESTBLACKLIST_ACCEPT = {
 ns.Data.AUTOQUESTBLACKLIST_COMPLETION = {
 }
 
--- KUI SpellList Config
---weakaura for use Unbreakable Iron Idol delve?
---outline mode quest objectives only
---center bars weakauras load not in vehicle
+ns.Data.GOSSIPBLACKLIST = {
+    ["Yes. I'm ready to observe the Ascendance Day speech."] = true,
+}
 
 ns.Data.WARLANDS_GOSSIP = {
     MinLevel = 70,
@@ -127,6 +126,18 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Arathi Orphan"] = {choice = 1},
     ["Alleria Windrunner"] = {phrase = {"Bring down the bubble"}},
     ["Arathi Stalwart"] = {choice = 1},
+
+    --AZJKAHET
+    ["Orweyna"] = {phrase = {"Where do we go from here"}},
+    ["Widow Arak'nai"] = {sequence={1,2,3,4}},
+    ["Flynn Fairwind"] = {phrase = {"Look where Flynn"}},
+    ["Monte Gazlowe"] = {phrase = {"Nudge Gazlowe", "I am ready"}},
+    ["High Arcanist Savor"] = {phrase = {"Hello?", "Have you seen Anduin?", "Meet up at the transport wagons"}},
+    ["Wriggling Web"] = {choice = 1},
+    ["Siegehold Gateminder"] = {choice = 1},
+    ["Executor Nizrek"] = {phrase = {"The Weaver wants to take out"}},
+    ["Nana Lek'kel"] = {phrase = {"Me? Why?", "Step away"}},
+    ["Klaskin"] = {phrase = {"Are you Arax'ne's husband", "Motion for Klaskin to follow"}},
 }
 
 
