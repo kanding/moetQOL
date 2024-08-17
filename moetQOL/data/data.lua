@@ -107,6 +107,26 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Foreman Gesa"] = {choice = 1},
     ["Foreman Otan"] = {choice = 1},
     ["Moira Thaurissan"] = {phrase = {"I'm ready"}},
+
+    --HALLOWFALL
+    ["Anduin Wrynn"] = {phrase = {"I'm ready"}},
+    ["Flight Observer Viktorina"] = {phrase = {"Have you seen Sophietta"}},
+    ["Errick Ryston"] = {phrase = {"Seen Edwyn?"}},
+    ["Headmaster Fynch"] = {phrase = {"Have you seen Edwyn?"}},
+    ["Engineering Instructor Morgaen"] = {phrase = {"Did Edwyn come through here?"}},
+    ["Edwyn Wyndsmithe"] = {phrase = {"Sophietta needs her notebook"}},
+    ["Faerin Lothar"] = {phrase = {"Look closer at the tower", "Tell Faerin what you learned", "I'm ready"}},
+    ["Kelther Hearthen"] = {choice = 1},
+    ["Velhanite Citizen"] = {choice = 1},
+    ["Maximillian Velhan"] = {phrase = {"Don't worry"}},
+    ["Auralia Steelstrike"] = {phrase = {"I can contact the Trading Post"}},
+    ["Letter of Recommendation"] = {choice = 1},
+    ["Shinda Creedpike"] = {phrase = {"I don't have time for this"}},
+    ["Nalina Ironsong"] = {phrase = {"Purchase a round of drinks"}},
+    ["Arathi Reserve"] = {choice = 1},
+    ["Arathi Orphan"] = {choice = 1},
+    ["Alleria Windrunner"] = {phrase = {"Bring down the bubble"}},
+    ["Arathi Stalwart"] = {choice = 1},
 }
 
 
