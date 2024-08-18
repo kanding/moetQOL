@@ -129,7 +129,7 @@ ns.Data.WARLANDS_GOSSIP = {
 
     --AZJKAHET
     ["Orweyna"] = {phrase = {"Where do we go from here"}},
-    ["Widow Arak'nai"] = {sequence={1,2,3,4}},
+    ["Widow Arak'nai"] = {sequence={1,2,3,4}, phrase = {"I need to inform you", "Begin Severed Threads conference"}},
     ["Flynn Fairwind"] = {phrase = {"Look where Flynn"}},
     ["Monte Gazlowe"] = {phrase = {"Nudge Gazlowe", "I am ready"}},
     ["High Arcanist Savor"] = {phrase = {"Hello?", "Have you seen Anduin?", "Meet up at the transport wagons"}},
@@ -138,6 +138,18 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Executor Nizrek"] = {phrase = {"The Weaver wants to take out"}},
     ["Nana Lek'kel"] = {phrase = {"Me? Why?", "Step away"}},
     ["Klaskin"] = {phrase = {"Are you Arax'ne's husband", "Motion for Klaskin to follow"}},
+    ["On'hiea"] = {choice = 1},
+    ["Ney'leia"] = {choice = 1},
+    ["Ysabel Gleamgaard"] = {phrase = {"Ney'leia says they are not offended", "Of course"}},
+    ["Baer"] = {choice = 2},
+    ["Worker Yareh'losh"] = {choice = 1},
+    ["Hannan"] = {phrase = {"Tell Hannan to follow you out of the cave"}},
+    ["Sammy Fizzvolt"] = {choice = 1},
+    ["Murfie"] = {phrase = {"What can you tell me about the goblins here"}},
+    ["Grigg"] = {phrase = {"What can you tell me about the goblins here"}},
+    ["Jenni Boombuckle"] = {phrase = {"Are you in charge here"}},
+    ["Ren'khat"] = {choice = 1},
+    ["Grand Overspinner Antourix"] = {choice = 1},
 }
 
 
