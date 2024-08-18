@@ -117,6 +117,7 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Faerin Lothar"] = {phrase = {"Look closer at the tower", "Tell Faerin what you learned", "I'm ready"}},
     ["Kelther Hearthen"] = {choice = 1},
     ["Velhanite Citizen"] = {choice = 1},
+    ["Velhanite Child"] = {choice = 1},
     ["Maximillian Velhan"] = {phrase = {"Don't worry"}},
     ["Auralia Steelstrike"] = {phrase = {"I can contact the Trading Post"}},
     ["Letter of Recommendation"] = {choice = 1},
@@ -130,7 +131,16 @@ ns.Data.WARLANDS_GOSSIP = {
 
     --AZJKAHET
     ["Orweyna"] = {phrase = {"Where do we go from here"}},
-    ["Widow Arak'nai"] = {sequence={1,2,3,4}, phrase = {"I need to inform you", "Begin Severed Threads conference"}},
+    ["Widow Arak'nai"] = {sequence={
+        questId = 78392,
+        -- map objective index to gossip
+        talkMap = {
+            [1] = "Tell me about yourself",
+            [2] = "Tell me about the enemy forces",
+            [3] = "Tell me about the Ascended",
+            [4] = "Tell me about the Queen's inner circle"
+        }
+    }, phrase = {"I need to inform you", "Begin Severed Threads conference"}},
     ["Flynn Fairwind"] = {phrase = {"Look where Flynn"}},
     ["Monte Gazlowe"] = {phrase = {"Nudge Gazlowe", "I am ready"}},
     ["High Arcanist Savor"] = {phrase = {"Hello?", "Have you seen Anduin?", "Meet up at the transport wagons"}},

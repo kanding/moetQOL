@@ -311,20 +311,24 @@ local function HandleGossip(self, e, ...)
         -- Handle sequence if exists and possible
         local sequence = gossip_data.sequence or nil
         if sequence ~= nil then
-            --Verify that we can successfully select sequence
-            local success = 0
-            for _, gos in pairs(gossipOptions) do
-                if sequence[gos.gossipOptionID] then
-                    success = success + 1
+            local questId = sequence["questId"] or nil
+            local talkMap = sequence["talkMap"] or nil
+            if questId and talkMap then
+                -- Get objective index (to check if completed) to what gossip choice we make
+                for objectiveIndex, matchstring in pairs(talkMap) do
+                    local description, objectiveType, isCompleted, _, _ = GetQuestObjectiveInfo(questId, objectiveIndex, false)
+                    
+                    --Look for this in the gossips
+                    if not isCompleted then
+                        for _,j in pairs(gossipOptions) do
+                            if string.find(j.name, matchstring) then
+                                local gossipId = j.gossipOptionID
+                                C_GossipInfo.SelectOption(gossipId)
+                                return
+                            end
+                        end
+                    end
                 end
-            end
-
-            if success == #sequence then
-                for i=1,#sequence do
-                    local gosID = sequence[i]
-                    C_GossipInfo.SelectOption(gosID)
-                end
-                return
             end
         end
 
