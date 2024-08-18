@@ -126,6 +126,7 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Arathi Orphan"] = {choice = 1},
     ["Alleria Windrunner"] = {phrase = {"Bring down the bubble"}},
     ["Arathi Stalwart"] = {choice = 1},
+    ["Taenar Strongoth"] = {phrase = {"Let's light the Sacred Flame"}},
 
     --AZJKAHET
     ["Orweyna"] = {phrase = {"Where do we go from here"}},

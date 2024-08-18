@@ -382,7 +382,7 @@ local function HandleGossip(self, e, ...)
         end
 
         if gossipOptionID ~= nil then
-            DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Auto gossiping.", ns.REDCOLOR), 255, 255, 0)
+            DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Auto-gossiping...", ns.REDCOLOR), 255, 255, 0)
             C_GossipInfo.SelectOption(gossipOptionID)
         end
     end
