@@ -218,7 +218,6 @@ local function HandleGossip(self, e, ...)
 
     if numAvailableQuests > 0 then
         local availableQuests = C_GossipInfo.GetAvailableQuests()
-        gossip = false
         if e == "QUEST_GREETING" then
             for i=1,numAvailableQuests do
                 local title = GetAvailableTitle(i)
@@ -226,13 +225,19 @@ local function HandleGossip(self, e, ...)
                 if DATA.AUTOQUESTBLACKLIST_ACCEPT[title] then
                     DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Not auto accepting %s because it has been blacklisted.", ns.REDCOLOR, questName))
                 else
+                    gossip = false
                     SelectAvailableQuest(i);
                 end
             end
         elseif e == "GOSSIP_SHOW" then
             if #availableQuests ~= 0 then
                 for i, quest in pairs(availableQuests) do
-                    C_GossipInfo.SelectAvailableQuest(quest.questID);
+                    if DATA.AUTOQUESTBLACKLIST_ACCEPT[quest.title] then
+                        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Not auto accepting %s because it has been blacklisted.", ns.REDCOLOR, quest.title))
+                    else
+                        gossip = false
+                        C_GossipInfo.SelectAvailableQuest(quest.questID);
+                    end
                 end
             end
         end
@@ -602,13 +607,17 @@ end
 
 function Func:AutoCancelCutscenes()
     hooksecurefunc("MovieFrame_PlayMovie", function()
-        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Cancelling movie.", ns.REDCOLOR), 255, 255, 0)
-        MovieFrame:Hide()
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Cancelling movie.", ns.REDCOLOR))
+        C_Timer.After(0.3, function() 
+            MovieFrame:Hide()
+        end)
     end)
 
     CinematicFrame:HookScript("OnShow", function(self, ...)
-        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Cancelling cinematic.", ns.REDCOLOR), 255, 255, 0)
-        CinematicFrame_CancelCinematic()
+        DEFAULT_CHAT_FRAME:AddMessage(string.format("|c%smq:|r Cancelling cinematic.", ns.REDCOLOR))
+        C_Timer.After(0.3, function() 
+            CinematicFrame_CancelCinematic()
+        end)
     end)
 end
 

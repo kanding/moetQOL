@@ -147,7 +147,7 @@ ns.Data.WARLANDS_GOSSIP = {
     ["Wriggling Web"] = {choice = 1},
     ["Siegehold Gateminder"] = {choice = 1},
     ["Executor Nizrek"] = {phrase = {"The Weaver wants to take out"}},
-    ["Nana Lek'kel"] = {phrase = {"Me? Why?", "Step away"}},
+    ["Nana Lek'kel"] = {phrase = {"Why", "Step away"}},
     ["Klaskin"] = {phrase = {"Are you Arax'ne's husband", "Motion for Klaskin to follow"}},
     ["On'hiea"] = {choice = 1},
     ["Ney'leia"] = {choice = 1},
