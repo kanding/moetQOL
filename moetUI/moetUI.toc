@@ -5,5 +5,6 @@
 
 ## Version: 1.1
 ## Notes: My own personal changes to the default Blizzard UI
+## SavedVariables: moetUIDB
 
 moetUI.lua
