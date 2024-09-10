@@ -14,6 +14,8 @@ local FINDER_POS_ANCHOR = "CENTER"
 local FINDER_POS_X = -70
 local FINDER_POS_Y = -35
 local IsLoadingBars = false
+
+local MAX_ACTION_BAR_SLOT = 132
 --
 
 local MICRO_BUTTONS = {
@@ -103,25 +105,6 @@ local function OnLogin()
     HideBlizzardFrames()
 end
 
--- Helper function to find a macro index by its name
-    --[[
-local function GetMacroIndexByName(macroName, isCharacterSpecific)
-    if isCharacterSpecific then
-        for i = (MAX_ACCOUNT_MACROS + 1), (MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS) do
-            if GetMacroInfo(i) == macroName then
-                return i
-            end
-        end
-    else
-        for i = 1, MAX_ACCOUNT_MACROS do
-            if GetMacroInfo(i) == macroName then
-                return i
-            end
-        end
-    end
-    return nil
-end
---]]
 local function DumpAllMacros()
     -- Print header
     print("Dumping all macros:")
@@ -152,45 +135,24 @@ local function GetClassSpecKey()
     return class .. "_" .. specName  -- Return a unique key (e.g., "WARRIOR_Arms")
 end
 
-local function TryFindMacroBySpell(id)
-    -- Attempt to check if the spell is from a macro by iterating over all macros
-    for i = 1, MAX_ACCOUNT_MACROS + MAX_CHARACTER_MACROS do
-        local macroSpellId = GetMacroSpell(i)
-        if macroSpellId and macroSpellId == id then
-            local macroName = GetMacroInfo(i)
-            return macroName, i > MAX_ACCOUNT_MACROS
+local function GetMountDisplayIndexByID(mountID)
+    for i = 1, C_MountJournal.GetNumDisplayedMounts() do
+        local displayedMountID = select(12, C_MountJournal.GetDisplayedMountInfo(i))
+        if displayedMountID == mountID then
+            return i  -- Return the display index
         end
     end
-
-    return nil
+    return nil  -- Return nil if the mountID is not found
 end
 
 local function SaveProfile()
     local profile = {}
-    for slot = 1, 120 do
+    for slot = 1, MAX_ACTION_BAR_SLOT do
         local type, id, subType = GetActionInfo(slot)
         if type then
             if type == "macro" then
-                if subType ~= "" and subType ~= "spell" then
-                    --GetActionInfo currently returns slot - 1 as id on these things
-                    --Which means we have no way of knowing what macro is on the slot so we cannot look for anything
-                    print("Unable to save macro on slot "..slot.." due to a current API Bug.\nSlot will not be modified on load.")
-                else 
-                    --If id was actually a macro id try locate it
-                    local macroName, icon, body = GetMacroInfo(id)
-                    if macroName then
-                        profile[slot] = {type = type, name = macroName, isCharacterSpecific = id > MAX_ACCOUNT_MACROS}
-                    else
-                        -- For spell macros the returned id can be a spell id
-                        -- Try to find a macro with that spell id and save that.
-                        local n, isCharSpecific = TryFindMacroBySpell(id)
-                        if n then
-                            profile[slot] = {type = type, name = n, isCharacterSpecific = isCharSpecific}
-                        else
-                            print("Warning: Failed to retrieve macro name for slot " .. slot)
-                        end
-                    end
-                end
+                local macroName = GetActionText(slot)
+                profile[slot] = {type = type, name = macroName, isCharacterSpecific = id > MAX_ACCOUNT_MACROS}
             else
                 profile[slot] = {type = type, id = id, subType = subType}
             end
@@ -224,16 +186,28 @@ local function LoadProfile()
                 if macroIndex then
                     PickupMacro(macroIndex)
                     PlaceAction(slot)
-                elseif action.isCharacterSpecific then
-                    print("Macro '"..action.name.."' not found. It may be a character specific macro instead of a general macro.")
                 else
-                    print("Macro '"..action.name.."' not found. Was it deleted or renamed since save?")
+                    print("Macro '"..action.name.."' not found. Was it deleted or renamed since save or is it char specific?")
                 end
             elseif action.type == "item" then
                 C_Item.PickupItem(action.id)
                 PlaceAction(slot)
             elseif action.type == "companion" then
-                PickupCompanion(action.subType, action.id)
+                if action.subType == "MOUNT" then
+                    PickupCompanion(action.subType, action.id)
+                else
+                    C_PetJournal.PickupPet(action.id)
+                end
+
+                PlaceAction(slot)
+            elseif action.type == "summonmount" then
+                local displayIndex = GetMountDisplayIndexByID(action.id)
+                if displayIndex then
+                    C_MountJournal.Pickup(displayIndex)
+                    PlaceAction(slot)
+                else
+                    print("Mount with ID "..action.id.." not found in the Mount Journal.")
+                end
             elseif action.type == "empty" then
                 -- Clear the slot if it was saved as empty
                 PickupAction(slot)
@@ -242,14 +216,9 @@ local function LoadProfile()
         end
     end
 
-    -- Apply actions with delays since api is rate limited
+    -- Apply actions with possibility of delays
     local function LoadNextSlot(slot)
-        if slot == 100 then
-            C_Timer.After(1, function() LoadNextSlot(slot + 1) end)
-            return
-        end
-        
-        if slot <= 120 then
+        if slot <= MAX_ACTION_BAR_SLOT then
             ApplyActions(slot)
             LoadNextSlot(slot + 1)
         else
@@ -278,7 +247,7 @@ local function DumpProfile()
         return
     end
 
-    for slot = 1, 120 do
+    for slot = 1, MAX_ACTION_BAR_SLOT do
         local action = profile[slot]
         if action then
             if action.type == "item" then
@@ -297,36 +266,46 @@ local function DumpProfile()
 end
 
 local function DumpCurrent()
-    for slot = 1, 120 do
+    for slot = 1, MAX_ACTION_BAR_SLOT do
         local type, id, subType = GetActionInfo(slot)
         if type then
-            if type == "macro" then
-                if subType ~= "" and subType ~= "spell" then
-                    --GetActionInfo currently returns slot - 1 as id on these things
-                    --Which means we have no way of knowing what macro is on the slot so we cannot look for anything
-                    print("Unable to save macro on slot "..slot.." due to a current API Bug.\nSlot will not be modified on load.")
-                else 
-                    --If id was actually a macro id try locate it
-                    local macroName, icon, body = GetMacroInfo(id)
-                    if macroName then
-                        profile[slot] = {type = type, name = macroName, isCharacterSpecific = id > MAX_ACCOUNT_MACROS}
-                    else
-                        -- For spell macros the returned id can be a spell id
-                        -- Try to find a macro with that spell id and save that.
-                        local n, isCharSpecific = TryFindMacroBySpell(id)
-                        if n then
-                            profile[slot] = {type = type, name = n, isCharacterSpecific = isCharSpecific}
-                        else
-                            print("Warning: Failed to retrieve macro name for slot " .. slot)
-                        end
-                    end
+            if type == "spell" then
+                local spellInfo = C_Spell.GetSpellInfo(id)
+                if spellInfo then
+                    print("Slot "..slot..": "..spellInfo.name.." - "..id)
+                else
+                    print("Unable to fetch spell from id "..id.." on slot "..slot)
+                end
+            elseif type == "macro" then
+                local macroName = GetActionText(slot)
+                print("Slot "..slot..": "..macroName.." - "..id)
+            elseif type == "item" then
+                local itemName = C_Item.GetItemInfo(id)
+                print("Slot "..slot..": "..itemName.." - "..id)
+            elseif type == "summonmount" then
+                local mountInfo = C_MountJournal.GetMountInfoByID(id)
+                if mountInfo then
+                    print("Slot "..slot..": "..mountInfo.." - "..id)
+                else
+                    print("Unable to fetch mount from id "..id.." on slot "..slot)
                 end
             else
-                profile[slot] = {type = type, id = id, subType = subType}
+                if subType then
+                    print("Slot "..slot..": "..type.." - "..id.." - "..subType)
+                else
+                    print("Slot "..slot..": "..type.." - "..id)
+                end
             end
         else
             print("Slot "..slot..": Empty")
         end
+    end
+end
+
+local function ClearActionBars()
+    for slot = 1, MAX_ACTION_BAR_SLOT do
+        PickupAction(slot)
+        ClearCursor()
     end
 end
 
@@ -352,6 +331,11 @@ local function HandleSlashCommands(str)
 
     if str == "cur" then
         DumpCurrent()
+        return
+    end
+
+    if str == "clear" then
+        ClearActionBars()
         return
     end
 end
