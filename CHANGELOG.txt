@@ -1,4 +1,2 @@
---moetQOL v3.2.5
-War within version
-Removed paragontooltip option due to blizzard ui and api changes
-All gossip and auto quest stuff for war within
+--moetQOL v3.2.6
+Midnight version bump
