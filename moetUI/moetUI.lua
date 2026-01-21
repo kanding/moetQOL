@@ -34,6 +34,7 @@ local MICRO_BUTTONS = {
     MainMenuMicroButton,
     ProfessionMicroButton,
     PlayerSpellsMicroButton,
+    HousingMicroButton,
 }
 
 local hiddenFrame = CreateFrame("FRAME")
@@ -103,6 +104,7 @@ local function OnLogin()
     UpdatePlayerFramePosition(pFrame, tFrame)
     UpdateAlphasAndScale()
     HideBlizzardFrames()
+    --DurabilityFrame update position
 end
 
 local function DumpAllMacros()

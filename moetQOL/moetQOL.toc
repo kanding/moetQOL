@@ -1,9 +1,9 @@
-## Interface: 110000
+## Interface: 120000, 120001
 
 ## Title: moetQOL
 ## Author: moet
 
-## Version: 3.2.5
+## Version: 3.2.6
 ## Notes: Lightweight quality of life improvements.
 ## SavedVariables: moetQOLDB
 

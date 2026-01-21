@@ -1,9 +1,9 @@
-## Interface: 90002
+## Interface: 120000, 120001
 
 ## Title: moetUI
 ## Author: moet
 
-## Version: 1.1
+## Version: 1.2
 ## Notes: My own personal changes to the default Blizzard UI
 ## SavedVariables: moetUIDB
 
