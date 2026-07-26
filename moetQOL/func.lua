@@ -744,13 +744,13 @@ end
 -- reworked
 -- original: https://www.curseforge.com/wow/addons/ridc
 function Func:RealIDCounter()
-    local f = CreateFrame("FRAME", "moetQOL_RealIDCounter", FriendsTabHeaderTab3)
-    f:SetPoint("TOPLEFT", FriendsTabHeaderTab3, "TOPRIGHT", 7, -12)
+    local f = CreateFrame("FRAME", "moetQOL_RealIDCounter", FriendsTabHeader.TabSystem)
+    f:SetPoint("TOPLEFT", FriendsTabHeader.TabSystem, "TOPRIGHT", 5, -5)
     f:SetWidth(50)
     f:SetHeight(20)
 
     local fstring = f:CreateFontString("moetQOL_RealIDCounterString", "OVERLAY", "GameFontNormal")
-    fstring:SetFont(STANDARD_TEXT_FONT, 11, "NONE")
+    fstring:SetFont(STANDARD_TEXT_FONT, 11, "SLUG")
     fstring:SetPoint("CENTER", f)
     fstring:SetWidth(fstring:GetStringWidth())
     fstring:SetHeight(fstring:GetStringHeight())
