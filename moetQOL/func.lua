@@ -1008,27 +1008,51 @@ function Func:DisableMinimapTracking()
 end
 
 function Func:AddSpellIdTooltipPostHooks()
-    local function TooltipAddSpellID(self,spellid)
-        if not spellid then return end
-        self:AddDoubleLine("|cff0099ffSpell ID|r",spellid)
+    local function TooltipAddSpellID(self, spellId)
+        if not spellId then return end
+
+        if issecretvalue and issecretvalue(spellId) then
+            return
+        end
+
+        self:AddDoubleLine("|cff0099ffSpell ID|r", spellId)
         self:Show()
     end
 
-    hooksecurefunc(GameTooltip, "SetUnitAura", function(self,...)
-        local data = C_UnitAuras.GetAuraDataByIndex(...)
-        if (data["spellId"]) then
-            TooltipAddSpellID(self,data["spellId"])
-        end
-    end)
+    
+    -- Aura tooltips
+    TooltipDataProcessor.AddTooltipPostCall(
+        Enum.TooltipDataType.UnitAura,
+        function(self, data)
+            if not data then
+                return
+            end
 
+            local spellId = data.id
+            self:AddDoubleLine(
+                "|cff0099ffSpell ID|r",
+                spellId
+            )
+        end
+    )
+
+    -- Spell tooltips
+    TooltipDataProcessor.AddTooltipPostCall(
+        Enum.TooltipDataType.Spell,
+        function(self, data)
+            TooltipAddSpellID(self, data and data.id)
+        end
+    )
+
+    -- Clickable spell links
     hooksecurefunc("SetItemRef", function(link)
         local type, value = link:match("(%a+):(.+)")
-        if type == "spell" then
-            TooltipAddSpellID(ItemRefTooltip,value:match("([^:]+)"))
-        end
-    end)
 
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, function(self)
-        TooltipAddSpellID(self,select(3,self:GetSpell()))
+        if type == "spell" then
+            TooltipAddSpellID(
+                ItemRefTooltip,
+                value:match("([^:]+)")
+            )
+        end
     end)
 end
