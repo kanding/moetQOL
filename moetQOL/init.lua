@@ -89,7 +89,7 @@ local function HandleSlashCommands(str)
 end
 
 local function HandlePin(str, ...)
-    if #str == 0 then mqCommands.mappinhelp() return false end
+    if not str or #str == 0 then mqCommands.mappinhelp() return false end
     local args = { string.split(' ', str) }
     -- Two coordinates: X and Y.
     if #args ~= 2 then mqCommands.mappinhelp() return false end
@@ -107,12 +107,17 @@ local function HandlePin(str, ...)
     if x > 1 then x = x / 100 end
     if y > 1 then y = y / 100 end
 
-    ns.Core:CreateMapPin(x, y)
+    return ns.Core:CreateMapPin(x, y)
 end
 
 local function HandlePinShare(str, ...)
-    HandlePin(str, ...)
+    if not HandlePin(str, ...) then return end
+    if not C_Map or not C_Map.GetUserWaypointHyperlink then
+        ns.Core:PrintMessage("Sharing map pins is not supported by this game client.")
+        return
+    end
     local waypointlink = C_Map.GetUserWaypointHyperlink()
+    if not waypointlink then return end
     if UnitInRaid("player") then
         SendChatMessage(waypointlink, "RAID")
     elseif UnitInParty("player") then

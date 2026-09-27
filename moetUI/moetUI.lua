@@ -1,5 +1,6 @@
 local _, ns = ...
-ns.ADDON_VERSION = C_AddOns.GetAddOnMetadata("moetQOL", "Version")
+ns.ADDON_VERSION = (C_AddOns and C_AddOns.GetAddOnMetadata and C_AddOns.GetAddOnMetadata("moetQOL", "Version"))
+    or (_G.GetAddOnMetadata and _G.GetAddOnMetadata("moetQOL", "Version")) or "unknown"
 _G.moetUIDB = moetUIDB or {}
 
 --OPTIONS
@@ -41,6 +42,7 @@ local hiddenFrame = CreateFrame("FRAME")
 hiddenFrame:Hide()
 
 local function UpdatePlayerFramePosition(pFrame, tFrame)
+    if not PlayerFrame or not TargetFrame then return end
     local anchor, _, _, x, y = PlayerFrame:GetPoint()
 
     if anchor ~= pFrame.anchor or x ~= pFrame.x or y ~= pFrame.y then
@@ -59,48 +61,52 @@ local function UpdatePlayerFramePosition(pFrame, tFrame)
 end
 
 local function UpdateAlphasAndScale()
-    if FULLSCREEN_WORLDMAP then
+    if FULLSCREEN_WORLDMAP and WorldMapFrame then
         WorldMapFrame:SetFrameStrata("FULLSCREEN")
     end
 end
 
 local function HideBlizzardFrames()
-    MicroButtonAndBagsBar:Hide()
+    if MicroButtonAndBagsBar then MicroButtonAndBagsBar:Hide() end
 
-    hooksecurefunc("UpdateMicroButtons", function()
+    if MicroButtonAndBagsBar and UpdateMicroButtons then hooksecurefunc("UpdateMicroButtons", function()
         if not MicroButtonAndBagsBar:IsShown() then
             for _, frame in pairs(MICRO_BUTTONS) do
-                frame:Hide()
+                if frame then frame:Hide() end
             end
         end
-    end)
+    end) end
 
-    EssencePlayerFrame:HookScript("OnShow", function()
-        if EssencePlayerFrame:IsVisible() then
-          EssencePlayerFrame:Hide()
-        end
-    end)
+    if EssencePlayerFrame then
+        EssencePlayerFrame:HookScript("OnShow", function()
+            if EssencePlayerFrame:IsVisible() then
+                EssencePlayerFrame:Hide()
+            end
+        end)
+    end
 end
 
 local function AnchorDungeonFinderIconToMinimap()
+    if not QueueStatusButton or not Minimap or not QueueStatusButtonIcon then return false end
     QueueStatusButton:ClearAllPoints()
     QueueStatusButton:SetParent(Minimap)
     QueueStatusButton:SetMovable(true)
     QueueStatusButton:SetPoint(FINDER_POS_ANCHOR, Minimap, FINDER_POS_ANCHOR, FINDER_POS_X, FINDER_POS_Y)
     QueueStatusButton:SetUserPlaced(true)
     QueueStatusButtonIcon:SetScale(0.8)
-    
+    return true
 end
 
 local function OnLogin()
-    AnchorDungeonFinderIconToMinimap()
-    hooksecurefunc(QueueStatusButton, "SetPoint", function(self, point, relativeTo, relativePoint, xOfs, yOfs)
-        if relativeTo == Minimap and xOfs == FINDER_POS_X and yOfs == FINDER_POS_Y then
-            return -- Allow setting to the desired position
-        end
-        AnchorDungeonFinderIconToMinimap() -- Reapply the desired position
-    end)
-    
+    if AnchorDungeonFinderIconToMinimap() then
+        hooksecurefunc(QueueStatusButton, "SetPoint", function(self, point, relativeTo, relativePoint, xOfs, yOfs)
+            if relativeTo == Minimap and xOfs == FINDER_POS_X and yOfs == FINDER_POS_Y then
+                return -- Allow setting to the desired position
+            end
+            AnchorDungeonFinderIconToMinimap() -- Reapply the desired position
+        end)
+    end
+
     UpdatePlayerFramePosition(pFrame, tFrame)
     UpdateAlphasAndScale()
     HideBlizzardFrames()
@@ -132,8 +138,9 @@ end
 
 local function GetClassSpecKey()
     local _, class = UnitClass("player")
-    local specIndex = GetSpecialization()
-    local specName = specIndex and select(2, GetSpecializationInfo(specIndex)) or "NoSpec"
+    local specIndex = GetSpecialization and GetSpecialization()
+    local specName = specIndex and GetSpecializationInfo
+        and select(2, GetSpecializationInfo(specIndex)) or "NoSpec"
     return class .. "_" .. specName  -- Return a unique key (e.g., "WARRIOR_Arms")
 end
 
@@ -181,7 +188,14 @@ local function LoadProfile()
         local action = profile[slot]
         if action then
             if action.type == "spell" then
-                C_Spell.PickupSpell(action.id)
+                if C_Spell and C_Spell.PickupSpell then
+                    C_Spell.PickupSpell(action.id)
+                elseif PickupSpell then
+                    PickupSpell(action.id)
+                else
+                    print("Spell actions are not supported by this game client.")
+                    return
+                end
                 PlaceAction(slot)
             elseif action.type == "macro" then
                 local macroIndex = GetMacroIndexByName(action.name)
@@ -192,7 +206,14 @@ local function LoadProfile()
                     print("Macro '"..action.name.."' not found. Was it deleted or renamed since save or is it char specific?")
                 end
             elseif action.type == "item" then
-                C_Item.PickupItem(action.id)
+                if C_Item and C_Item.PickupItem then
+                    C_Item.PickupItem(action.id)
+                elseif PickupItem then
+                    PickupItem(action.id)
+                else
+                    print("Item actions are not supported by this game client.")
+                    return
+                end
                 PlaceAction(slot)
             elseif action.type == "companion" then
                 if action.subType == "MOUNT" then
@@ -272,7 +293,11 @@ local function DumpCurrent()
         local type, id, subType = GetActionInfo(slot)
         if type then
             if type == "spell" then
-                local spellInfo = C_Spell.GetSpellInfo(id)
+                local spellInfo = C_Spell and C_Spell.GetSpellInfo and C_Spell.GetSpellInfo(id)
+                if not spellInfo and GetSpellInfo then
+                    local spellName = GetSpellInfo(id)
+                    if spellName then spellInfo = { name = spellName } end
+                end
                 if spellInfo then
                     print("Slot "..slot..": "..spellInfo.name.." - "..id)
                 else
@@ -282,7 +307,8 @@ local function DumpCurrent()
                 local macroName = GetActionText(slot)
                 print("Slot "..slot..": "..macroName.." - "..id)
             elseif type == "item" then
-                local itemName = C_Item.GetItemInfo(id)
+                local itemName = C_Item and C_Item.GetItemInfo and C_Item.GetItemInfo(id)
+                if not itemName and GetItemInfo then itemName = GetItemInfo(id) end
                 print("Slot "..slot..": "..itemName.." - "..id)
             elseif type == "summonmount" then
                 local mountInfo = C_MountJournal.GetMountInfoByID(id)

@@ -26,14 +26,19 @@ end
 local function Line_OnLeave(self) GameTooltip:Hide() end
 
 local function Tab_OnClick(self)
-    PanelTemplates_SetTab(self:GetParent(), self:GetID())
-    local scrollChild = self:GetParent().ScrollFrame:GetScrollChild()
+    local parent = self:GetParent()
+    local scrollChild = parent.ScrollFrame:GetScrollChild()
 	if scrollChild then
 		scrollChild:Hide()
 	end
 
-	self:GetParent().ScrollFrame:SetScrollChild(self.content)
+	parent.ScrollFrame:SetScrollChild(self.content)
 	self.content:Show()
+
+    for _, tab in ipairs(parent.Tabs) do
+        tab.label:SetTextColor(0.8, 0.8, 0.8)
+    end
+    self.label:SetTextColor(1, 1, 1)
 end
 
 local function DropDown_OnClick(self, frame)
@@ -264,21 +269,39 @@ local function AddFunctionsForCategory(parent, sorted_db_functions)
     return i
 end
 
+local function CreateCategoryTab(parent, tabName, id, text)
+    local tab = CreateFrame("Button", tabName, parent)
+    tab:SetID(id)
+    tab:SetSize(115, 32)
+
+    tab:SetNormalFontObject(GameFontNormalSmall)
+    tab:SetHighlightFontObject(GameFontHighlightSmall)
+    tab:SetDisabledFontObject(GameFontDisableSmall)
+
+    local label = tab:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+    label:SetPoint("CENTER", 0, 2)
+    label:SetText(text)
+    tab:SetFontString(label)
+    tab.label = label
+
+    tab:SetScript("OnClick", Tab_OnClick)
+
+    return tab
+end
+
 local function AddCategoryTabs(parent)
     local db_sorted = SortDatabaseByCategory()
 
-    for i=2, parent.numTabs do
-        local category_index = i-1 -- account for general tab
+    for i = 2, parent.numTabs do
+        local category_index = i - 1 -- account for general tab
         local name = ns.Core:GetKeyName(ns.Core.FunctionCategory, category_index)
         local tabName = parent:GetName().."Tab"..i
-        local tab = CreateFrame("Button", tabName, parent, C_EditMode and "CharacterFrameTabTemplate" or "CharacterFrameTabButtonTemplate")
-        tab:SetID(i)
-        tab:SetText(name)
-        tab:SetScript("OnClick", Tab_OnClick)
+
+        local tab = CreateCategoryTab(parent, tabName, i, name)
         tab:SetPoint("TOPLEFT", parent.Tabs[i-1], "TOPRIGHT", DISTANCE_BETWEEN_TABS, 0)
 
         tab.content = CreateFrame("Frame", tabName.."Body", tab)
-        tab.content:SetWidth(parent:GetWidth()*0.85)
+        tab.content:SetWidth(parent:GetWidth() * 0.85)
         tab.content:Hide()
 
         local entries = AddFunctionsForCategory(tab.content, db_sorted[category_index])
@@ -291,13 +314,12 @@ end
 local function AddGeneralTab(parent)
     local id = 1
     local tabName = parent:GetName().."Tab"..id
-    local tab = CreateFrame("Button", tabName, parent, C_EditMode and "CharacterFrameTabTemplate" or "CharacterFrameTabButtonTemplate")
-    tab:SetID(id)
-    tab:SetText("General")
-    tab:SetScript("OnClick", Tab_OnClick)
+
+    local tab = CreateCategoryTab(parent, tabName, id, "General")
     tab:SetPoint("TOPLEFT", parent, "BOTTOMLEFT", 3, 7)
+
     tab.content = CreateFrame("Frame", tabName.."Body", parent)
-    tab.content:SetWidth(parent:GetWidth()*0.85)
+    tab.content:SetWidth(parent:GetWidth() * 0.85)
     tab.content:SetHeight(300)
     tab.content:Hide()
 
@@ -305,7 +327,7 @@ local function AddGeneralTab(parent)
     tab.content.title:SetPoint("LEFT", parent:GetName().."TopBorder", "LEFT", 5, -60)
     tab.content.title:SetText("Chat Commands")
 
-    for i=1,5 do
+    for i = 1, 5 do
         local info = ns.Core.ChatCommands[i]
         if info then
             local cmd = tab.content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
@@ -317,6 +339,7 @@ local function AddGeneralTab(parent)
     tab.content.source = tab.content:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     tab.content.source:SetPoint("CENTER", parent:GetName().."BottomBorder", "CENTER", 0, 40)
     tab.content.source:SetText("For issues, requests and source:")
+
     tab.content.sourcelink = tab.content:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     tab.content.sourcelink:SetPoint("CENTER", parent:GetName().."BottomBorder", "CENTER", 0, 25)
     tab.content.sourcelink:SetText(ns.SOURCE)
@@ -331,7 +354,6 @@ local function IntializeTabs(parent)
     
     AddGeneralTab(parent)
     AddCategoryTabs(parent)
-    PanelTemplates_SetNumTabs(parent, numT)
 
     Tab_OnClick(parent.Tabs[1])
 end
@@ -383,11 +405,13 @@ function Config:SetupInterfaceOption()
         return Config:ToggleFrame()
     end)
     
-    -- Add the panel to the new Settings system
-    local category, layout = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
-
-    -- Add the category to the Blizzard settings
-    Settings.RegisterAddOnCategory(category)
+    -- Retail uses Settings; clients with the legacy options API use its fallback.
+    if Settings and Settings.RegisterCanvasLayoutCategory and Settings.RegisterAddOnCategory then
+        local category = Settings.RegisterCanvasLayoutCategory(panel, panel.name)
+        Settings.RegisterAddOnCategory(category)
+    elseif InterfaceOptions_AddCategory then
+        InterfaceOptions_AddCategory(panel)
+    end
 end
 
 function Config:ToggleFrame()

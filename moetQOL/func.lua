@@ -32,7 +32,11 @@ end
 
 --NOTE: this only sells 12 items at a time, rest will say object is busy.
 local function SellGreyItems()
-    C_MerchantFrame.SellAllJunkItems()
+    if C_MerchantFrame and C_MerchantFrame.SellAllJunkItems then
+        C_MerchantFrame.SellAllJunkItems()
+    elseif _G.SellAllJunkItems then
+        _G.SellAllJunkItems()
+    end
 end
 
 local function GetFps()
@@ -77,10 +81,10 @@ local function InfoStringTooltip(self)
     UpdateAddOnMemoryUsage()
     GameTooltip:AddLine("Top 50 AddOns", color.r, color.g, color.b)
     GameTooltip:AddLine(" ")
-    for i=1, C_AddOns.GetNumAddOns(), 1 do
+    for i=1, ns.GetNumAddOns(), 1 do
         if GetAddOnMemoryUsage(i) > 0  then
             local memory = GetAddOnMemoryUsage(i)
-            entry = {name = C_AddOns.GetAddOnInfo(i), memory = memory}
+            entry = {name = ns.GetAddOnInfo(i), memory = memory}
             table.insert(addons, entry)
             total = total + memory
         end
@@ -110,6 +114,7 @@ local function IsPlayerRanged()
         ["EVOKER"] = true,
     }
 
+    if not GetSpecialization or not GetSpecializationInfo then return false end
     local currentSpec = GetSpecialization()
     local _, CLASS = UnitClass("player")
     local currentSpecName = currentSpec and select(2, GetSpecializationInfo(currentSpec)) or "None"
@@ -198,6 +203,7 @@ local function HandleQuests(self, e, ...)
 end
 
 local function HandleGossip(self, e, ...)
+    if not C_GossipInfo or not C_GossipInfo.GetOptions then return end
     if IsShiftKeyDown() then return end
 
     local numAvailableQuests = 0
@@ -400,7 +406,7 @@ end
 local function ChatFrame_OnLeave(self)
     if not self.ShouldHide then return end
     
-    local focusRegion = GetMouseFoci()
+    local focusRegion = ns.GetMouseFocusRegions()
     if focusRegion then 
         local f = focusRegion[0]
         if f then
@@ -504,8 +510,11 @@ end
 ---------------------------------------------------
 function Func:HidePortraitNumbers()
     -- PlayerHitIndicator.Show = function() end
-    PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HitIndicator:Hide();
-    PetHitIndicator.Show = function() end
+    local hitIndicator = PlayerFrame and PlayerFrame.PlayerFrameContent
+        and PlayerFrame.PlayerFrameContent.PlayerFrameContentMain
+        and PlayerFrame.PlayerFrameContent.PlayerFrameContentMain.HitIndicator
+    if hitIndicator then hitIndicator:Hide() end
+    if PetHitIndicator then PetHitIndicator.Show = function() end end
     CombatFeedback_OnCombatEvent = function() end
 end
 
@@ -570,6 +579,7 @@ function Func:CreateSellButton()
     local auto = option == "auto"
     local manual = option == "manual"
 
+    if not MerchantFrame then return end
     local merchantButton = CreateFrame("Button", "moetQOL_SellButton", MerchantFrame, "LFGListMagicButtonTemplate")
     merchantButton:SetPoint("BOTTOMLEFT", 87, 4)
     merchantButton:SetText("Sell Greys")
@@ -688,11 +698,14 @@ function Func:CreateInfoStrings()
 end
 
 function Func:HideTalkingHead()
+    if not TalkingHeadFrame or not TalkingHeadFrame.PlayCurrent then return end
     hooksecurefunc(TalkingHeadFrame, "PlayCurrent", function(self)
         self:Hide()
         local option = moetQOLDB["talkinghead"].custom
         local should_mute = option == "muteaudio"
-        if should_mute then C_TalkingHead.IgnoreCurrentTalkingHead() end
+        if should_mute and C_TalkingHead and C_TalkingHead.IgnoreCurrentTalkingHead then
+            C_TalkingHead.IgnoreCurrentTalkingHead()
+        end
     end)
 end
 
@@ -733,7 +746,7 @@ function Func:AutoRepair()
             if canRepair and repairAllCost <= GetMoney() then
                 RepairAllItems(false) -- use player funds
                 DEFAULT_CHAT_FRAME:AddMessage(
-                    "Your items have been repaired for "..C_CurrencyInfo.GetCoinText(repairAllCost,", ")..".", 255, 255, 0
+                    "Your items have been repaired for "..ns.GetCoinText(repairAllCost,", ")..".", 255, 255, 0
                 )
             end
         end
@@ -744,6 +757,7 @@ end
 -- reworked
 -- original: https://www.curseforge.com/wow/addons/ridc
 function Func:RealIDCounter()
+    if not FriendsTabHeader or not FriendsTabHeader.TabSystem or not BNGetNumFriends then return end
     local f = CreateFrame("FRAME", "moetQOL_RealIDCounter", FriendsTabHeader.TabSystem)
     f:SetPoint("TOPLEFT", FriendsTabHeader.TabSystem, "TOPRIGHT", 5, -5)
     f:SetWidth(50)
@@ -817,6 +831,11 @@ function Func:DynamicSpellQueue()
 end
 
 function Func:AutoQuest()
+    if not C_GossipInfo or not C_GossipInfo.GetOptions or not C_QuestLog then
+        ns.Core:PrintMessage("Auto quest is not supported by this game client.")
+        return
+    end
+
     --if not VerifyCustomOption("autoquest") then return end
     local option = moetQOLDB["autoquest"].custom
     local noforce = option == "noforce"
@@ -909,6 +928,13 @@ function Func:HideChatInCombat()
 end
 
 function Func:QuestItemBind()
+    if not C_QuestLog or not C_QuestLog.GetQuestIDForLogIndex
+        or not C_QuestLog.GetDistanceSqToQuest or not QuestObjectiveItemButtonMixin
+        or not C_Item or not C_Item.GetItemInfo then
+        ns.Core:PrintMessage("Quest item bindings are not supported by this game client.")
+        return
+    end
+
     local buttonFrame = CreateFrame("FRAME", "moetQOL_QuestItemButton")
     buttonFrame:Hide()
     buttonFrame.lastItem = ""
@@ -985,6 +1011,12 @@ function Func:QuestItemBind()
 end
 
 function Func:DisableMinimapTracking()
+    if not C_Minimap or not C_Minimap.GetNumTrackingTypes
+        or not C_Minimap.GetTrackingInfo or not C_Minimap.SetTracking then
+        ns.Core:PrintMessage("Minimap tracking controls are not supported by this game client.")
+        return
+    end
+
     local option = moetQOLDB["minimaptracking"].custom
     if option == "all" then
         RunOnLogin(function()
@@ -1008,10 +1040,16 @@ function Func:DisableMinimapTracking()
 end
 
 function Func:AddSpellIdTooltipPostHooks()
+    if not TooltipDataProcessor or not Enum or not Enum.TooltipDataType
+        or not TooltipDataProcessor.AddTooltipPostCall then
+        ns.Core:PrintMessage("Spell ID tooltips are not supported by this game client.")
+        return
+    end
+
     local function TooltipAddSpellID(self, spellId)
         if not spellId then return end
 
-        if issecretvalue and issecretvalue(spellId) then
+        if ns.IsSecretValue(spellId) then
             return
         end
 

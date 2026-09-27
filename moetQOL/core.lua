@@ -2,7 +2,7 @@
 
 local _, ns	= ...
 ns.Core	= {} 
-ns.ADDON_VERSION = C_AddOns.GetAddOnMetadata("moetQOL", "Version")
+ns.ADDON_VERSION = ns.GetAddOnMetadata("moetQOL", "Version") or "unknown"
 ns.SOURCE = "https://github.com/kanding/moetQOL/"
 
 local Core = ns.Core
@@ -65,16 +65,22 @@ function Core:MapPinError(X, Y)
 end
 
 function Core:CreateMapPin(X, Y)
+    if not C_Map or not C_Map.GetBestMapForUnit or not C_Map.CanSetUserWaypointOnMap or not C_Map.SetUserWaypoint then
+        Core:PrintMessage("Map pins are not supported by this game client.")
+        return false
+    end
+
     local mapID = C_Map.GetBestMapForUnit("player")
-    if not C_Map.CanSetUserWaypointOnMap(mapID) then
+    if not mapID or not C_Map.CanSetUserWaypointOnMap(mapID) then
         print(string.format("|c%smq|r: Cannot create pins on this mapID.", ns.REDCOLOR))
-        return
+        return false
     end
 
     C_Map.SetUserWaypoint({uiMapID=mapID, position={x=X, y=Y}})
     DEFAULT_CHAT_FRAME:AddMessage(
         string.format("|c%smq|r: Created map pin at (%s, %s).", ns.REDCOLOR, X, Y), 255, 255, 0
     )
+    return true
 end
 
 function Core:GetKeyName(table, value)
