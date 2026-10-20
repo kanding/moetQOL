@@ -30,15 +30,6 @@ local function IsInArray(array, s)
     return false
 end
 
---NOTE: this only sells 12 items at a time, rest will say object is busy.
-local function SellGreyItems()
-    if C_MerchantFrame and C_MerchantFrame.SellAllJunkItems then
-        C_MerchantFrame.SellAllJunkItems()
-    elseif _G.SellAllJunkItems then
-        _G.SellAllJunkItems()
-    end
-end
-
 local function GetFps()
     return floor(GetFramerate()) .. "fps"
 end
@@ -574,27 +565,19 @@ function Func:EnableEasyDelete()
 end
 
 function Func:CreateSellButton()
-    --if not VerifyCustomOption("sell") then return end
-    local option = moetQOLDB["sell"].custom
-    local auto = option == "auto"
-    local manual = option == "manual"
+    if not C_MerchantFrame or not C_MerchantFrame.SellAllJunkItems then
+        ns.Core:PrintMessage("Selling junk items is not supported by this game client.")
+        return
+    end
 
-    if not MerchantFrame then return end
-    local merchantButton = CreateFrame("Button", "moetQOL_SellButton", MerchantFrame, "LFGListMagicButtonTemplate")
-    merchantButton:SetPoint("BOTTOMLEFT", 87, 4)
-    merchantButton:SetText("Sell Greys")
-    merchantButton:SetScript("OnClick", SellGreyItems)
-
-    MerchantFrame:HookScript("OnShow", function()
-        if auto then SellGreyItems() end
-
-        if MerchantExtraCurrencyBg:IsVisible() then
-            MerchantMoneyFrame:Hide()
-            MerchantExtraCurrencyBg:Hide()
-        else
-            MerchantMoneyFrame:Show()
-        end
+    local f = CreateFrame("FRAME")
+    f:RegisterEvent("MERCHANT_SHOW")
+    f:SetScript("OnEvent", function()
+        if C_MerchantFrame.IsSellAllJunkEnabled and not C_MerchantFrame.IsSellAllJunkEnabled() then return end
+        if C_MerchantFrame.GetNumJunkItems and C_MerchantFrame.GetNumJunkItems() == 0 then return end
+        C_MerchantFrame.SellAllJunkItems()
     end)
+    f:Hide()
 end
 
 function Func:HideChatButtons()

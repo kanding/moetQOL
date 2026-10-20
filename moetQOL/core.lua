@@ -167,7 +167,7 @@ Core.MQdefault = {
     ["chatbuttons"] = {state = false, desc="Hide voice buttons on your chat", func=Func.HideChatButtons, category=Core.FunctionCategory.UI},
     ["skipmovies"] = {state = false, desc="Auto skip all cinematics and cutscenes immediately", func=Func.AutoCancelCutscenes, category=Core.FunctionCategory.Misc},
     ["infostring"] = {state = false, desc="Show addon usage, MS and FPS beneath minimap. Additionally you can click the frame to clear garbage memory. The frame is moveable with ALT+LClick", func=Func.CreateInfoStrings, category=Core.FunctionCategory.UI},
-    ["sell"] = {state = false, desc="Add a button on merchants to sell grey items. Alternatively select auto to automatically sell up to 12 grey items when speaking with a vendor", func=Func.CreateSellButton, custom={"manual", "auto"}, category=Core.FunctionCategory.Misc},
+    ["autosell"] = {state = false, desc="Automatically sell grey items when visiting a vendor", func=Func.CreateSellButton, category=Core.FunctionCategory.Misc},
     ["talkinghead"] = {state = false, desc="Hide talking head frames", func=Func.HideTalkingHead, custom={"audio", "muteaudio"}, category=Core.FunctionCategory.UI},
     ["autorepair"] = {state = false, desc="Automatically repair items when possible using player funds", func=Func.AutoRepair, category=Core.FunctionCategory.Misc},
     ["realidcounter"] = {state = false, desc="Add a counter that shows current out of the maximum allowed friends to your social window", func=Func.RealIDCounter, category=Core.FunctionCategory.UI},
