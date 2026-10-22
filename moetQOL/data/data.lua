@@ -401,3 +401,13 @@ ns.Data.SHADOWLANDS_GOSSIP = {
     ["Overseer Kah-Sher"] = {choice=1},
     ["Pathscribe Roh-Avonavi"] = {choice=1},
 }
+
+ns.Data.FOREVER_GOSSIP = {
+    MinLevel = 1,
+    MaxLevel = 60,
+
+    --General
+    ["Halaan Hawk-Eye"] = {choice=1},
+    ["Illaya Amberwind"] = {choice=1},
+    ["Wardrobe"] = {choice=1},
+}
